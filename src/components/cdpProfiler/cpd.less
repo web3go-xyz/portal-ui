@@ -1,0 +1,251 @@
+.cdp-page {
+  padding-left: 100px;
+  padding-right: 100px;
+
+  .clear {
+    clear: both;
+  }
+
+  .cdp-search-filter-input .el-input__inner {
+    font-size: 16px;
+    height: 60px !important;
+    border-radius: 6px !important;
+    border: 1px solid #17c684 !important;
+    padding-left: 70px;
+  }
+
+  .cdp-search-filter-input .el-input__icon {
+    font-size: 20px;
+    line-height: 60px;
+    margin-left: 26px;
+  }
+
+  .el-pagination.is-background .btn-next,
+  .el-pagination.is-background .btn-prev,
+  .el-pagination.is-background .el-pager li {
+    background-color: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 4px;
+  }
+
+  .el-pagination.is-background .el-pager li:not(.disabled).active {
+    background: #17c684;
+    color: #fff;
+  }
+
+  .el-input__inner {
+    background-color: #111111;
+    border: 1px solid rgba(107, 32, 32, 0.2) !important;
+    border-radius: 4px;
+  }
+
+
+  .content {
+    background: #111111;
+    padding-top: 1px;
+    position: relative;
+  }
+
+  .bg {
+    position: absolute;
+    background: url(./../../assets/images/cdp-bg.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    width: 120%;
+    height: 300px;
+    left: -10vw;
+    top: 40px;
+  }
+
+  .search-filter {
+    position: relative;
+    color: #17c684;
+    text-align: left;
+    margin-top: 64px;
+  }
+
+  .search-filter .title1 {
+    font-size: 48px;
+    font-weight: bold;
+  }
+
+  .search-filter .title2 {
+    font-size: 36px;
+    margin-bottom: 24px;
+  }
+
+
+  .cdp-list {}
+
+  .cdp-list-header {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 10px;
+  }
+
+  .lp-row {
+    height: 80px;
+    line-height: 80px;
+    background: #181818;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+
+  .lp-row:hover {
+    background: #212121;
+  }
+
+  .account-logo {
+    height: 40px;
+  }
+
+  .accountId {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+  }
+
+  .debt,
+  .collateral {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .ratio,
+  .status {
+    font-size: 14px;
+  }
+
+  .view {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .view:hover {
+    color: #17c684;
+  }
+
+  .Safe {
+    color: #17c684;
+  }
+
+  .Warning {
+    color: #ffad00;
+  }
+
+  .Danger {
+    color: #ea3943;
+  }
+
+  .Safe-bg {
+    background: #17c684;
+  }
+
+  .Warning-bg {
+    background: #ffad00;
+  }
+
+  .Danger-bg {
+    background: #ea3943;
+  }
+
+
+  .cdp-list-pagination {
+    text-align: right;
+    padding-bottom: 30px;
+  }
+}
+
+body.white-theme .cdp-page {
+  .content {
+    background: white;
+  }
+
+  .cdp-search-filter-input .el-input__inner {
+    border: 1px solid transparent !important;
+  }
+
+  .el-input__inner {
+    background-color: white;
+  }
+
+  .cdp-list-header {
+    color: rgba(41, 40, 40, 0.6);
+  }
+
+  .lp-row {
+    height: 50px;
+    line-height: 50px;
+    background: white;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+
+  .lp-row:hover {
+    box-shadow: 0px 18px 34px 0px rgba(41, 40, 40, 0.1);
+    z-index: 2;
+    position: relative;
+    transition: all .2s;
+  }
+
+  .accountId {
+    color: rgba(41, 40, 40, 0.8);
+  }
+
+  .debt,
+  .collateral {
+    color: rgba(41, 40, 40, 0.8);
+  }
+
+  .view {
+    color: rgba(56, 203, 152, 1);
+  }
+
+  .view:hover {
+    opacity: .7;
+  }
+
+  .el-pagination.is-background .btn-next,
+  .el-pagination.is-background .btn-prev,
+  .el-pagination.is-background .el-pager li {
+    background-color: white;
+    border: 1px solid rgba(41, 40, 40, 0.3);
+    border-radius: 4px;
+  }
+
+  .el-pagination.is-background .el-pager li:not(.disabled).active {
+    background: #17c684;
+    border: 1px solid #17c684;
+    color: #fff;
+  }
+
+  .el-pagination.is-background .btn-prev,
+  .el-pagination.is-background .btn-next,
+  .el-pagination.is-background .el-pager li {
+    background: transparent !important;
+    border-radius: 4px;
+    border: 1px solid rgba(41, 40, 40, 0.3) !important;
+  }
+
+  .el-pagination.is-background .el-pager li:hover {
+    border-color: #17c684 !important;
+  }
+
+  .el-pagination.is-background .el-pager li.active {
+    background: #17c684 !important;
+    border: 0 !important;
+  }
+
+  .el-pagination .el-select .el-input .el-input__inner {
+    background: transparent !important;
+  }
+
+  .el-pagination__jump .el-input__inner {
+    background: transparent !important;
+  }
+}
