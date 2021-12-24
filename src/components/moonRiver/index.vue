@@ -441,7 +441,6 @@
               <div class="rank-icon">
                 <span class="text">{{ getCollectorRank(scope.row) }}</span>
                 <el-popover
-                  :disabled="getCollectorRank(scope.row) <= 10"
                   class="icon-wrap"
                   placement="bottom"
                   trigger="click"
@@ -524,7 +523,9 @@
                   </div>
                   <img
                     class="tooltip-icon safe"
-                    v-if="getCollectorRank(scope.row) <= 10"
+                    v-if="
+                      getCollectorRank(scope.row) < parseInt(maxCollector * 0.9)
+                    "
                     slot="reference"
                     src="@/assets/images/stake-safe.png"
                     alt=""
