@@ -19,12 +19,68 @@
       </div>
       <div v-else class="wallet-wrap">
         <img class="icon" src="@/assets/images/wallet-login-icon.png" alt="" />
-        <span class="number">
+        <div class="number">
           <el-tooltip :content="linkAccount.address" placement="top">
             <span> {{ shotFilter(linkAccount.address) }}</span>
           </el-tooltip>
-          （{{ this.freeBalance }} MOVR）</span
-        >
+          （{{ this.freeBalance }} MOVR）
+        </div>
+
+        <div>
+          <el-popover placement="bottom" width="400" trigger="click">
+            <div class="popover-subscribe">
+              <div class="subscribe-address">
+                <div class="title">Wallet address:</div>
+                <div class="content">
+                  {{ linkAccountSubscribeData.subscribe_address }}
+                </div>
+              </div>
+              <div
+                class="subscribe-email"
+                v-if="linkAccountSubscribeData.subscribe_email"
+              >
+                <div class="title">Email account:</div>
+                <div class="content">
+                  {{ linkAccountSubscribeData.subscribe_email }}
+                  <div
+                    class="subscribe-email-clear"
+                    @click="linkAccountSubscribeData.subscribe_email = ''"
+                  >
+                    <i class="el-icon-remove-outline"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="watched-address"
+                v-if="
+                  linkAccountSubscribeData.watched_address &&
+                  linkAccountSubscribeData.watched_address.length > 0
+                "
+              >
+                <div class="title">Watched Addresses:</div>
+                <div
+                  class="content watched-address-item"
+                  v-for="wa in linkAccountSubscribeData.watched_address"
+                  :key="wa"
+                >
+                  {{ wa }}
+                  <div
+                    class="watched-address-remove"
+                    @click="unsubscribe({ id: wa })"
+                  >
+                    <i class="el-icon-remove-outline"></i>
+                  </div>
+                </div>
+
+                <div class="clear-all-subscribe">
+                  <a @click="clearSubscribe()">Clear All</a>
+                </div>
+              </div>
+            </div>
+            <i slot="reference" class="el-icon-bell"></i>
+          </el-popover>
+        </div>
       </div>
     </div>
     <div class="big-bg">
@@ -131,188 +187,226 @@
           </el-table-column>
           <el-table-column>
             <template slot-scope="scope">
-              <el-popover
-                popper-class="simulate-popover"
-                @show="showDetail(scope.$index, scope.row)"
-                placement="left"
-                trigger="click"
-              >
-                <div class="simulate-popover-content">
-                  <div
-                    class="detail-chart"
-                    :ref="'detailChart' + scope.row.id"
-                  ></div>
-                  <div class="title statistic-title">
-                    <span>RPM Statistic</span>
-                    <el-tooltip
-                      placement="top"
-                      trigger="hover"
-                      content='RPM, Rewards Per MOVR. To simplify the calculation, we define RPM as "rewards per MOVR when nominating to the specific collator"'
-                    >
-                      <i class="el-icon-warning-outline"></i>
-                    </el-tooltip>
-                  </div>
-                  <div class="statistic">
-                    <div class="item">
-                      <span class="label">Min:</span
-                      ><span>{{ scope.row.mimRPM | roundNumber(7) }} MOVR</span>
-                    </div>
-                    <div class="item">
-                      <span class="label">Max:</span
-                      ><span>{{ scope.row.maxRPM | roundNumber(7) }} MOVR</span>
-                    </div>
-                    <div class="item">
-                      <span class="label">Average:</span
-                      ><span
-                        >{{ scope.row.averageRPM | roundNumber(7) }} MOVR</span
-                      >
-                    </div>
-                    <div class="item">
-                      <span class="label"> RPM Valatility Score: </span>
-                      <span class="yellow">{{
-                        scope.row.standardDeviation | roundNumber(8)
-                      }}</span>
+              <div class="div-operation">
+                <el-popover
+                  popper-class="simulate-popover"
+                  @show="showDetail(scope.$index, scope.row)"
+                  placement="left"
+                  trigger="click"
+                >
+                  <div class="simulate-popover-content">
+                    <div
+                      class="detail-chart"
+                      :ref="'detailChart' + scope.row.id"
+                    ></div>
+                    <div class="title statistic-title">
+                      <span>RPM Statistic</span>
                       <el-tooltip
                         placement="top"
                         trigger="hover"
-                        content="The volatility of rewards. We use standard deviation to indicate the volatility of rewards. The less the volatility is, the rewards of nominating this collator are relatively stable(according to the latest 10 rounds)"
+                        content='RPM, Rewards Per MOVR. To simplify the calculation, we define RPM as "rewards per MOVR when nominating to the specific collator"'
                       >
                         <i class="el-icon-warning-outline"></i>
                       </el-tooltip>
                     </div>
-                  </div>
-                  <div class="title">Estimate Reward</div>
-                  <div class="input-wrap">
-                    <span class="label">Stake</span>
-                    <el-input class="input" v-model="inputValue"></el-input>
-                    <span class="unit">MOVR</span>
-                    <el-tooltip
-                      class="tip"
-                      placement="top"
-                      trigger="hover"
-                      content="Input the quantity of MOVR to estimate the rewards in real-time. Estimated reward = Quantity * RPM, RPM is calculated according to the standard deviation"
-                    >
-                      <i class="el-icon-warning-outline"></i>
-                    </el-tooltip>
-                    <i class="el-icon-right"></i>
-                    <span class="yellow">{{
-                      getBoundaryReward(scope.row)
-                    }}</span>
-                    <span class="unit">MOVR</span>
-                  </div>
-                  <div class="title">
-                    <span>Competitor </span>
-                    <el-tooltip
-                      placement="top"
-                      trigger="hover"
-                      content="The real-time data of MOVR staked by the nominators and the corresponding ranking are listed here"
-                    >
-                      <i class="el-icon-warning-outline"></i>
-                    </el-tooltip>
-                  </div>
-                  <div class="competitor-wrap">
-                    <div class="item">
-                      <div class="item-top">
-                        <span class="title">Current Rank:</span>
-                        <span class="number yellow">{{
-                          getSimulateRank(scope.row)
+                    <div class="statistic">
+                      <div class="item">
+                        <span class="label">Min:</span
+                        ><span
+                          >{{ scope.row.mimRPM | roundNumber(7) }} MOVR</span
+                        >
+                      </div>
+                      <div class="item">
+                        <span class="label">Max:</span
+                        ><span
+                          >{{ scope.row.maxRPM | roundNumber(7) }} MOVR</span
+                        >
+                      </div>
+                      <div class="item">
+                        <span class="label">Average:</span
+                        ><span
+                          >{{
+                            scope.row.averageRPM | roundNumber(7)
+                          }}
+                          MOVR</span
+                        >
+                      </div>
+                      <div class="item">
+                        <span class="label"> RPM Valatility Score: </span>
+                        <span class="yellow">{{
+                          scope.row.standardDeviation | roundNumber(8)
                         }}</span>
-                      </div>
-                      <div class="progress-wrap">
-                        <el-progress
-                          :text-inside="true"
-                          :stroke-width="16"
-                          :percentage="getSumulatePercent(scope.row)"
-                        ></el-progress>
+                        <el-tooltip
+                          placement="top"
+                          trigger="hover"
+                          content="The volatility of rewards. We use standard deviation to indicate the volatility of rewards. The less the volatility is, the rewards of nominating this collator are relatively stable(according to the latest 10 rounds)"
+                        >
+                          <i class="el-icon-warning-outline"></i>
+                        </el-tooltip>
                       </div>
                     </div>
-                    <div class="item">
-                      <div class="item-top">
-                        <span class="title"
-                          >Rank {{ maxNominator }} Stake:</span
-                        >
-                        <span class="number"
-                          >{{
-                            getSingleNominatorStakeByRank(
-                              scope.row,
-                              parseInt(maxNominator)
-                            )
-                          }}
-                          MOVR</span
-                        >
-                      </div>
-                      <div class="progress-wrap">
-                        <el-progress
-                          :text-inside="true"
-                          :stroke-width="16"
-                          :percentage="
-                            getSumulatePercentByRank(scope.row, maxNominator)
-                          "
-                        ></el-progress>
-                      </div>
+                    <div class="title">Estimate Reward</div>
+                    <div class="input-wrap">
+                      <span class="label">Stake</span>
+                      <el-input class="input" v-model="inputValue"></el-input>
+                      <span class="unit">MOVR</span>
+                      <el-tooltip
+                        class="tip"
+                        placement="top"
+                        trigger="hover"
+                        content="Input the quantity of MOVR to estimate the rewards in real-time. Estimated reward = Quantity * RPM, RPM is calculated according to the standard deviation"
+                      >
+                        <i class="el-icon-warning-outline"></i>
+                      </el-tooltip>
+                      <i class="el-icon-right"></i>
+                      <span class="yellow">{{
+                        getBoundaryReward(scope.row)
+                      }}</span>
+                      <span class="unit">MOVR</span>
                     </div>
-                    <div class="item">
-                      <div class="item-top">
-                        <span class="title"
-                          >Rank {{ parseInt(maxNominator * 0.9) }} Stake:</span
-                        >
-                        <span class="number"
-                          >{{
-                            getSingleNominatorStakeByRank(
-                              scope.row,
-                              parseInt(maxNominator * 0.9)
-                            )
-                          }}
-                          MOVR</span
-                        >
-                      </div>
-                      <div class="progress-wrap">
-                        <el-progress
-                          :text-inside="true"
-                          :stroke-width="16"
-                          :percentage="
-                            getSumulatePercentByRank(
-                              scope.row,
-                              parseInt(maxNominator * 0.9)
-                            )
-                          "
-                        ></el-progress>
-                      </div>
+                    <div class="title">
+                      <span>Competitor </span>
+                      <el-tooltip
+                        placement="top"
+                        trigger="hover"
+                        content="The real-time data of MOVR staked by the nominators and the corresponding ranking are listed here"
+                      >
+                        <i class="el-icon-warning-outline"></i>
+                      </el-tooltip>
                     </div>
-                    <div class="item">
-                      <div class="item-top">
-                        <span class="title"
-                          >Rank {{ parseInt(maxNominator * 0.5) }} Stake:</span
-                        >
-                        <span class="number"
-                          >{{
-                            getSingleNominatorStakeByRank(
-                              scope.row,
-                              parseInt(maxNominator * 0.5)
-                            )
-                          }}
-                          MOVR</span
-                        >
+                    <div class="competitor-wrap">
+                      <div class="item">
+                        <div class="item-top">
+                          <span class="title">Current Rank:</span>
+                          <span class="number yellow">{{
+                            getSimulateRank(scope.row)
+                          }}</span>
+                        </div>
+                        <div class="progress-wrap">
+                          <el-progress
+                            :text-inside="true"
+                            :stroke-width="16"
+                            :percentage="getSumulatePercent(scope.row)"
+                          ></el-progress>
+                        </div>
                       </div>
-                      <div class="progress-wrap">
-                        <el-progress
-                          :text-inside="true"
-                          :stroke-width="16"
-                          :percentage="
-                            getSumulatePercentByRank(
-                              scope.row,
-                              parseInt(maxNominator * 0.5)
-                            )
-                          "
-                        ></el-progress>
+                      <div class="item">
+                        <div class="item-top">
+                          <span class="title"
+                            >Rank {{ maxNominator }} Stake:</span
+                          >
+                          <span class="number"
+                            >{{
+                              getSingleNominatorStakeByRank(
+                                scope.row,
+                                parseInt(maxNominator)
+                              )
+                            }}
+                            MOVR</span
+                          >
+                        </div>
+                        <div class="progress-wrap">
+                          <el-progress
+                            :text-inside="true"
+                            :stroke-width="16"
+                            :percentage="
+                              getSumulatePercentByRank(scope.row, maxNominator)
+                            "
+                          ></el-progress>
+                        </div>
+                      </div>
+                      <div class="item">
+                        <div class="item-top">
+                          <span class="title"
+                            >Rank
+                            {{ parseInt(maxNominator * 0.9) }} Stake:</span
+                          >
+                          <span class="number"
+                            >{{
+                              getSingleNominatorStakeByRank(
+                                scope.row,
+                                parseInt(maxNominator * 0.9)
+                              )
+                            }}
+                            MOVR</span
+                          >
+                        </div>
+                        <div class="progress-wrap">
+                          <el-progress
+                            :text-inside="true"
+                            :stroke-width="16"
+                            :percentage="
+                              getSumulatePercentByRank(
+                                scope.row,
+                                parseInt(maxNominator * 0.9)
+                              )
+                            "
+                          ></el-progress>
+                        </div>
+                      </div>
+                      <div class="item">
+                        <div class="item-top">
+                          <span class="title"
+                            >Rank
+                            {{ parseInt(maxNominator * 0.5) }} Stake:</span
+                          >
+                          <span class="number"
+                            >{{
+                              getSingleNominatorStakeByRank(
+                                scope.row,
+                                parseInt(maxNominator * 0.5)
+                              )
+                            }}
+                            MOVR</span
+                          >
+                        </div>
+                        <div class="progress-wrap">
+                          <el-progress
+                            :text-inside="true"
+                            :stroke-width="16"
+                            :percentage="
+                              getSumulatePercentByRank(
+                                scope.row,
+                                parseInt(maxNominator * 0.5)
+                              )
+                            "
+                          ></el-progress>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <span slot="reference" class="table-operation-span"
-                  >Simulate</span
-                >
-              </el-popover>
+                  <span slot="reference" class="table-operation-span"
+                    ><i class="el-icon-data-line"></i>Simulate</span
+                  >
+                </el-popover>
+                <el-tooltip effect="light" placement="bottom">
+                  <div slot="content">
+                    Add current collator into watch list with specified
+                    email,<br />
+                    you'll recieve notification email when the rank reach the
+                    end of max collators.<br />current thresold is the last 10%.
+                  </div>
+                  <div
+                    v-show="showSubscribe(scope.row)"
+                    class="subscribe"
+                    @click="subscribe(scope.row)"
+                  >
+                    <i class="el-icon-circle-plus-outline"></i>
+                  </div>
+                </el-tooltip>
+                <el-tooltip effect="light" placement="bottom">
+                  <div slot="content">
+                    remove current collator from watch list.
+                  </div>
+                  <div
+                    v-show="alreadySubscribed(scope.row)"
+                    class="subscribe-already"
+                    @click="unsubscribe(scope.row)"
+                  >
+                    <i class="el-icon-remove-outline"></i>
+                  </div>
+                </el-tooltip>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -652,6 +746,12 @@ export default {
 
       charts: {},
       refreshDataInterval: 15000,
+
+      linkAccountSubscribeData: {
+        subscribe_address: "",
+        watched_address: [],
+        subscribe_email: "",
+      },
     };
   },
   async created() {
@@ -698,6 +798,153 @@ export default {
     },
   },
   methods: {
+    clearSubscribe() {
+      let self = this;
+      moonriverService
+        .unsubscribe({
+          subscribe_address: self.linkAccountSubscribeData.subscribe_address,
+          cancel_watched_address: self.linkAccountSubscribeData.watched_address,
+        })
+        .then((resp) => {
+          self.linkAccountSubscribeData.watched_address.splice(
+            0,
+            self.linkAccountSubscribeData.watched_address.length
+          );
+
+          self.$notify({
+            message: "Clear Success",
+            position: "bottom-left",
+            showClose: false,
+            duration: 2000,
+            type: "success",
+          });
+        });
+    },
+    showSubscribe(row) {
+      let self = this;
+      if (!this.linkAccount || !this.linkAccount.address) {
+        return false;
+      }
+      let collatorAddress = row.id;
+      if (
+        self.linkAccountSubscribeData &&
+        self.linkAccountSubscribeData.watched_address
+      ) {
+        let exist = self.linkAccountSubscribeData.watched_address.find(
+          (item) => {
+            return item.toLowerCase() === collatorAddress.toLowerCase();
+          }
+        );
+        if (exist) {
+          return false;
+        }
+      }
+      return true;
+    },
+    alreadySubscribed(row) {
+      let self = this;
+      if (!this.linkAccount || !this.linkAccount.address) {
+        return false;
+      }
+      let collatorAddress = row.id;
+      if (
+        self.linkAccountSubscribeData &&
+        self.linkAccountSubscribeData.watched_address
+      ) {
+        let exist = self.linkAccountSubscribeData.watched_address.find(
+          (item) => {
+            return item.toLowerCase() === collatorAddress.toLowerCase();
+          }
+        );
+        if (exist) {
+          return true;
+        }
+      }
+      return false;
+    },
+    configDialog_subscribe_email(row) {
+      let self = this;
+      self
+        .$prompt(
+          "please specify an email address to receive notifications",
+          "",
+          {
+            confirmButtonText: "Confirm",
+            cancelButtonText: "Cancel",
+            inputPattern:
+              /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+            inputErrorMessage: "email format incorrect",
+          }
+        )
+        .then(({ value }) => {
+          self.linkAccountSubscribeData.subscribe_email = value;
+          if (row && row.id) {
+            self.subscribe(row);
+          }
+        })
+        .catch(() => {});
+    },
+    subscribe(row) {
+      let self = this;
+      let collatorAddress = row.id;
+      console.log(collatorAddress);
+      if (!self.linkAccountSubscribeData.subscribe_email) {
+        self.configDialog_subscribe_email(row);
+        return;
+      }
+
+      let exist = self.linkAccountSubscribeData.watched_address.find((item) => {
+        return item.toLowerCase() === collatorAddress.toLowerCase();
+      });
+      if (!exist) {
+        moonriverService
+          .subscribe({
+            subscribe_address: self.linkAccountSubscribeData.subscribe_address,
+            new_watched_address: [collatorAddress],
+            subscribe_email: self.linkAccountSubscribeData.subscribe_email,
+          })
+          .then((resp) => {
+            self.linkAccountSubscribeData.watched_address.push(collatorAddress);
+
+            self.$notify({
+              message: "Subscribe Success",
+              position: "bottom-left",
+              showClose: false,
+              duration: 2000,
+              type: "success",
+            });
+          });
+      }
+    },
+    unsubscribe(row) {
+      let self = this;
+      let collatorAddress = row.id;
+      console.log(collatorAddress);
+      let findIndex = self.linkAccountSubscribeData.watched_address.findIndex(
+        (item) => {
+          return item.toLowerCase() === collatorAddress.toLowerCase();
+        }
+      );
+      if (findIndex >= 0) {
+        moonriverService
+          .unsubscribe({
+            subscribe_address: self.linkAccountSubscribeData.subscribe_address,
+            cancel_watched_address: [collatorAddress],
+          })
+          .then((resp) => {
+            self.linkAccountSubscribeData.watched_address.splice(findIndex, 1);
+
+            self.$notify({
+              message: "Unsubscribe Success",
+              position: "bottom-left",
+              showClose: false,
+              duration: 2000,
+              type: "success",
+            });
+          });
+      }
+    },
+
     getLatestRPM(d) {
       if (d && d.length > 0) {
         return d[d.length - 1].RPM.toNumber();
@@ -1233,42 +1480,8 @@ export default {
       });
     },
     async handleLinkAccount() {
-      // this.linkLoading = true;
-      // // 指定远端接口
-      // const wsProvider = new WsProvider("wss://rpc.polkadot.io");
-      // // 创建接口
-      // const api = await ApiPromise.create({ provider: wsProvider });
-
-      // await web3Enable("Web3go");
-      // const allAccounts = await web3Accounts();
-      // if (allAccounts.length) {
-      //   this.linkAccount = allAccounts[0];
-      //   this.searchAccount = this.linkAccount.address;
-      //   const acct = await api.query.system.account(this.linkAccount.address);
-      //   this.freeBalance = acct.data.free.toString(10);
-      //   this.inputValue = this.freeBalance;
-      //   this.linkLoading = false;
-      //   if (this.tableData.length) {
-      //     this.getMyStackList();
-      //   }
-      // }
-
       // 引入web3
       this.linkLoading = true;
-      // var Web3 = require("web3");
-      // if (window.ethereum) {
-      //   this.provider = window.ethereum;
-
-      //   // 请求连接demo.
-      //   try {
-      //     await window.ethereum.enable();
-      //   } catch (error) {
-      //     console.error("User denied account access");
-      //   }
-      // }
-
-      // this.web3 = new Web3(this.provider);
-      // this.web3.provider = this.provider;
       const Web3 = require("web3"); //Load Web3 library
       //Create local Web3 instance - set Moonriver as provider
       this.web3 = new Web3(ethereum);
@@ -1325,6 +1538,29 @@ export default {
         this.linkAccount = {
           address: accs[0],
         };
+        let self = this;
+        moonriverService
+          .getMySubscribe({ subscribe_address: this.linkAccount.address })
+          .then((resp) => {
+            //debugger;
+            if (resp && resp.id) {
+              self.linkAccountSubscribeData.subscribe_address =
+                resp.subscribe_address;
+              self.linkAccountSubscribeData.subscribe_email =
+                resp.subscribe_email;
+              if (resp.watched_address) {
+                self.linkAccountSubscribeData.watched_address =
+                  resp.watched_address.split(",");
+              } else {
+                self.linkAccountSubscribeData.watched_address = [];
+              }
+            } else {
+              self.linkAccountSubscribeData.subscribe_address =
+                this.linkAccount.address;
+              self.linkAccountSubscribeData.subscribe_email = "";
+              self.linkAccountSubscribeData.watched_address = [];
+            }
+          });
         this.searchAccount = this.linkAccount.address;
         // 查询token余额
         this.web3.eth.getBalance(this.linkAccount.address).then((d) => {
@@ -1687,8 +1923,9 @@ export default {
   }
   .wallet-wrap {
     float: right;
-
     margin-right: 35px;
+    display: flex;
+    align-items: center;
     .icon {
       width: 24px;
       height: 24px;
@@ -1996,5 +2233,71 @@ export default {
 .simulate-popover {
   background: rgb(250, 250, 250) !important;
   box-shadow: rgba(0, 0, 0, 0.6) 0px 2px 20px 0px !important;
+}
+</style>
+<style lang="less" scoped>
+.div-operation {
+  display: flex;
+  .subscribe {
+    margin-left: 10px;
+    font-size: 20px;
+    color: #36f1a6;
+    cursor: pointer;
+  }
+  .subscribe-already {
+    margin-left: 10px;
+    font-size: 20px;
+    color: #e96868;
+    cursor: pointer;
+  }
+}
+
+.el-icon-bell {
+  color: #36f1a6;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.popover-subscribe {
+  padding: 10px 10px;
+  .title {
+    margin-top: 5px;
+    font-weight: bold;
+  }
+  .subscribe-address {
+  }
+  .subscribe-email {
+    .content {
+      display: flex;
+      padding: 5px 0px;
+    }
+    .subscribe-email-clear {
+      margin-left: 10px;
+      color: #e96868;
+      cursor: pointer;
+    }
+  }
+  .watched-address {
+    .content {
+      display: flex;
+      padding: 5px 0px;
+    }
+    .watched-address-item {
+      .watched-address-remove {
+        margin-left: 10px;
+        color: #e96868;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .clear-all-subscribe {
+    a {
+      text-align: center;
+      cursor: pointer;
+      color: #e96868;
+      text-decoration: underline;
+    }
+  }
 }
 </style>

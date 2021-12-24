@@ -1,4 +1,4 @@
-import request from "@/utils/request"; 
+import request from "@/utils/request";
 import utils from "@/utils/index";
 function formatUrl4Moonriver(url) {
     return utils.formatUrl(window.MOONRIVER_API || '/moonriver', url);
@@ -107,6 +107,33 @@ export function getCollatorActionHistory(data) {
         data
     })
 }
+
+
+//获取订阅信息
+export function getMySubscribe(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-monitor/getMySubscribe'),
+        method: 'post',
+        data
+    })
+}
+//从订阅中移除某些地址
+export function unsubscribe(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-monitor/unsubscribe'),
+        method: 'post',
+        data
+    })
+}
+//订阅某些地址,订阅后当该Collator地址处于节点排序的边缘（位置在靠后10%时），会收到提示消息。
+export function subscribe(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-monitor/subscribe'),
+        method: 'post',
+        data
+    })
+}
+
 export default {
     getLatestBlockNumber,
     getCurrentRoundInfo,
@@ -120,5 +147,8 @@ export default {
     getCollatorTotalReward,
     getNominatorReward,
     atStake,
-    getCollatorActionHistory
+    getCollatorActionHistory,
+    getMySubscribe,
+    unsubscribe,
+    subscribe
 };
