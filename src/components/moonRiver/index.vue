@@ -1867,6 +1867,7 @@ export default {
           selfStake: this.getSelfStake(row),
           totalStake: this.getTotalStake(row),
         },
+        params: { data: row },
       });
     },
     handleClick(e) {},

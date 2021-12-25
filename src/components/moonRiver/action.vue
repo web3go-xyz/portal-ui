@@ -40,17 +40,15 @@
           </div>
         </div>
       </div>
-      <el-table class="table" v-loading="loading" :data="tableData">
+      <el-table
+        class="table"
+        v-loading="loading"
+        :data="tableData_CollatorActionHistory"
+      >
         <el-table-column prop="roundindex" label="RoundIndex">
         </el-table-column>
         <el-table-column prop="actiontype" label="Action"></el-table-column>
-        <!-- <el-table-column prop="name1" label="Extrinsics">
-          <template slot-scope="scope">
-            <el-tooltip :content="scope.row.name1" placement="top">
-              <span>{{ shotFilter(scope.row.name1) }}</span>
-            </el-tooltip>
-          </template>
-        </el-table-column> -->
+
         <el-table-column prop="blocknumber" label="Block"></el-table-column>
         <el-table-column label="Balance Change">
           <template slot-scope="scope">
@@ -74,7 +72,8 @@ export default {
   data() {
     return {
       loading: false,
-      tableData: [],
+      tableData_CollatorActionHistory: [],
+      totalCount_CollatorActionHistory: 0,
     };
   },
   created() {
@@ -89,12 +88,8 @@ export default {
         })
         .then((res) => {
           this.loading = false;
-          this.tableData = res;
-          // this.tableData = res.list.map((v) => ({
-          //   ...v,
-          //   name1: "0x000000000000006f6502b7f2bbac8c30a3f67e9a",
-          //   name2: "100.0MOVR",
-          // }));
+          this.tableData_CollatorActionHistory = res.list;
+          this.totalCount_CollatorActionHistory = res.totalCount;
         });
     },
     shotFilter(str) {
