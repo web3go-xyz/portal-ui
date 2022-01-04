@@ -10,10 +10,13 @@
         $moment(infoData.timestamp_created_at).format("YYYY-MM-DD")
       }}</span>
     </div>
-    <div class="nftNav">
-      <span class="active hover-item">Overview</span>
-      <span class="hover-item" @click="goToBreakdown">Breakdown</span>
+    <div class="nftNav-wrap">
+      <div class="nftNav">
+        <span class="active hover-item">Overview</span>
+        <span class="hover-item" @click="goToBreakdown">Breakdown</span>
+      </div>
     </div>
+
     <div class="info-wrap">
       <div class="row">
         <div class="item">
@@ -838,25 +841,29 @@ export default {
     color: #7f7e7e;
   }
 }
-.nftNav {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 32px;
-
-  span {
-    cursor: pointer;
-    width: 147px;
-    height: 32px;
-    line-height: 32px;
+.nftNav-wrap {
+  text-align: left;
+  .nftNav {
     background: #ebeff3;
-    font-size: 16px;
-    font-family: Rubik-Regular, Rubik;
-    font-weight: 400;
-    color: #7f7e7e;
-    &.active {
-      color: #38cb98;
-      font-weight: 500;
-      background: #fff;
+    border-radius: 4px;
+    margin-top: 32px;
+    display: inline-block;
+    padding: 5px;
+    span {
+      padding: 7px 39px;
+      cursor: pointer;
+      width: 147px;
+      height: 32px;
+      line-height: 32px;
+      border-radius: 4px;
+      font-size: 16px;
+
+      color: #7f7e7e;
+      &.active {
+        background: #ffffff;
+        color: #38cb98;
+        font-weight: 500;
+      }
     }
   }
 }

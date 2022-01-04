@@ -15,7 +15,10 @@
           <ul class="nav-list">
             <li
               class="nav-item"
-              :class="{ active: index === actNavInddex }"
+              :class="{
+                active:
+                  item.name === actNav.name || item.name == $route.meta.parent,
+              }"
               v-for="(item, index) in navLeft"
               :key="index"
               @click.stop="clickNav(item, index)"
@@ -51,8 +54,7 @@
                 />
               </div>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="toMyInfo"
+                <el-dropdown-item @click.native="toMyInfo"
                   >My Info</el-dropdown-item
                 >
                 <el-dropdown-item divided @click.native="logout">
@@ -81,9 +83,13 @@ import plusImg from "@/assets/images/home/plus.png";
 export default {
   name: "App",
   data() {
+    console.log("111", this.$route);
     return {
       userInfo: null,
-      actNavInddex: 0,
+      actNav: {
+        name: "Dashboard",
+        route: "HomePage",
+      },
       logoImg,
       plusImg,
       isShowComing: false,
@@ -98,7 +104,7 @@ export default {
         // },
         {
           name: "Profile",
-          isShowComing: true,
+          route: "ProfileHome",
         },
         {
           name: "My Analytics",
@@ -119,6 +125,11 @@ export default {
     };
   },
   created() {
+    // 菜单高亮
+    const find = this.navLeft.find((v) => v.name == this.$route.meta.parent);
+    if (find) {
+      this.actNav = find;
+    }
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       this.userInfo = JSON.parse(userInfo);
@@ -146,7 +157,7 @@ export default {
     },
     toMyInfo() {
       this.isShowComing = false;
-      this.$router.push({ name: 'UserInfo' });
+      this.$router.push({ name: "UserInfo" });
     },
     loadAddressLabelList() {
       let self = this;
@@ -170,7 +181,7 @@ export default {
     },
     clickNav(item, index) {
       const { isShowComing, route } = item;
-      this.actNavInddex = index;
+      this.actNav = item;
       this.isShowComing = isShowComing;
       if (route) {
         this.$router.push({
