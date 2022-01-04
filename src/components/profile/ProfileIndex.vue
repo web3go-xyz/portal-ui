@@ -6,14 +6,10 @@
         <div class="text-wrap">
           <div class="title">EaCAgm…x6f3Hq</div>
           <div class="copy-wrap">
-            <input
-              id="copy-input"
-              value="EaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f3Hq"
-            />
             <span>EaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f3Hq</span>
             <img
               title="copy"
-              @click="copy()"
+              @click="copy('EaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f3Hq')"
               src="@/assets/images/profile/copy.png"
               alt=""
               class="copy hover-item"
@@ -25,9 +21,14 @@
       <div class="item">
         <div class="title">
           <span> Address list </span>
-          <img src="@/assets/images/profile/info1.png" alt="" />
+          <img
+            class="hover-item"
+            @click="openDrawer"
+            src="@/assets/images/profile/info1.png"
+            alt=""
+          />
         </div>
-        <div class="text-wrap hover-item">
+        <div class="text-wrap hover-item" @click="openDrawer">
           <span>All available address</span>
           <img src="@/assets/images/profile/arrow.png" alt="" />
         </div>
@@ -58,6 +59,48 @@
     <div class="component-wrap">
       <component :is="currentNav.component" />
     </div>
+    <el-drawer
+      size="480"
+      :visible.sync="visible"
+      :with-header="false"
+      direction="rtl"
+    >
+      <div class="drawer-content">
+        <div class="title">
+          <span>Address list</span>
+          <img
+            class="hover-item"
+            @click="visible = false"
+            src="@/assets/images/profile/close.png"
+            alt=""
+          />
+        </div>
+        <div class="address-list">
+          <div class="item" v-for="(v, i) in addressList" :key="i">
+            <img
+              class="left"
+              src="@/assets\images\home_slices/moonriver.png"
+              alt=""
+            />
+            <div class="middle">
+              <div class="item-title">Moonriver</div>
+              <div class="item-text">
+                EcccaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f
+              </div>
+            </div>
+            <div class="copy-wrap">
+              <img
+                title="copy"
+                @click="copy('EcccaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f')"
+                src="@/assets/images/profile/copy.png"
+                alt=""
+                class="copy hover-item"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -68,8 +111,16 @@ import Defi from "./nav/Defi";
 import Staking from "./nav/Staking";
 import NFT from "./nav/NFT";
 export default {
+  components: {
+    Balance,
+    Crowdloan,
+    Defi,
+    Staking,
+    NFT,
+  },
   data() {
     return {
+      visible: false,
       currentNav: {
         name: "Balance",
         component: Balance,
@@ -96,6 +147,13 @@ export default {
           component: NFT,
         },
       ],
+      addressList: [
+        {},
+        {},
+        {},
+        {},
+        {},
+      ],
     };
   },
   created() {
@@ -105,6 +163,9 @@ export default {
     }
   },
   methods: {
+    openDrawer() {
+      this.visible = true;
+    },
     goToNav(v) {
       this.currentNav = v;
       this.$router.replace({
@@ -114,11 +175,16 @@ export default {
         },
       });
     },
-    copy() {
-      const copyEl = document.getElementById("copy-input");
-      copyEl.select(); // 选择对象
-      document.execCommand("copy"); // 执行浏览器复制命令
-      this.$message.success("Already copied");
+    copy(text) {
+      const input = document.createElement("input");
+      document.body.appendChild(input);
+      input.setAttribute("value", text);
+      input.select();
+      if (document.execCommand("copy")) {
+        document.execCommand("copy");
+        this.$message.success("Already copied");
+      }
+      document.body.removeChild(input);
     },
   },
 };
@@ -159,19 +225,6 @@ export default {
           color: #7f7e7e;
           display: flex;
           align-items: center;
-          #copy-input {
-            background: none;
-            position: absolute;
-            border: none;
-            opacity: 0;
-            font-size: 14px;
-            width: 1px;
-            height: 0px;
-            padding: 0;
-            margin: 0;
-            outline: none;
-            color: rgba(255, 255, 255, 0.6);
-          }
           img {
             width: 16px;
             height: 16px;
@@ -245,6 +298,62 @@ export default {
     border-radius: 10px;
     padding: 24px;
     margin-top: 20px;
+  }
+}
+.drawer-content {
+  padding: 21px 0;
+  .title {
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
+    color: #292828;
+    img {
+      padding: 10px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+  .address-list {
+    height: calc(100vh - 120px);
+    overflow: auto;
+    .item {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(233, 233, 233, 1);
+      padding: 8px 24px;
+      &:last-child{
+        border-bottom: 0;
+      }
+      .left {
+        width: 26px;
+        height: 26px;
+      }
+      .middle {
+        flex: 1;
+        margin: 0 11px;
+        .item-title {
+          font-size: 14px;
+          font-weight: bold;
+          color: #545353;
+        }
+        .item-text {
+          margin-top: 4px;
+          font-family: "Rubik";
+          font-size: 12px;
+          color: #a9a9a9;
+        }
+      }
+      .copy-wrap {
+        position: relative;
+        .copy {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
   }
 }
 </style>
