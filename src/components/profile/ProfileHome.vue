@@ -54,7 +54,7 @@ export default {
   .center {
     padding-bottom: 200px;
     .title {
-      padding: 0 100px;
+      padding: 0 200px;
       font-size: 48px;
       font-weight: bold;
       color: #292828;
