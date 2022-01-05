@@ -79,7 +79,7 @@
           <div class="item" v-for="(v, i) in addressList" :key="i">
             <img
               class="left"
-              src="@/assets\images\home_slices/moonriver.png"
+              src="@/assets/images/home_slices/moonriver.png"
               alt=""
             />
             <div class="middle">
