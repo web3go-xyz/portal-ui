@@ -1,3 +1,4 @@
+window.BASE_API = "https://web3go.xyz";
 window.API = "https://web3go.xyz/portal/";
 window.POLKADOT_API = "https://web3go.xyz/polkadot/";
 window.KUSAMA_API = "https://web3go.xyz/kusama/";

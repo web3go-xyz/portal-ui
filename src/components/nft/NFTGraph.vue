@@ -125,7 +125,6 @@
 <script>
 import nftGraphApi from "@/api/nft/nft-graph";
 import ipfsUtil from "@/utils/ipfsUtil";
-console.log(ipfsUtil);
 export default {
   name: "NFTGraph",
   data() {

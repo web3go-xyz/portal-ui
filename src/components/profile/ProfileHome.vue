@@ -26,12 +26,16 @@ export default {
       inputValue: "",
     };
   },
+
   methods: {
     jumpToIndex() {
       this.$router.push({
         name: "ProfileIndex",
         params: {
           nav: "Balance",
+        },
+        query: {
+          address: this.inputValue,
         },
       });
     },

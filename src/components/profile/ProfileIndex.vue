@@ -2,14 +2,14 @@
   <div class="profile-index-page">
     <div class="info-wrap">
       <div class="info-left">
-        <img class="left-img" src="@/assets/images/home/eye.png" alt="" />
+        <img class="left-img" :src="getMainIcon()" alt="" />
         <div class="text-wrap">
-          <div class="title">EaCAgm…x6f3Hq</div>
+          <div class="title">{{ $route.query.address | shorterAddress }}</div>
           <div class="copy-wrap">
-            <span>EaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f3Hq</span>
+            <span>{{ $route.query.address }}</span>
             <img
               title="copy"
-              @click="copy('EaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f3Hq')"
+              @click="copy($route.query.address)"
               src="@/assets/images/profile/copy.png"
               alt=""
               class="copy hover-item"
@@ -21,12 +21,7 @@
       <div class="item">
         <div class="title">
           <span> Address list </span>
-          <img
-            class="hover-item"
-            @click="openDrawer"
-            src="@/assets/images/profile/info1.png"
-            alt=""
-          />
+          <img src="@/assets/images/profile/info1.png" alt="" />
         </div>
         <div class="text-wrap hover-item" @click="openDrawer">
           <span>All available address</span>
@@ -36,7 +31,7 @@
       <div class="split"></div>
       <div class="item">
         <div class="title">
-          <span>$ 9,999</span>
+          <span>$ {{ totalAmount }}</span>
           <img src="@/assets/images/profile/info2.png" alt="" />
         </div>
         <div class="text-wrap">
@@ -57,7 +52,11 @@
       </div>
     </div>
     <div class="component-wrap">
-      <component :is="currentNav.component" />
+      <component
+        :is="currentNav.component"
+        :balanceNavData="balanceNavData"
+        :balanceNavLoading="balanceNavLoading"
+      />
     </div>
     <el-drawer
       size="480"
@@ -77,21 +76,17 @@
         </div>
         <div class="address-list">
           <div class="item" v-for="(v, i) in addressList" :key="i">
-            <img
-              class="left"
-              src="@/assets/images/home_slices/moonriver.png"
-              alt=""
-            />
+            <img class="left" :src="getIcon(v)" alt="" />
             <div class="middle">
-              <div class="item-title">Moonriver</div>
+              <div class="item-title">{{ v.network }}</div>
               <div class="item-text">
-                EcccaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f
+                {{ v.value }}
               </div>
             </div>
             <div class="copy-wrap">
               <img
                 title="copy"
-                @click="copy('EcccaCAgmsTaQ23WHQ9b7ohJ6FoTzzy87hwA2HpUkX4fx6f')"
+                @click="copy(v.value)"
                 src="@/assets/images/profile/copy.png"
                 alt=""
                 class="copy hover-item"
@@ -105,6 +100,12 @@
 </template>
 
 <script>
+import {
+  getAllSupportedChains,
+  ss58transform,
+  getBalance,
+  getPrice,
+} from "@/api/profile/Balance";
 import Balance from "./nav/Balance";
 import Crowdloan from "./nav/Crowdloan";
 import Defi from "./nav/Defi";
@@ -120,6 +121,10 @@ export default {
   },
   data() {
     return {
+      balanceNavLoading: false,
+      allChains: [],
+      addressList: [],
+      balanceNavData: [],
       visible: false,
       currentNav: {
         name: "Balance",
@@ -147,13 +152,6 @@ export default {
           component: NFT,
         },
       ],
-      addressList: [
-        {},
-        {},
-        {},
-        {},
-        {},
-      ],
     };
   },
   created() {
@@ -161,8 +159,94 @@ export default {
     if (find) {
       this.currentNav = find;
     }
+    this.balanceNavLoading = true;
+    getAllSupportedChains().then((d) => {
+      this.allChains = d;
+      ss58transform({
+        account: this.$route.query.address,
+        // account: "15MtNMKZUFjHoWzqQzQ8ntuXaAB8KHb3QSf5SeXfkqpBh45i",
+        networks: d.map((v) => v.network),
+        filter_no_symbol: true,
+      }).then((data) => {
+        if (data.length && data[0].error) {
+          this.addressList = [];
+        } else {
+          this.addressList = data;
+        }
+        this.getTableData();
+      });
+    });
+  },
+  computed: {
+    // 删掉最前面一条
+    filterAddressList() {
+      if (this.addressList.length) {
+        // 去掉第一个特殊数据
+        return this.addressList.slice(1);
+        // return this.addressList.slice(1, 4);
+      }
+      return [];
+    },
+    totalAmount() {
+      let sum = 0;
+      this.balanceNavData.forEach((v) => {
+        sum += v.totalPrice;
+      });
+      return sum;
+    },
   },
   methods: {
+    getMainIcon() {
+      const find = this.filterAddressList.find(
+        (v) => v.value == this.$route.query.address
+      );
+      if (find) {
+        return `static/parachain-icon/${find.network}.png`;
+      }
+      return "";
+    },
+    getTableData() {
+      const promiseArr = [];
+      this.filterAddressList.forEach((v) => {
+        promiseArr.push(
+          getBalance({
+            account_id: v.value,
+            wssEndpoint: v.wssEndpoints[0],
+            network: v.network,
+          })
+        );
+        promiseArr.push(
+          getPrice({
+            symbol: v.symbols[0],
+          })
+        );
+      });
+      Promise.all(promiseArr).then((d) => {
+        // balance的表格数据
+        const balanceNavData = [];
+        // 表格balance字段数组
+        const balanceResult = d.filter((v, i) => i % 2 == 0);
+        // 表格price字段数组
+        const priceResult = d.filter((v, i) => i % 2 == 1);
+        this.filterAddressList.forEach((v, i) => {
+          const balance =
+            balanceResult[i].balance.free + balanceResult[i].balance.reserved;
+          const price = priceResult[i].price;
+          balanceNavData.push({
+            ...v,
+            balance,
+            price,
+            totalPrice: Number(price) * Number(balance),
+          });
+        });
+        this.balanceNavData = balanceNavData;
+        this.balanceNavLoading = false;
+        console.log("balanceNavData", balanceNavData);
+      });
+    },
+    getIcon(v) {
+      return `static/parachain-icon/${v.network}.png`;
+    },
     openDrawer() {
       this.visible = true;
     },
@@ -173,6 +257,7 @@ export default {
         params: {
           nav: v.name,
         },
+        query: this.$route.query,
       });
     },
     copy(text) {
@@ -209,7 +294,7 @@ export default {
       align-items: center;
       .left-img {
         width: 56px;
-        height: 56px;
+        height: auto;
         border-radius: 50%;
         margin-right: 8px;
       }
@@ -324,12 +409,12 @@ export default {
       align-items: center;
       border-bottom: 1px solid rgba(233, 233, 233, 1);
       padding: 8px 24px;
-      &:last-child{
+      &:last-child {
         border-bottom: 0;
       }
       .left {
         width: 26px;
-        height: 26px;
+        height: auto;
       }
       .middle {
         flex: 1;

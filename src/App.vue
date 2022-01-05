@@ -83,7 +83,6 @@ import plusImg from "@/assets/images/home/plus.png";
 export default {
   name: "App",
   data() {
-    console.log("111", this.$route);
     return {
       userInfo: null,
       actNav: {
