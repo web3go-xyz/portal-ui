@@ -21,6 +21,7 @@
 
 <script>
 export default {
+  name: "ProfileHome",
   data() {
     return {
       inputValue: "",

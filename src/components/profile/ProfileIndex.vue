@@ -113,6 +113,7 @@ import Staking from "./nav/Staking";
 import NFT from "./nav/NFT";
 import BigNumber from "bignumber.js";
 export default {
+  name: "ProfileIndex",
   components: {
     Balance,
     Crowdloan,

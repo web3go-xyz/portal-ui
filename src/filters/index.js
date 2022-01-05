@@ -63,3 +63,13 @@ export function formatKUSAMA(amount, precision) {
 export function format2(v) {
     return BigNumber(v).toFormat(2);
 }
+
+export function formatBalanceWithDecimal(balance, decimal) {
+    if (decimal) {
+        let balanceFormated = BigNumber(balance).dividedBy(
+            BigNumber("1e" + decimal)
+        );
+        return balanceFormated.toNumber();
+    }
+    return balance;
+}

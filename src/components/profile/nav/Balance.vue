@@ -149,9 +149,17 @@
               <div v-if="scope.row.balanceChange" class="num-change-wrap">
                 <img class="left" :src="getIcon(currentRow)" alt="" />
                 <span v-if="isAdd(scope.row)" class="blue"
-                  >+{{ scope.row.balanceChange }}</span
+                  >+{{
+                    scope.row.balanceChange
+                      | formatBalanceWithDecimal(getDecimal())
+                  }}</span
                 >
-                <span v-else class="red">-{{ scope.row.balanceChange }}</span>
+                <span v-else class="red"
+                  >-{{
+                    scope.row.balanceChange
+                      | formatBalanceWithDecimal(getDecimal())
+                  }}</span
+                >
               </div>
             </template>
           </el-table-column>
@@ -187,6 +195,7 @@
 import BigNumber from "bignumber.js";
 import { getAccountDetail } from "@/api/profile/Balance";
 export default {
+  name: "Profile-Balance",
   props: {
     balanceNavLoading: {
       type: Boolean,
@@ -223,9 +232,19 @@ export default {
     },
   },
   methods: {
+    getDecimal() {
+      if (
+        this.currentRow &&
+        this.currentRow.decimals &&
+        this.currentRow.decimals.length > 0
+      ) {
+        return this.currentRow.decimals[0];
+      }
+      return 0;
+    },
     isAdd(row) {
-      if (row.type == "Tranfer") {
-        if (currentRow.value == row.fromAccountId) {
+      if (row.type == "Transfer") {
+        if (this.currentRow.value == row.fromAccountId) {
           return false;
         } else {
           return true;
@@ -287,10 +306,14 @@ export default {
         const detailData = [];
         d.transactions.forEach((v) => {
           v.list.forEach((sv) => {
-            detailData.push({
+            let record = {
               ...sv,
               type: v.type,
-            });
+            };
+            if (record.type === "Endowed") {
+              record.balanceChange = record.freeBalance;
+            }
+            detailData.push(record);
           });
         });
         // 根据时间倒序
