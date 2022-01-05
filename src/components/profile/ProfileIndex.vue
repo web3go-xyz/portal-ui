@@ -230,10 +230,18 @@ export default {
         // 表格price字段数组
         const priceResult = d.filter((v, i) => i % 2 == 1);
         this.filterAddressList.forEach((v, i) => {
-          let balance =
-            balanceResult[i].balance.free + balanceResult[i].balance.reserved;
-          balance = this.formatTokenBalance(balance, balanceResult[i]);
-          const price = priceResult[i].price;
+          let balance = 0;
+          let price = 0;
+
+          let balanceItem = balanceResult[i];
+          if (balanceItem && balanceItem.balance) {
+            balance = balanceItem.balance.free + balanceItem.balance.reserved;
+            balance = this.formatTokenBalance(balance, balanceItem);
+          }
+          if (priceResult[i] && priceResult[i].price) {
+            price = priceResult[i].price;
+          }
+
           balanceNavData.push({
             ...v,
             balance,
@@ -317,7 +325,7 @@ export default {
       .left-img {
         width: 56px;
         height: auto;
-        border-radius: 50%;
+        // border-radius: 50%;
         margin-right: 8px;
       }
       .text-wrap {
