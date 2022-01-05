@@ -46,6 +46,8 @@ export default {
 <style lang="less" scoped>
 .profile-home-page {
   height: calc(100vh - 60px);
+  background: url(~@/assets/images/profile/bg.png) no-repeat center;
+  background-size: 70% 70%;
   display: flex;
   align-items: center;
   justify-content: center;
