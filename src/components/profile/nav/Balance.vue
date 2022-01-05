@@ -59,12 +59,15 @@
           </el-table-column>
           <el-table-column label="Balance">
             <template slot-scope="scope">
-              <div>{{ scope.row.balance }} {{ scope.row.symbols[0] }}</div>
+              <div>
+                {{ scope.row.balance | format2 }}
+                {{ scope.row.symbols[0] }}
+              </div>
             </template>
           </el-table-column>
           <el-table-column label="Value">
             <template slot-scope="scope">
-              <div>$ {{ Number(scope.row.totalPrice).toFixed(2) }}</div>
+              <div>$ {{ scope.row.totalPrice | format2 }}</div>
             </template>
           </el-table-column>
         </el-table>
@@ -181,6 +184,7 @@
 </template>
 
 <script>
+import BigNumber from "bignumber.js";
 import { getAccountDetail } from "@/api/profile/Balance";
 export default {
   props: {
@@ -243,7 +247,7 @@ export default {
       input.select();
       if (document.execCommand("copy")) {
         document.execCommand("copy");
-        this.$message.success("Already copied");
+        this.$message.success("Address Copied");
       }
       document.body.removeChild(input);
     },

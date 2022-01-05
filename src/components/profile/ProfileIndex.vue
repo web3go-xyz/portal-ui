@@ -31,11 +31,11 @@
       <div class="split"></div>
       <div class="item">
         <div class="title">
-          <span>$ {{ totalAmount }}</span>
+          <span>$ {{ totalAmount | format2 }}</span>
           <img src="@/assets/images/profile/info2.png" alt="" />
         </div>
         <div class="text-wrap">
-          <span>The total amout of accout</span>
+          <span>The total amout of account</span>
         </div>
       </div>
     </div>
@@ -78,7 +78,7 @@
           <div class="item" v-for="(v, i) in addressList" :key="i">
             <img class="left" :src="getIcon(v)" alt="" />
             <div class="middle">
-              <div class="item-title">{{ v.network }}</div>
+              <div class="item-title">{{ v.network || "Public Key" }}</div>
               <div class="item-text">
                 {{ v.value }}
               </div>
@@ -111,6 +111,7 @@ import Crowdloan from "./nav/Crowdloan";
 import Defi from "./nav/Defi";
 import Staking from "./nav/Staking";
 import NFT from "./nav/NFT";
+import BigNumber from "bignumber.js";
 export default {
   components: {
     Balance,
@@ -229,8 +230,9 @@ export default {
         // 表格price字段数组
         const priceResult = d.filter((v, i) => i % 2 == 1);
         this.filterAddressList.forEach((v, i) => {
-          const balance =
+          let balance =
             balanceResult[i].balance.free + balanceResult[i].balance.reserved;
+          balance = this.formatTokenBalance(balance, balanceResult[i]);
           const price = priceResult[i].price;
           balanceNavData.push({
             ...v,
@@ -243,6 +245,26 @@ export default {
         this.balanceNavLoading = false;
         console.log("balanceNavData", balanceNavData);
       });
+    },
+    formatTokenBalance(balance, balanceResp) {
+      if (balanceResp && balanceResp.account_id) {
+        let findAddressItem = this.addressList.find((t) => {
+          if (t.value) {
+            return t.value === balanceResp.account_id;
+          }
+          return false;
+        });
+        if (findAddressItem) {
+          if (findAddressItem.decimals && findAddressItem.decimals.length > 0) {
+            let decimal = findAddressItem.decimals[0];
+            let balanceFormated = BigNumber(balance).dividedBy(
+              BigNumber("1e" + decimal)
+            );
+            return balanceFormated.toNumber();
+          }
+        }
+      }
+      return balance;
     },
     getIcon(v) {
       return `static/parachain-icon/${v.network}.png`;
@@ -267,7 +289,7 @@ export default {
       input.select();
       if (document.execCommand("copy")) {
         document.execCommand("copy");
-        this.$message.success("Already copied");
+        this.$message.success("Address Copied");
       }
       document.body.removeChild(input);
     },

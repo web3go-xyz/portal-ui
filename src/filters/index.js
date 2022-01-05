@@ -59,3 +59,7 @@ export function formatDOT(amount, precision) {
 export function formatKUSAMA(amount, precision) {
     return utils.formatToken(amount, utils.KSM_RATIO, precision);
 }
+
+export function format2(v) {
+    return BigNumber(v).toFormat(2);
+}
