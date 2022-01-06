@@ -452,6 +452,11 @@ export default {
           icon: "medium",
         },
         {
+          name: "Telegram",
+          url: "http://t.me/web3go",
+          icon: "telegram",
+        },
+        {
           name: "Docs",
           url: "https://doc.web3go.xyz/",
         },
