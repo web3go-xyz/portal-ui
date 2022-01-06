@@ -53,12 +53,20 @@
           </el-table-column>
           <el-table-column label="Price">
             <template slot-scope="scope">
-              <div>$ {{ Number(scope.row.price).toFixed(2) }}</div>
+              <i
+                v-if="scope.row.price === undefined"
+                class="el-icon-loading"
+              ></i>
+              <div v-else>$ {{ Number(scope.row.price).toFixed(2) }}</div>
             </template>
           </el-table-column>
           <el-table-column label="Balance">
             <template slot-scope="scope">
-              <div>
+              <i
+                v-if="scope.row.balance === undefined"
+                class="el-icon-loading"
+              ></i>
+              <div v-else>
                 {{ scope.row.balance | format2 }}
                 {{ scope.row.symbols[0] }}
               </div>
@@ -66,7 +74,11 @@
           </el-table-column>
           <el-table-column label="Value">
             <template slot-scope="scope">
-              <div>$ {{ scope.row.totalPrice | format2 }}</div>
+              <i
+                v-if="scope.row.totalPrice === undefined"
+                class="el-icon-loading"
+              ></i>
+              <div v-else>$ {{ scope.row.totalPrice | format2 }}</div>
             </template>
           </el-table-column>
         </el-table>

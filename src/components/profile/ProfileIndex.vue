@@ -52,10 +52,7 @@
       </div>
     </div>
     <div class="component-wrap">
-      <component
-        :is="currentNav.component"
-        :balanceNavData="balanceNavData"
-      />
+      <component :is="currentNav.component" :balanceNavData="balanceNavData" />
     </div>
     <el-drawer
       size="480"
@@ -205,44 +202,35 @@ export default {
       return "";
     },
     getTableData() {
-      this.filterAddressList.forEach((v) => {
-        const promiseArr = [];
-        promiseArr.push(
-          getBalance({
-            account_id: v.value,
-            wssEndpoint: v.wssEndpoints[0],
-            network: v.network,
-          })
-        );
-        promiseArr.push(
-          getPrice({
-            symbol: v.symbols[0],
-          })
-        );
-        Promise.all(promiseArr).then((d) => {
-          // 表格balance字段数组
-          const balanceResult = d[0];
-          // 表格price字段数组
-          const priceResult = d[1];
-          let balance = 0;
+      this.balanceNavData = JSON.parse(JSON.stringify(this.filterAddressList));
+      this.balanceNavData.forEach((v) => {
+        getPrice({
+          symbol: v.symbols[0],
+        }).then((priceResult) => {
           let price = 0;
-
+          if (priceResult && priceResult.price) {
+            price = priceResult.price;
+          }
+          this.$set(v, "price", price);
+          if (v.price !== undefined && v.balance !== undefined) {
+            this.$set(v, "totalPrice", Number(v.price) * Number(v.balance));
+          }
+        });
+        getBalance({
+          account_id: v.value,
+          wssEndpoint: v.wssEndpoints[0],
+          network: v.network,
+        }).then((balanceResult) => {
+          let balance = 0;
           if (balanceResult && balanceResult.balance) {
             balance =
               balanceResult.balance.free + balanceResult.balance.reserved;
             balance = this.formatTokenBalance(balance, balanceResult);
           }
-          if (priceResult && priceResult.price) {
-            price = priceResult.price;
+          this.$set(v, "balance", balance);
+          if (v.price !== undefined && v.balance !== undefined) {
+            this.$set(v, "totalPrice", Number(v.price) * Number(v.balance));
           }
-
-          const balanceNavRow = {
-            ...v,
-            balance,
-            price,
-            totalPrice: Number(price) * Number(balance),
-          };
-          this.balanceNavData.push(balanceNavRow);
         });
       });
     },
