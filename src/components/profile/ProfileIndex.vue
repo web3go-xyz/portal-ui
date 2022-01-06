@@ -31,7 +31,8 @@
       <div class="split"></div>
       <div class="item">
         <div class="title">
-          <span>$ {{ totalAmount | format2 }}</span>
+          <i v-if="isNaN(totalAmount)" class="el-icon-loading"></i>
+          <span v-else>$ {{ totalAmount | format2 }}</span>
           <img src="@/assets/images/profile/info2.png" alt="" />
         </div>
         <div class="text-wrap">
