@@ -29,7 +29,12 @@
         </div>
         <div class="nav-right">
           <div class="search">
-            <input type="text" placeholder="Search" />
+            <input
+              type="text"
+              placeholder="Search"
+              v-model="inputValue"
+              @keyup.enter="jumpToProfileIndex"
+            />
           </div>
           <ul class="nav-list">
             <li class="nav-item" v-for="(item, index) in navRight" :key="index">
@@ -84,6 +89,7 @@ export default {
   name: "App",
   data() {
     return {
+      inputValue: "",
       userInfo: null,
       actNav: {
         name: "Dashboard",
@@ -150,6 +156,17 @@ export default {
     },
   },
   methods: {
+    jumpToProfileIndex() {
+      this.$router.push({
+        name: "ProfileIndex",
+        params: {
+          nav: "Balance",
+        },
+        query: {
+          address: this.inputValue,
+        },
+      });
+    },
     toLogin() {
       this.isShowComing = false;
       this.$router.push({ name: "Login" });
@@ -323,6 +340,7 @@ export default {
   height: 100%;
   outline: none;
   margin-left: 30px;
+  padding-right:15px;
   border: none;
   background: #f5f7f9;
 }
