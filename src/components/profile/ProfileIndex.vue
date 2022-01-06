@@ -55,7 +55,6 @@
       <component
         :is="currentNav.component"
         :balanceNavData="balanceNavData"
-        :balanceNavLoading="balanceNavLoading"
       />
     </div>
     <el-drawer
@@ -123,7 +122,6 @@ export default {
   },
   data() {
     return {
-      balanceNavLoading: false,
       allChains: [],
       addressList: [],
       balanceNavData: [],
@@ -161,7 +159,6 @@ export default {
     if (find) {
       this.currentNav = find;
     }
-    this.balanceNavLoading = true;
     getAllSupportedChains().then((d) => {
       this.allChains = d;
       ss58transform({
@@ -208,8 +205,8 @@ export default {
       return "";
     },
     getTableData() {
-      const promiseArr = [];
       this.filterAddressList.forEach((v) => {
+        const promiseArr = [];
         promiseArr.push(
           getBalance({
             account_id: v.value,
@@ -222,37 +219,31 @@ export default {
             symbol: v.symbols[0],
           })
         );
-      });
-      Promise.all(promiseArr).then((d) => {
-        // balance的表格数据
-        const balanceNavData = [];
-        // 表格balance字段数组
-        const balanceResult = d.filter((v, i) => i % 2 == 0);
-        // 表格price字段数组
-        const priceResult = d.filter((v, i) => i % 2 == 1);
-        this.filterAddressList.forEach((v, i) => {
+        Promise.all(promiseArr).then((d) => {
+          // 表格balance字段数组
+          const balanceResult = d[0];
+          // 表格price字段数组
+          const priceResult = d[1];
           let balance = 0;
           let price = 0;
 
-          let balanceItem = balanceResult[i];
-          if (balanceItem && balanceItem.balance) {
-            balance = balanceItem.balance.free + balanceItem.balance.reserved;
-            balance = this.formatTokenBalance(balance, balanceItem);
+          if (balanceResult && balanceResult.balance) {
+            balance =
+              balanceResult.balance.free + balanceResult.balance.reserved;
+            balance = this.formatTokenBalance(balance, balanceResult);
           }
-          if (priceResult[i] && priceResult[i].price) {
-            price = priceResult[i].price;
+          if (priceResult && priceResult.price) {
+            price = priceResult.price;
           }
 
-          balanceNavData.push({
+          const balanceNavRow = {
             ...v,
             balance,
             price,
             totalPrice: Number(price) * Number(balance),
-          });
+          };
+          this.balanceNavData.push(balanceNavRow);
         });
-        this.balanceNavData = balanceNavData;
-        this.balanceNavLoading = false;
-        console.log("balanceNavData", balanceNavData);
       });
     },
     formatTokenBalance(balance, balanceResp) {

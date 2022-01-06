@@ -17,7 +17,6 @@
     <div class="table-wrap">
       <div class="left-table">
         <el-table
-          v-loading="balanceNavLoading"
           :data="
             filterBalanceNavData.slice(
               (tableParams1.pageIndex - 1) * tableParams1.pageSize,
@@ -197,9 +196,6 @@ import { getAccountDetail } from "@/api/profile/Balance";
 export default {
   name: "Profile-Balance",
   props: {
-    balanceNavLoading: {
-      type: Boolean,
-    },
     balanceNavData: {
       type: Array,
     },
