@@ -35,7 +35,7 @@
           <img src="@/assets/images/profile/info2.png" alt="" />
         </div>
         <div class="text-wrap">
-          <span>The total amout of account</span>
+          <span>The total amount of account</span>
         </div>
       </div>
     </div>
