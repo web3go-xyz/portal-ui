@@ -779,6 +779,12 @@ export default {
     }
   },
   computed: {
+    startRoundIndex() {
+      return this.roundInfo.current - 11 - 1;
+    },
+    endRoundIndex() {
+      return this.roundInfo.current - 2 - 1; //Reward延迟2round发放，在获取发放明细时，因为分区块发放的问题，目前系统是获取的前一round的数据， 因此还需要再减去1.
+    },
     totalCollectorStake() {
       let result = BigNumber(0);
       // 算出中标的大哥的金额
@@ -1171,20 +1177,20 @@ export default {
           // 获取大哥的历史10次reward
           const getCollector10RewardPromise =
             moonriverService.getCollatorReward({
-              startRoundIndex: this.roundInfo.current - 11,
-              endRoundIndex: this.roundInfo.current - 2,
+              startRoundIndex: this.startRoundIndex,
+              endRoundIndex: this.endRoundIndex,
               accounts: c.map((v) => v.owner),
             });
           // 获取小弟的历史10次totalStake
           const getNominator10TotalStakePromise = moonriverService.atStake({
-            startRoundIndex: this.roundInfo.current - 11,
-            endRoundIndex: this.roundInfo.current - 2,
+            startRoundIndex: this.startRoundIndex,
+            endRoundIndex: this.endRoundIndex,
           });
           // 获取小弟的历史10次totalReward
           const getNominator10RewardPromise =
             moonriverService.getNominatorReward({
-              startRoundIndex: this.roundInfo.current - 11,
-              endRoundIndex: this.roundInfo.current - 2,
+              startRoundIndex: this.startRoundIndex,
+              endRoundIndex: this.endRoundIndex,
             });
 
           const allPromiseArr = [
@@ -1243,11 +1249,7 @@ export default {
             const getCollector10RewardRes = d[nominatorPromiseArr.length + 1];
             nominatorRes.forEach((v) => {
               const arr = [];
-              for (
-                let i = this.roundInfo.current - 11;
-                i <= this.roundInfo.current - 2;
-                i++
-              ) {
+              for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
                 const find = getCollector10RewardRes.rewards.find(
                   (sv) =>
                     sv.account.toLowerCase() == v.id.toLowerCase() &&
@@ -1272,11 +1274,7 @@ export default {
               d[nominatorPromiseArr.length + 2];
             nominatorRes.forEach((v) => {
               const arr = [];
-              for (
-                let i = this.roundInfo.current - 11;
-                i <= this.roundInfo.current - 2;
-                i++
-              ) {
+              for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
                 const find = getNominator10TotalStakeRes.stakes.find(
                   (sv) => sv.collatorAccount == v.id && sv.roundIndex == i
                 );
@@ -1305,11 +1303,7 @@ export default {
             );
             nominatorRes.forEach((v) => {
               const arr = [];
-              for (
-                let i = this.roundInfo.current - 11;
-                i <= this.roundInfo.current - 2;
-                i++
-              ) {
+              for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
                 //按照collator分开reward数据
                 const find = getNorminator10RewardRes.rewards.find(
                   (sv) =>
@@ -1333,11 +1327,7 @@ export default {
             // 计算历史RPM
             nominatorRes.forEach((v) => {
               const arr = [];
-              for (
-                let i = this.roundInfo.current - 11;
-                i <= this.roundInfo.current - 2;
-                i++
-              ) {
+              for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
                 const findTop = v.historyNominatorTotalReward.find(
                   (sv) => sv.roundIndex == i
                 );
