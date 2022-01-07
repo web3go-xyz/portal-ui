@@ -175,12 +175,32 @@ export default {
     });
   },
   computed: {
-    // 删掉最前面一条
+    // 删掉无效balance的地址
     filterAddressList() {
       if (this.addressList.length) {
-        // 去掉第一个特殊数据
-        return this.addressList.slice(1);
-        // return this.addressList.slice(1, 4);
+        let filter = [];
+        this.addressList.forEach((t) => {
+          // 去掉特殊数据
+          if (t.key == "Public Key") {
+            return;
+          }
+
+          //去掉没有链地址的
+          let findChain = this.allChains.find((c) => {
+            return c.network == t.network;
+          });
+          if (!findChain) {
+            return;
+          } else {
+            if (!findChain.wssEndpoints || findChain.wssEndpoints.length == 0) {
+              return;
+            }
+          }
+
+          filter.push(t);
+        });
+
+        return filter;
       }
       return [];
     },
