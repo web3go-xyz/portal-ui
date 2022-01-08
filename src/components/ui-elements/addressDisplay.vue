@@ -12,7 +12,9 @@
     <div>
       <img
         @click="copyAddress(addressLabel.originalAddress)"
-        :src="copyImg"
+        @mouseenter="mouseenter()"
+        @mouseleave="mouseleave()"
+        :src="localImg"
         class="copyImg"
       />
     </div>
@@ -36,17 +38,29 @@
 
 <script>
 import copyImg from "@/assets/images/copy.png";
+import profileCopyImg from "@/assets/images/profile/copy.png";
+import profileCopyHoverImg from "@/assets/images/profile/copy_hover.png";
 export default {
   props: {
     address: {
       type: String,
-      default: "",
+      default: ""
     },
+    isPrifile: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
+      profileCopyImg,
+      profileCopyHoverImg,
       copyImg,
+      localImg: null
     };
+  },
+  created() {
+    this.localImg = this.isPrifile ? profileCopyImg : copyImg;
   },
   computed: {
     addressLabel() {
@@ -60,7 +74,7 @@ export default {
               description: "",
               addressTag: element.addressTag,
               address: element.address,
-              originalAddress: element.address,
+              originalAddress: element.address
             };
 
             if (element.description) {
@@ -83,11 +97,19 @@ export default {
       }
       return {
         originalAddress: self.address,
-        address: self.$options.filters["shorterAddress"](self.address),
+        address: self.$options.filters["shorterAddress"](self.address)
       };
-    },
+    }
   },
   methods: {
+    mouseenter() {
+      if (!this.isPrifile) return;
+      this.localImg = profileCopyHoverImg;
+    },
+    mouseleave() {
+      if (!this.isPrifile) return;
+      this.localImg = profileCopyImg;
+    },
     copyAddress(targetAddress) {
       let id = "input-" + targetAddress;
       var input = document.getElementById(id);
@@ -102,10 +124,10 @@ export default {
         position: "bottom-left",
         showClose: false,
         duration: 1500,
-        type: "success",
+        type: "success"
       });
-    },
-  },
+    }
+  }
 };
 </script>
 
