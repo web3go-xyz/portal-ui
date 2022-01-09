@@ -2,15 +2,15 @@
   <div class="profile-index-page">
     <div class="info-wrap">
       <div class="info-left">
-        <img class="left-img" :src="getMainIcon()" alt="" />
-        <div class="text-wrap">
-          <div class="title">{{ $route.query.address | shorterAddress }}</div>
-          <div class="copy-wrap">
-            <Identicon
+        <!-- <img class="left-img" :src="getMainIcon()" alt="" /> -->
+        <Identicon
               :size="32"
               :theme="'polkadot'"
               :value="$route.query.address"
             />
+        <div class="text-wrap">
+          <div class="title">{{ $route.query.address | shorterAddress }}</div>
+          <div class="copy-wrap">            
             <span>{{ $route.query.address }}</span>
             <img
               title="copy"
