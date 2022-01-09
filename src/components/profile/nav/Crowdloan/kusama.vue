@@ -1,7 +1,7 @@
 <template>
   <div class="ProfileNFT ProfileNFT-rmrk">
     <div class="common-profile-title">
-      <img src="/static/images/kusama.png" alt="" />
+      <img src="/static/parachain-icon/kusama.png" alt="" />
       <span>KSM {{ totalCount }}</span>
     </div>
     <div class="nftNavCon">
@@ -75,7 +75,10 @@
 </template>
 
 <script>
-import { getKusamaCrowdloanContributions } from "@/api/profile/crowdloan";
+import {
+  getKusamaCrowdloanContributions,
+  getKusamaParaChainList
+} from "@/api/profile/crowdloan";
 import { formatKUSAMA } from "@/filters";
 export default {
   name: "ProfileCrodloanKusama",
@@ -98,7 +101,7 @@ export default {
         {
           col: 6,
           title: "Parachain",
-          value: "source",
+          value: "projectName",
           img: this.getIcon,
           click: this.goDetail,
           className: "parachain collection"
@@ -146,25 +149,41 @@ export default {
         query: {
           crowdloanId: row.crowdloanId,
           lastUpdateTime: row.createdTime,
-          projectName: row.source,
-          iconPath: row.source
+          projectName: row.projectName,
+          iconPath: row.icon
         }
       });
     },
     getIcon(item) {
-      return `static/parachain-icon/${item.source.toLowerCase()}.png`;
+      return `static/parachain-icon/${item.icon}`;
     },
     init() {
       this.loading = true;
       const account = this.addressList.filter(
         item => item.network === "kusama"
       )[0].value;
-      getKusamaCrowdloanContributions({
-        account
-      }).then(res => {
-        this.loading = false;
-        this.listData = res;
-        this.totalCount = res.length;
+      getKusamaParaChainList().then(res => {
+        this.allParachainList = res.list;
+        getKusamaCrowdloanContributions({
+          account
+        }).then(res => {
+          this.loading = false;
+          this.totalCount = res.length;
+          let list = res;
+          if (list) {
+            for (const d of list) {
+              let paraId = d.paraId;
+              let findParachainInfo = this.allParachainList.find(t => {
+                return t.paraId === paraId;
+              });
+              if (findParachainInfo) {
+                d.icon = findParachainInfo.icon;
+                d.projectName = findParachainInfo.projectName;
+              }
+            }
+          }
+          this.listData = list;
+        });
       });
     },
     filterTimestamp_created_at(str) {

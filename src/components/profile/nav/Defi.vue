@@ -36,9 +36,9 @@ export default {
           name: "Karura",
           view: Karura
         },
-        {
-          name: "Others"
-        }
+        // {
+        //   name: "Others"
+        // }
       ]
     };
   },

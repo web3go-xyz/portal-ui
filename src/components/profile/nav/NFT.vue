@@ -36,12 +36,12 @@ export default {
           name: "RMRK",
           view: RMRK
         },
-        {
-          name: "ETH"
-        },
-        {
-          name: "Others"
-        }
+        // {
+        //   name: "ETH"
+        // },
+        // {
+        //   name: "Others"
+        // }
       ]
     };
   },

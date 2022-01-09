@@ -2,16 +2,12 @@
   <div class="profile-index-page">
     <div class="info-wrap">
       <div class="info-left">
-        <img class="left-img" :src="getMainIcon()" alt="" />
+        <Identicon :size="48" :theme="'polkadot'" :value="polkadotAddress" />
+        <!-- <img class="left-img" :src="getMainIcon()" alt="" /> -->
         <div class="text-wrap">
           <div class="title">{{ $route.query.address | shorterAddress }}</div>
           <div class="copy-wrap">
-            <Identicon
-              :size="32"
-              :theme="'polkadot'"
-              :value="$route.query.address"
-            />
-            <span>{{ $route.query.address }}</span>
+            <span class="text">{{ $route.query.address }}</span>
             <img
               title="copy"
               @click="copy($route.query.address)"
@@ -38,7 +34,7 @@
         <div class="title">
           <i v-if="isNaN(totalAmount)" class="el-icon-loading"></i>
           <span v-else>$ {{ totalAmount | format2 }}</span>
-          <img src="@/assets/images/profile/info2.png" alt="" />
+          <img style="margin-right:15px;" src="@/assets/images/profile/info2.png" alt="" />
         </div>
         <div class="text-wrap">
           <span>The total amount of account</span>
@@ -100,7 +96,7 @@
                 @click="copy(v.value)"
                 src="@/assets/images/profile/copy.png"
                 alt=""
-                class="copy hover-item"
+                class="copy"
               />
             </div>
           </div>
@@ -111,7 +107,8 @@
 </template>
 
 <script>
-import Identicon from "@vue-polkadot/vue-identicon";
+// import Identicon from "@vue-polkadot/vue-identicon";
+import Identicon from '@polkadot/vue-identicon';
 import {
   getAllSupportedChains,
   ss58transform,
@@ -158,10 +155,10 @@ export default {
           name: "Defi",
           component: Defi
         },
-        {
-          name: "Staking",
-          component: Staking
-        },
+        // {
+        //   name: "Staking",
+        //   component: Staking,
+        // },
         {
           name: "NFT",
           component: NFT
@@ -192,6 +189,18 @@ export default {
     });
   },
   computed: {
+    polkadotAddress() {
+      if (!this.addressList || this.addressList.length == 0) {
+        return "";
+      }
+
+      for (const ad of this.addressList) {
+        if (ad.network && ad.network === "polkadot") {
+          return ad.value;
+        }
+      }
+      return "";
+    },
     // 删掉无效balance的地址
     filterAddressList() {
       if (this.addressList.length) {
@@ -386,7 +395,6 @@ export default {
   margin-top: 27px;
 
   .info-wrap {
-    width: 100%;
     background: #ffffff;
     border-radius: 10px;
     padding: 24px 16px;
@@ -403,6 +411,7 @@ export default {
         margin-right: 8px;
       }
       .text-wrap {
+        margin-left: 4px;
         .title {
           font-size: 24px;
           font-weight: bold;
@@ -414,6 +423,9 @@ export default {
           color: #7f7e7e;
           display: flex;
           align-items: center;
+          // .text {
+          //   margin-left: 4px;
+          // }
           img {
             width: 16px;
             height: 16px;
@@ -548,8 +560,13 @@ export default {
       .copy-wrap {
         position: relative;
         .copy {
+          opacity: .6;
+          cursor: pointer;
           width: 16px;
           height: 16px;
+          &:hover{
+            opacity: .4;
+          }
         }
       }
     }
