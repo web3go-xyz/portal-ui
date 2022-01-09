@@ -572,8 +572,9 @@ export default {
     padding: 0 !important;
   }
   .empty {
-    margin-top: calc(50% + 48px);
-    transform: translateY(-50%);
+    padding-top: 190px;
+    box-sizing: border-box;
+    height: 569px;
     line-height: initial;
     .img-wrap {
       margin-bottom: 16px;
