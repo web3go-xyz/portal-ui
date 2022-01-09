@@ -116,6 +116,11 @@ export default {
       ]
     };
   },
+  props: {
+    addressList: {
+      type: Array
+    }
+  },
   created() {},
   mounted() {
     this.init();
@@ -140,9 +145,13 @@ export default {
       });
     },
     init() {
+      if (!this.addressList || !this.addressList.length) return;
+      const account_id = this.addressList.filter(
+        item => item.network === "kusama"
+      )[0].value;
       this.loading = true;
       getAccountOwnedNFT({
-        account_id: this.$route.query.address
+        account_id
       }).then(res => {
         this.loading = false;
         this.listData = res.nft_list;
@@ -157,6 +166,14 @@ export default {
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
+    }
+  },
+  watch: {
+    addressList(val) {
+      if (val && val.length) {
+        this.addressList = val;
+        this.init();
+      }
     }
   }
 };

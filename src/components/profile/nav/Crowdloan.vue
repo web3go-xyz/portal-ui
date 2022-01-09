@@ -10,7 +10,7 @@
       >
     </div>
     <div class="common-profile-component">
-      <Component :is="actComponent"></Component>
+      <Component :is="actComponent" :addressList="addressList"></Component>
     </div>
   </div>
 </template>
@@ -20,6 +20,11 @@ import Kusama from "./Crowdloan/kusama.vue";
 
 export default {
   name: "ProfileCrowdloan",
+  props: {
+    addressList: {
+      type: Array
+    }
+  },
   data() {
     return {
       actSortIndex: 0,

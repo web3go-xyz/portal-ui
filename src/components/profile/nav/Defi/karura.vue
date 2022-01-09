@@ -58,7 +58,10 @@
             ></el-col>
           </el-row>
         </div>
-        <div v-if="!loanPositionTableData.length" class="common-profile-table-nodata">
+        <div
+          v-if="!loanPositionTableData.length"
+          class="common-profile-table-nodata"
+        >
           No Data
         </div>
       </div>
@@ -89,6 +92,11 @@ export default {
   components: {
     addressDisplay
   },
+  props: {
+    addressList: {
+      type: Array
+    }
+  },
   data() {
     return {
       ifWhiteTheme: false,
@@ -113,20 +121,22 @@ export default {
   },
   computed: {},
   mounted() {
-    const bodyEl = document.querySelector("body");
-    if (bodyEl.className.includes("white-theme")) {
-      this.ifWhiteTheme = true;
-    }
-    let self = this;
-    if (self.$route.params.paramsOnPage) {
-      var paramsOnPage = self.$route.params.paramsOnPage;
-      self.query = paramsOnPage;
-    }
-    self.loadStatistic();
-
-    self.loadLoanPositionTable();
+    this.init();
   },
   methods: {
+    init() {
+      const bodyEl = document.querySelector("body");
+      if (bodyEl.className.includes("white-theme")) {
+        this.ifWhiteTheme = true;
+      }
+      let self = this;
+      if (self.$route.params.paramsOnPage) {
+        var paramsOnPage = self.$route.params.paramsOnPage;
+        self.query = paramsOnPage;
+      }
+      self.loadStatistic();
+      self.loadLoanPositionTable();
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
       this.loadLoanPositionTable();
@@ -163,6 +173,10 @@ export default {
     },
 
     loadLoanPositionTable() {
+      if (!this.addressList || !this.addressList.length) return;
+      const accountId = this.addressList.filter(
+        item => item.network === "karura"
+      )[0].value;
       let self = this;
       self.loading = true;
       cdpService
@@ -171,7 +185,7 @@ export default {
           orderBys: [{ sort: "collateral", order: "DESC" }],
           chain: "Karura",
           symbol: "KSM",
-          accountId: self.$route.query.address
+          accountId
         })
         .then(resp => {
           self.loanPositionTableData = [];
@@ -203,6 +217,14 @@ export default {
           accountId: lp.accountId
         }
       });
+    }
+  },
+  watch: {
+    addressList(val) {
+      if (val && val.length) {
+        this.addressList = val;
+        this.init(val);
+      }
     }
   }
 };

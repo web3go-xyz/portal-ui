@@ -10,7 +10,7 @@
       >
     </div>
     <div class="common-profile-component">
-      <Component :is="actComponent"></Component>
+      <Component :is="actComponent" :addressList="addressList"></Component>
     </div>
   </div>
 </template>
@@ -18,6 +18,11 @@
 import Karura from "./Defi/karura.vue";
 
 export default {
+  props: {
+    addressList: {
+      type: Array
+    }
+  },
   name: "ProfileDefi",
   data() {
     return {

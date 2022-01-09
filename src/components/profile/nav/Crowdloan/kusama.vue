@@ -79,6 +79,11 @@ import { getKusamaCrowdloanContributions } from "@/api/profile/crowdloan";
 import { formatKUSAMA } from "@/filters";
 export default {
   name: "ProfileCrodloanKusama",
+  props: {
+    addressList: {
+      type: Array
+    }
+  },
   data() {
     return {
       query: {
@@ -151,8 +156,11 @@ export default {
     },
     init() {
       this.loading = true;
+      const account = this.addressList.filter(
+        item => item.network === "kusama"
+      )[0].value;
       getKusamaCrowdloanContributions({
-        account: this.$route.query.address
+        account
       }).then(res => {
         this.loading = false;
         this.listData = res;
@@ -167,6 +175,14 @@ export default {
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
+    }
+  },
+  watch: {
+    addressList(val) {
+      if (val && val.length) {
+        this.addressList = val;
+        this.init();
+      }
     }
   }
 };

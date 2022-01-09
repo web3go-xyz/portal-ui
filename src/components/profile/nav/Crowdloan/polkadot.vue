@@ -79,6 +79,11 @@ import { getPolkadotCrowdloanContributions } from "@/api/profile/crowdloan";
 import { formatDOT } from "@/filters";
 export default {
   name: "ProfileCrodloanPolkadot",
+  props: {
+    addressList: {
+      type: Array
+    }
+  },
   data() {
     return {
       query: {
@@ -150,9 +155,13 @@ export default {
       return `static/parachain-icon/${item.source.toLowerCase()}.png`;
     },
     init() {
+      if (!this.addressList || !this.addressList.length) return;
       this.loading = true;
+      const account = this.addressList.filter(
+        item => item.network === "polkadot"
+      )[0].value;
       getPolkadotCrowdloanContributions({
-        account: this.$route.query.address
+        account
       }).then(res => {
         this.loading = false;
         this.listData = res;
@@ -167,6 +176,14 @@ export default {
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
+    }
+  },
+  watch: {
+    addressList(val) {
+      if (val && val.length) {
+        this.addressList = val;
+        this.init();
+      }
     }
   }
 };
