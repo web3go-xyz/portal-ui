@@ -13,6 +13,7 @@
     "dependencies": {
         "@polkadot/api": "^6.12.1",
         "@polkadot/extension-dapp": "^0.40.3",
+        "@polkadot/vue-identicon": "^0.88.1",
         "bignumber.js": "^9.0.1",
         "decimal.js": "^10.3.1",
         "dom-to-image": "^2.6.0",
@@ -45,6 +46,7 @@
         "@babel/plugin-syntax-import-meta": "^7.0.0",
         "@babel/plugin-syntax-jsx": "^7.0.0",
         "@babel/plugin-transform-runtime": "^7.0.0",
+        "@babel/polyfill": "^7.12.1",
         "@babel/preset-env": "^7.0.0",
         "@babel/runtime-corejs2": "^7.15.4",
         "autoprefixer": "^7.1.2",

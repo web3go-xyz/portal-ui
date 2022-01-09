@@ -6,6 +6,11 @@
         <div class="text-wrap">
           <div class="title">{{ $route.query.address | shorterAddress }}</div>
           <div class="copy-wrap">
+            <Identicon
+              :size="32"
+              :theme="'polkadot'"
+              :value="$route.query.address"
+            />
             <span>{{ $route.query.address }}</span>
             <img
               title="copy"
@@ -51,7 +56,7 @@
           >{{ v.name }}</span
         >
       </div>
-      <div class="checkbox" v-if="currentNav.name=='Balance'">
+      <div class="checkbox" v-if="currentNav.name == 'Balance'">
         <el-checkbox v-model="showZeroBalance">Show zero balances</el-checkbox>
       </div>
     </div>
@@ -105,6 +110,7 @@
 </template>
 
 <script>
+import Identicon from "@polkadot/vue-identicon";
 import {
   getAllSupportedChains,
   ss58transform,
@@ -125,6 +131,7 @@ export default {
     Defi,
     Staking,
     NFT,
+    Identicon,
   },
   data() {
     return {
@@ -466,7 +473,7 @@ export default {
       margin-left: 28px;
       /deep/ .el-checkbox__label {
         font-size: 16px;
-        color: #7f7e7e!important;
+        color: #7f7e7e !important;
       }
     }
   }
