@@ -44,7 +44,7 @@
                       @click.stop="copy(scope.row.value)"
                       src="@/assets/images/profile/copy.png"
                       alt=""
-                      class="copy hover-item"
+                      class="copy"
                     />
                   </div>
                 </div>
@@ -174,6 +174,12 @@
               </div>
             </template>
           </el-table-column>
+          <div class="empty" slot="empty">
+            <div class="img-wrap">
+              <img src="@/assets/images/profile/none.png" alt="" />
+            </div>
+            <div class="text">No data…</div>
+          </div>
         </el-table>
       </div>
     </div>
@@ -232,10 +238,10 @@ export default {
     };
   },
   created() {},
-  watch:{
-    showZeroBalance(){
+  watch: {
+    showZeroBalance() {
       this.clearTable2();
-    }
+    },
   },
   computed: {
     filterBalanceNavData() {
@@ -490,6 +496,11 @@ export default {
             margin-left: 8px;
             width: 16px;
             height: 16px;
+            opacity: 0.6;
+            cursor: pointer;
+            &:hover {
+              opacity: 0.4;
+            }
           }
         }
       }
@@ -559,6 +570,21 @@ export default {
   }
   /deep/ .icon-cell .cell {
     padding: 0 !important;
+  }
+  .empty {
+    margin-top: 170px;
+    line-height: initial;
+    .img-wrap {
+      margin-bottom: 16px;
+      img {
+        width: 120px;
+        height: 115px;
+      }
+    }
+    .text {
+      font-size: 18px;
+      color: rgba(41, 40, 40, 0.6);
+    }
   }
 }
 </style>

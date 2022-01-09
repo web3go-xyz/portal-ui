@@ -11,7 +11,7 @@
               :theme="'polkadot'"
               :value="$route.query.address"
             />
-            <span>{{ $route.query.address }}</span>
+            <span class="text">{{ $route.query.address }}</span>
             <img
               title="copy"
               @click="copy($route.query.address)"
@@ -38,7 +38,7 @@
         <div class="title">
           <i v-if="isNaN(totalAmount)" class="el-icon-loading"></i>
           <span v-else>$ {{ totalAmount | format2 }}</span>
-          <img src="@/assets/images/profile/info2.png" alt="" />
+          <img style="margin-right:15px;" src="@/assets/images/profile/info2.png" alt="" />
         </div>
         <div class="text-wrap">
           <span>The total amount of account</span>
@@ -99,7 +99,7 @@
                 @click="copy(v.value)"
                 src="@/assets/images/profile/copy.png"
                 alt=""
-                class="copy hover-item"
+                class="copy"
               />
             </div>
           </div>
@@ -385,7 +385,6 @@ export default {
   margin-top: 27px;
 
   .info-wrap {
-    width: 100%;
     background: #ffffff;
     border-radius: 10px;
     padding: 24px 16px;
@@ -413,6 +412,9 @@ export default {
           color: #7f7e7e;
           display: flex;
           align-items: center;
+          // .text {
+          //   margin-left: 4px;
+          // }
           img {
             width: 16px;
             height: 16px;
@@ -547,8 +549,13 @@ export default {
       .copy-wrap {
         position: relative;
         .copy {
+          opacity: .6;
+          cursor: pointer;
           width: 16px;
           height: 16px;
+          &:hover{
+            opacity: .4;
+          }
         }
       }
     }
