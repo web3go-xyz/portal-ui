@@ -2,7 +2,7 @@
   <div class="profile-index-page">
     <div class="info-wrap">
       <div class="info-left">
-        <Identicon :size="48" :theme="'jdenticon'" :value="polkadotAddress" />
+        <Identicon :size="48" :theme="'polkadot'" :value="polkadotAddress" />
         <!-- <img class="left-img" :src="getMainIcon()" alt="" /> -->
         <div class="text-wrap">
           <div class="title">{{ $route.query.address | shorterAddress }}</div>
@@ -106,7 +106,8 @@
 </template>
 
 <script>
-import Identicon from "@vue-polkadot/vue-identicon";
+// import Identicon from "@vue-polkadot/vue-identicon";
+import Identicon from '@polkadot/vue-identicon';
 import {
   getAllSupportedChains,
   ss58transform,
