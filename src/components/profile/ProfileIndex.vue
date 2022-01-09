@@ -117,7 +117,7 @@ import {
   getAllSupportedChains,
   ss58transform,
   getBalance,
-  getPrice
+  getPrice,
 } from "@/api/profile/Balance";
 import Balance from "./nav/Balance";
 import Crowdloan from "./nav/Crowdloan";
@@ -133,7 +133,7 @@ export default {
     Defi,
     Staking,
     NFT,
-    Identicon
+    Identicon,
   },
   data() {
     return {
@@ -144,20 +144,20 @@ export default {
       visible: false,
       currentNav: {
         name: "Balance",
-        component: Balance
+        component: Balance,
       },
       navList: [
         {
           name: "Balance",
-          component: Balance
+          component: Balance,
         },
         {
           name: "Parachain Crowdloan",
-          component: Crowdloan
+          component: Crowdloan,
         },
         {
           name: "Defi",
-          component: Defi
+          component: Defi,
         },
         // {
         //   name: "Staking",
@@ -165,9 +165,9 @@ export default {
         // },
         {
           name: "NFT",
-          component: NFT
-        }
-      ]
+          component: NFT,
+        },
+      ],
     };
   },
   watch: {
@@ -178,18 +178,18 @@ export default {
     },
   },
   created() {
-    const find = this.navList.find(v => this.$route.params.nav == v.name);
+    const find = this.navList.find((v) => this.$route.params.nav == v.name);
     if (find) {
       this.currentNav = find;
     }
-    getAllSupportedChains().then(d => {
+    getAllSupportedChains().then((d) => {
       this.allChains = d;
       ss58transform({
         account: this.$route.query.address,
         // account: "15MtNMKZUFjHoWzqQzQ8ntuXaAB8KHb3QSf5SeXfkqpBh45i",
-        networks: d.map(v => v.network),
-        filter_no_symbol: true
-      }).then(data => {
+        networks: d.map((v) => v.network),
+        filter_no_symbol: true,
+      }).then((data) => {
         if (data.length && data[0].error) {
           this.addressList = [];
         } else {
@@ -219,14 +219,14 @@ export default {
     filterAddressList() {
       if (this.addressList.length) {
         let filter = [];
-        this.addressList.forEach(t => {
+        this.addressList.forEach((t) => {
           // 去掉特殊数据
           if (t.key == "Public Key") {
             return;
           }
 
           //去掉没有链地址的
-          let findChain = this.allChains.find(c => {
+          let findChain = this.allChains.find((c) => {
             return c.network == t.network;
           });
           if (!findChain) {
@@ -246,11 +246,11 @@ export default {
     },
     totalAmount() {
       let sum = 0;
-      this.balanceNavData.forEach(v => {
+      this.balanceNavData.forEach((v) => {
         sum += v.totalPrice;
       });
       return sum;
-    }
+    },
   },
   methods: {
     init() {
@@ -277,7 +277,7 @@ export default {
     },
     getMainIcon() {
       const find = this.filterAddressList.find(
-        v => v.value == this.$route.query.address
+        (v) => v.value == this.$route.query.address
       );
       if (find) {
         return `static/parachain-icon/${find.network}.png`;
@@ -289,10 +289,10 @@ export default {
       if (this.balanceNavData.length) {
         this.$refs.component.rowClick(this.balanceNavData[0]);
       }
-      this.balanceNavData.forEach(v => {
+      this.balanceNavData.forEach((v) => {
         getPrice({
-          symbol: v.symbols[0]
-        }).then(priceResult => {
+          symbol: v.symbols[0],
+        }).then((priceResult) => {
           let price = 0;
           if (priceResult && priceResult.price) {
             price = priceResult.price;
@@ -305,12 +305,13 @@ export default {
         getBalance({
           account_id: v.value,
           wssEndpoint: v.wssEndpoints[0],
-          network: v.network
-        }).then(balanceResult => {
+          network: v.network,
+        }).then((balanceResult) => {
           let balance = 0;
           if (balanceResult && balanceResult.balance) {
-            balance =
-              balanceResult.balance.free + balanceResult.balance.reserved;
+            balance = BigNumber(balanceResult.balance.free).plus(
+              BigNumber(balanceResult.balance.reserved)
+            );
             balance = this.formatTokenBalance(balance, balanceResult);
           }
           this.$set(v, "balance", balance);
@@ -322,7 +323,7 @@ export default {
     },
     formatTokenBalance(balance, balanceResp) {
       if (balanceResp && balanceResp.account_id) {
-        let findAddressItem = this.addressList.find(t => {
+        let findAddressItem = this.addressList.find((t) => {
           if (t.value) {
             return t.value === balanceResp.account_id;
           }
@@ -351,9 +352,9 @@ export default {
       this.$router.replace({
         name: "ProfileIndex",
         params: {
-          nav: v.name
+          nav: v.name,
         },
-        query: this.$route.query
+        query: this.$route.query,
       });
     },
     copy(text) {
@@ -366,8 +367,8 @@ export default {
         this.$message.success("Address Copied");
       }
       document.body.removeChild(input);
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less">
