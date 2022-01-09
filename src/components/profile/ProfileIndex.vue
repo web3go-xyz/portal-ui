@@ -51,7 +51,7 @@
           >{{ v.name }}</span
         >
       </div>
-      <div class="checkbox">
+      <div class="checkbox" v-if="currentNav.name=='Balance'">
         <el-checkbox v-model="showZeroBalance">Show zero balances</el-checkbox>
       </div>
     </div>
