@@ -2,15 +2,11 @@
   <div class="profile-index-page">
     <div class="info-wrap">
       <div class="info-left">
-        <img class="left-img" :src="getMainIcon()" alt="" />
+        <Identicon :size="48" :theme="'polkadot'" :value="polkadotAddress" />
+        <!-- <img class="left-img" :src="getMainIcon()" alt="" /> -->
         <div class="text-wrap">
           <div class="title">{{ $route.query.address | shorterAddress }}</div>
           <div class="copy-wrap">
-            <Identicon
-              :size="32"
-              :theme="'polkadot'"
-              :value="$route.query.address"
-            />
             <span>{{ $route.query.address }}</span>
             <img
               title="copy"
@@ -191,6 +187,18 @@ export default {
     });
   },
   computed: {
+    polkadotAddress() {
+      if (!this.addressList || this.addressList.length == 0) {
+        return "";
+      }
+
+      for (const ad of this.addressList) {
+        if (ad.network && ad.network === "polkadot") {
+          return ad.value;
+        }
+      }
+      return "";
+    },
     // 删掉无效balance的地址
     filterAddressList() {
       if (this.addressList.length) {
