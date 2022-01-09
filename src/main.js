@@ -11,7 +11,7 @@ import './style/theme/index.less'
 import './style/whiteTheme/index.less'
 // element公共组件自定义样式
 import './style/whiteTheme.less';
-
+import '@babel/polyfill';
 
 import App from './App'
 import router from './router'
