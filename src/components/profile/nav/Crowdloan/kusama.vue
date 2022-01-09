@@ -2,7 +2,7 @@
   <div class="ProfileNFT ProfileNFT-rmrk">
     <div class="common-profile-title">
       <img src="/static/parachain-icon/kusama.png" alt="" />
-      <span>KSM {{ totalCount }}</span>
+      <span>KSM {{ totalamount }}</span>
     </div>
     <div class="nftNavCon">
       <div class="nftNavConList">
@@ -58,7 +58,7 @@
           <div class="nftNavConList-table-pagination">
             <el-pagination
               background
-              layout="prev, pager, next,sizes,jumper"
+              layout="prev, pager"
               :current-page.sync="query.pageIndex"
               :page-size.sync="query.pageSize"
               :page-sizes="[10, 20, 50, 100]"
@@ -95,6 +95,7 @@ export default {
         orderBys: []
       },
       listData: [],
+      totalamount: "",
       totalCount: 0,
       loading: false,
       tableTitle: [
@@ -169,6 +170,13 @@ export default {
         }).then(res => {
           this.loading = false;
           this.totalCount = res.length;
+          this.totalamount = formatKUSAMA(
+            this.totalCount
+              .map(item => +item.amount)
+              .reduce((prev, curr) => {
+                return prev + curr;
+              })
+          );
           let list = res;
           if (list) {
             for (const d of list) {

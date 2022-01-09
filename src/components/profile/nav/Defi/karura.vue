@@ -68,7 +68,7 @@
       <div class="cdp-list-pagination">
         <el-pagination
           background
-          layout="prev, pager, next,sizes,jumper"
+          layout="prev, pager"
           :current-page.sync="query.pageIndex"
           :page-size.sync="query.pageSize"
           :page-sizes="[10, 20, 50, 100]"

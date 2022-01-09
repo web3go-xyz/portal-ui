@@ -2,7 +2,7 @@
   <div class="ProfileNFT ProfileNFT-rmrk">
     <div class="common-profile-title">
       <img src="/static/parachain-icon/polkadot.png" alt="" />
-      <span>DOT {{ totalCount }}</span>
+      <span>DOT {{ totalamount }}</span>
     </div>
     <div class="nftNavCon">
       <div class="nftNavConList">
@@ -58,7 +58,7 @@
           <div class="nftNavConList-table-pagination">
             <el-pagination
               background
-              layout="prev, pager, next,sizes,jumper"
+              layout="prev, pager"
               :current-page.sync="query.pageIndex"
               :page-size.sync="query.pageSize"
               :page-sizes="[10, 20, 50, 100]"
@@ -77,7 +77,7 @@
 <script>
 import {
   getPolkadotCrowdloanContributions,
-  getPolkadotParaChainList,
+  getPolkadotParaChainList
 } from "@/api/profile/crowdloan";
 import { formatDOT } from "@/filters";
 export default {
@@ -92,8 +92,9 @@ export default {
       query: {
         pageSize: 10,
         pageIndex: 1,
-        orderBys: [],
+        orderBys: []
       },
+      totalamount: "",
       listData: [],
       totalCount: 0,
       loading: false,
@@ -104,30 +105,30 @@ export default {
           value: "projectName",
           img: this.getIcon,
           click: this.goDetail,
-          className: "parachain collection",
+          className: "parachain collection"
         },
         {
           col: 4,
           title: "Amount（DOT）",
           align: "right",
           filter: formatDOT,
-          value: "amount",
+          value: "amount"
         },
         {
           col: 4,
           offset: 2,
           title: "BlockNumber",
           align: "right",
-          value: "blockNumber",
+          value: "blockNumber"
         },
         {
           col: 4,
           title: "Time",
           offset: 4,
           filter: this.filterTimestamp_created_at,
-          value: "createdTime",
-        },
-      ],
+          value: "createdTime"
+        }
+      ]
     };
   },
   created() {},
@@ -140,7 +141,7 @@ export default {
         (this.query.pageIndex - 1) * this.query.pageSize,
         this.query.pageIndex * this.query.pageSize
       );
-    },
+    }
   },
   methods: {
     goDetail(row) {
@@ -150,8 +151,8 @@ export default {
           crowdloanId: row.crowdloanId,
           lastUpdateTime: row.createdTime,
           projectName: row.projectName,
-          iconPath: row.icon,
-        },
+          iconPath: row.icon
+        }
       });
     },
     getIcon(item) {
@@ -160,21 +161,28 @@ export default {
     init() {
       if (!this.addressList || !this.addressList.length) return;
       this.loading = true;
-        const account = this.addressList.filter(
+      const account = this.addressList.filter(
         item => item.network === "polkadot"
       )[0].value;
-      getPolkadotParaChainList().then((res) => {
+      getPolkadotParaChainList().then(res => {
         this.allParachainList = res.list;
         getPolkadotCrowdloanContributions({
-          account,
-        }).then((res) => {
+          account
+        }).then(res => {
           this.loading = false;
           this.totalCount = res.length;
+          this.totalamount = formatDOT(
+            this.totalCount
+              .map(item => +item.amount)
+              .reduce((prev, curr) => {
+                return prev + curr;
+              })
+          );
           let list = res;
           if (list) {
             for (const d of list) {
               let paraId = d.paraId;
-              let findParachainInfo = this.allParachainList.find((t) => {
+              let findParachainInfo = this.allParachainList.find(t => {
                 return t.paraId === paraId;
               });
               if (findParachainInfo) {
