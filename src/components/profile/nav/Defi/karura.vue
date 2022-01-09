@@ -58,6 +58,9 @@
             ></el-col>
           </el-row>
         </div>
+        <div v-if="!loanPositionTableData.length" class="common-profile-table-nodata">
+          No Data
+        </div>
       </div>
       <div class="cdp-list-pagination">
         <el-pagination
@@ -82,7 +85,7 @@ import { ss58transform } from "@/api/common";
 
 import addressDisplay from "@/components/ui-elements/addressDisplay";
 export default {
-  name: "CDPProfiler",
+  name: "ProfileDefiKarura",
   components: {
     addressDisplay
   },

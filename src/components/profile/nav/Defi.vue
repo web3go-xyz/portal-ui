@@ -3,7 +3,7 @@
     <div class="common-profile-sort">
       <span
         v-for="(sort, index) in sortList"
-        :key="sort.code"
+        :key="sort.name"
         :class="actSortIndex === index ? 'act' : ''"
         @click="clickSort(index)"
         >{{ sort.name }}</span
@@ -25,17 +25,14 @@ export default {
       actComponent: Karura,
       sortList: [
         {
-          name: "All",
-          code: ""
+          name: "All"
         },
         {
           name: "Karura",
-          view: Karura,
-          code: ""
+          view: Karura
         },
         {
-          name: "Others",
-          code: ""
+          name: "Others"
         }
       ]
     };

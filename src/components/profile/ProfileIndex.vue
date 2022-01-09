@@ -51,7 +51,7 @@
           >{{ v.name }}</span
         >
       </div>
-      <div class="checkbox" v-if="currentNav.name=='Balance'">
+      <div class="checkbox" v-if="currentNav.name == 'Balance'">
         <el-checkbox v-model="showZeroBalance">Show zero balances</el-checkbox>
       </div>
     </div>
@@ -109,7 +109,7 @@ import {
   getAllSupportedChains,
   ss58transform,
   getBalance,
-  getPrice,
+  getPrice
 } from "@/api/profile/Balance";
 import Balance from "./nav/Balance";
 import Crowdloan from "./nav/Crowdloan";
@@ -124,7 +124,7 @@ export default {
     Crowdloan,
     Defi,
     Staking,
-    NFT,
+    NFT
   },
   data() {
     return {
@@ -135,45 +135,45 @@ export default {
       visible: false,
       currentNav: {
         name: "Balance",
-        component: Balance,
+        component: Balance
       },
       navList: [
         {
           name: "Balance",
-          component: Balance,
+          component: Balance
         },
         {
           name: "Parachain Crowdloan",
-          component: Crowdloan,
+          component: Crowdloan
         },
         {
           name: "Defi",
-          component: Defi,
+          component: Defi
         },
         {
           name: "Staking",
-          component: Staking,
+          component: Staking
         },
         {
           name: "NFT",
-          component: NFT,
-        },
-      ],
+          component: NFT
+        }
+      ]
     };
   },
   created() {
-    const find = this.navList.find((v) => this.$route.params.nav == v.name);
+    const find = this.navList.find(v => this.$route.params.nav == v.name);
     if (find) {
       this.currentNav = find;
     }
-    getAllSupportedChains().then((d) => {
+    getAllSupportedChains().then(d => {
       this.allChains = d;
       ss58transform({
         account: this.$route.query.address,
         // account: "15MtNMKZUFjHoWzqQzQ8ntuXaAB8KHb3QSf5SeXfkqpBh45i",
-        networks: d.map((v) => v.network),
-        filter_no_symbol: true,
-      }).then((data) => {
+        networks: d.map(v => v.network),
+        filter_no_symbol: true
+      }).then(data => {
         if (data.length && data[0].error) {
           this.addressList = [];
         } else {
@@ -188,14 +188,14 @@ export default {
     filterAddressList() {
       if (this.addressList.length) {
         let filter = [];
-        this.addressList.forEach((t) => {
+        this.addressList.forEach(t => {
           // 去掉特殊数据
           if (t.key == "Public Key") {
             return;
           }
 
           //去掉没有链地址的
-          let findChain = this.allChains.find((c) => {
+          let findChain = this.allChains.find(c => {
             return c.network == t.network;
           });
           if (!findChain) {
@@ -215,16 +215,16 @@ export default {
     },
     totalAmount() {
       let sum = 0;
-      this.balanceNavData.forEach((v) => {
+      this.balanceNavData.forEach(v => {
         sum += v.totalPrice;
       });
       return sum;
-    },
+    }
   },
   methods: {
     getMainIcon() {
       const find = this.filterAddressList.find(
-        (v) => v.value == this.$route.query.address
+        v => v.value == this.$route.query.address
       );
       if (find) {
         return `static/parachain-icon/${find.network}.png`;
@@ -236,10 +236,10 @@ export default {
       if (this.balanceNavData.length) {
         this.$refs.component.rowClick(this.balanceNavData[0]);
       }
-      this.balanceNavData.forEach((v) => {
+      this.balanceNavData.forEach(v => {
         getPrice({
-          symbol: v.symbols[0],
-        }).then((priceResult) => {
+          symbol: v.symbols[0]
+        }).then(priceResult => {
           let price = 0;
           if (priceResult && priceResult.price) {
             price = priceResult.price;
@@ -252,8 +252,8 @@ export default {
         getBalance({
           account_id: v.value,
           wssEndpoint: v.wssEndpoints[0],
-          network: v.network,
-        }).then((balanceResult) => {
+          network: v.network
+        }).then(balanceResult => {
           let balance = 0;
           if (balanceResult && balanceResult.balance) {
             balance =
@@ -269,7 +269,7 @@ export default {
     },
     formatTokenBalance(balance, balanceResp) {
       if (balanceResp && balanceResp.account_id) {
-        let findAddressItem = this.addressList.find((t) => {
+        let findAddressItem = this.addressList.find(t => {
           if (t.value) {
             return t.value === balanceResp.account_id;
           }
@@ -298,9 +298,9 @@ export default {
       this.$router.replace({
         name: "ProfileIndex",
         params: {
-          nav: v.name,
+          nav: v.name
         },
-        query: this.$route.query,
+        query: this.$route.query
       });
     },
     copy(text) {
@@ -313,8 +313,8 @@ export default {
         this.$message.success("Address Copied");
       }
       document.body.removeChild(input);
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="less">
@@ -341,6 +341,19 @@ export default {
   }
 }
 .common-profile-component {
+}
+.nftNavCon .nftNavConList-table-header {
+  padding-bottom: 15px !important;
+  border-bottom: 1px solid #e9e9e9;
+}
+.nftNavConList-table-content .lp-row .el-row {
+  border-bottom: 1px solid #e9e9e9;
+}
+.common-profile-table-nodata{
+  color: #999;
+  padding-top: 10px;
+  font-size: 14px;
+  text-align: center;
 }
 .common-profile-title {
   height: 40px;
@@ -466,7 +479,7 @@ export default {
       margin-left: 28px;
       /deep/ .el-checkbox__label {
         font-size: 16px;
-        color: #7f7e7e!important;
+        color: #7f7e7e !important;
       }
     }
   }
