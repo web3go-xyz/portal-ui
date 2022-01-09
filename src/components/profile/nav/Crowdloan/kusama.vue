@@ -75,7 +75,10 @@
 </template>
 
 <script>
-import { getKusamaCrowdloanContributions } from "@/api/profile/crowdloan";
+import {
+  getKusamaCrowdloanContributions,
+  getKusamaParaChainList,
+} from "@/api/profile/crowdloan";
 import { formatKUSAMA } from "@/filters";
 export default {
   name: "ProfileCrodloanKusama",
@@ -84,7 +87,7 @@ export default {
       query: {
         pageSize: 10,
         pageIndex: 1,
-        orderBys: []
+        orderBys: [],
       },
       listData: [],
       totalCount: 0,
@@ -93,33 +96,33 @@ export default {
         {
           col: 6,
           title: "Parachain",
-          value: "source",
+          value: "projectName",
           img: this.getIcon,
           click: this.goDetail,
-          className: "parachain collection"
+          className: "parachain collection",
         },
         {
           col: 4,
           title: "Amount（KSM）",
           align: "right",
           filter: formatKUSAMA,
-          value: "amount"
+          value: "amount",
         },
         {
           col: 4,
           offset: 2,
           title: "BlockNumber",
           align: "right",
-          value: "blockNumber"
+          value: "blockNumber",
         },
         {
           col: 4,
           title: "Time",
           offset: 4,
           filter: this.filterTimestamp_created_at,
-          value: "createdTime"
-        }
-      ]
+          value: "createdTime",
+        },
+      ],
     };
   },
   created() {},
@@ -132,7 +135,7 @@ export default {
         (this.query.pageIndex - 1) * this.query.pageSize,
         this.query.pageIndex * this.query.pageSize
       );
-    }
+    },
   },
   methods: {
     goDetail(row) {
@@ -141,22 +144,38 @@ export default {
         query: {
           crowdloanId: row.crowdloanId,
           lastUpdateTime: row.createdTime,
-          projectName: row.source,
-          iconPath: row.source
-        }
+          projectName: row.projectName,
+          iconPath: row.icon,
+        },
       });
     },
     getIcon(item) {
-      return `static/parachain-icon/${item.source.toLowerCase()}.png`;
+      return `static/parachain-icon/${item.icon}`;
     },
     init() {
       this.loading = true;
-      getKusamaCrowdloanContributions({
-        account: this.$route.query.address
-      }).then(res => {
-        this.loading = false;
-        this.listData = res;
-        this.totalCount = res.length;
+      getKusamaParaChainList().then((res) => {
+        this.allParachainList = res.list;
+        getKusamaCrowdloanContributions({
+          account: this.$route.query.address,
+        }).then((res) => {
+          this.loading = false;
+          this.totalCount = res.length;
+          let list = res;
+          if (list) {
+            for (const d of list) {
+              let paraId = d.paraId;
+              let findParachainInfo = this.allParachainList.find((t) => {
+                return t.paraId === paraId;
+              });
+              if (findParachainInfo) {
+                d.icon = findParachainInfo.icon;
+                d.projectName = findParachainInfo.projectName;
+              }
+            }
+          }
+          this.listData = list;
+        });
       });
     },
     filterTimestamp_created_at(str) {
@@ -167,8 +186,8 @@ export default {
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>

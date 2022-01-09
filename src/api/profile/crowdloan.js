@@ -2,7 +2,6 @@ import request from "@/utils/request";
 import utils from "@/utils/index";
 
 
-// 获取所有链
 export function getPolkadotCrowdloanContributions(data) {
     return request({
         url: `${window.BASE_API}/polkadot/parachain-analysis/getCrowdloanContributions`,
@@ -11,7 +10,6 @@ export function getPolkadotCrowdloanContributions(data) {
     })
 }
 
-// 获取所有链
 export function getKusamaCrowdloanContributions(data) {
     return request({
         url: `${window.BASE_API}/kusama/parachain-analysis/getCrowdloanContributions`,
@@ -19,3 +17,18 @@ export function getKusamaCrowdloanContributions(data) {
         data
     })
 }
+
+export function getKusamaParaChainList(data) {
+    return request({
+        url: `${window.BASE_API}/kusama/parachain-analysis/getPolkParaChainList`,
+        method: 'post',
+        data
+    })
+}
+export function getPolkadotParaChainList(data) {
+    return request({
+        url: `${window.BASE_API}/polkadot/parachain-analysis/getPolkParaChainList`,
+        method: 'post',
+        data
+    })
+} 

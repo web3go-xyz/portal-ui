@@ -2,7 +2,7 @@
   <div class="profile-index-page">
     <div class="info-wrap">
       <div class="info-left">
-        <Identicon :size="48" :theme="'polkadot'" :value="polkadotAddress" />
+        <Identicon :size="48" :theme="'jdenticon'" :value="polkadotAddress" />
         <!-- <img class="left-img" :src="getMainIcon()" alt="" /> -->
         <div class="text-wrap">
           <div class="title">{{ $route.query.address | shorterAddress }}</div>
