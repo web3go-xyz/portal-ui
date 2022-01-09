@@ -211,6 +211,9 @@ export default {
     balanceNavData: {
       type: Array,
     },
+    showZeroBalance: {
+      type: Boolean,
+    },
   },
   data() {
     return {
@@ -229,14 +232,26 @@ export default {
     };
   },
   created() {},
+  watch:{
+    showZeroBalance(){
+      this.clearTable2();
+    }
+  },
   computed: {
     filterBalanceNavData() {
+      // 过滤是否显示zero balance
+      const result = this.balanceNavData.filter((v) => {
+        if (this.showZeroBalance) {
+          return true;
+        } else {
+          return v.balance > 0;
+        }
+      });
+      // 过滤选中tag
       if (!this.currentTag) {
-        return this.balanceNavData;
+        return result;
       }
-      return this.balanceNavData.filter(
-        (v) => v.network == this.currentTag.network
-      );
+      return result.filter((v) => v.network == this.currentTag.network);
     },
   },
   methods: {
