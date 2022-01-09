@@ -34,7 +34,11 @@
         <div class="title">
           <i v-if="isNaN(totalAmount)" class="el-icon-loading"></i>
           <span v-else>$ {{ totalAmount | format2 }}</span>
-          <img style="margin-right:15px;" src="@/assets/images/profile/info2.png" alt="" />
+          <img
+            style="margin-right: 15px"
+            src="@/assets/images/profile/info2.png"
+            alt=""
+          />
         </div>
         <div class="text-wrap">
           <span>The total amount of account</span>
@@ -108,7 +112,7 @@
 
 <script>
 // import Identicon from "@vue-polkadot/vue-identicon";
-import Identicon from '@polkadot/vue-identicon';
+import Identicon from "@polkadot/vue-identicon";
 import {
   getAllSupportedChains,
   ss58transform,
@@ -166,6 +170,13 @@ export default {
       ]
     };
   },
+  watch: {
+    queryAddress(newValue, oldValue) {
+      if (newValue != oldValue) {
+        this.init();
+      }
+    },
+  },
   created() {
     const find = this.navList.find(v => this.$route.params.nav == v.name);
     if (find) {
@@ -189,6 +200,9 @@ export default {
     });
   },
   computed: {
+    queryAddress() {
+      return this.$route.query.address;
+    },
     polkadotAddress() {
       if (!this.addressList || this.addressList.length == 0) {
         return "";
@@ -239,6 +253,28 @@ export default {
     }
   },
   methods: {
+    init() {
+      const find = this.navList.find((v) => this.$route.params.nav == v.name);
+      if (find) {
+        this.currentNav = find;
+      }
+      getAllSupportedChains().then((d) => {
+        this.allChains = d;
+        ss58transform({
+          account: this.$route.query.address,
+          // account: "15MtNMKZUFjHoWzqQzQ8ntuXaAB8KHb3QSf5SeXfkqpBh45i",
+          networks: d.map((v) => v.network),
+          filter_no_symbol: true,
+        }).then((data) => {
+          if (data.length && data[0].error) {
+            this.addressList = [];
+          } else {
+            this.addressList = data;
+          }
+          this.getTableData();
+        });
+      });
+    },
     getMainIcon() {
       const find = this.filterAddressList.find(
         v => v.value == this.$route.query.address
@@ -560,12 +596,12 @@ export default {
       .copy-wrap {
         position: relative;
         .copy {
-          opacity: .6;
+          opacity: 0.6;
           cursor: pointer;
           width: 16px;
           height: 16px;
-          &:hover{
-            opacity: .4;
+          &:hover {
+            opacity: 0.4;
           }
         }
       }
