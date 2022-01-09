@@ -153,10 +153,10 @@ export default {
           name: "Defi",
           component: Defi,
         },
-        {
-          name: "Staking",
-          component: Staking,
-        },
+        // {
+        //   name: "Staking",
+        //   component: Staking,
+        // },
         {
           name: "NFT",
           component: NFT,
