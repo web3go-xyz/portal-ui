@@ -1,7 +1,7 @@
 <template>
   <div class="ProfileNFT ProfileNFT-rmrk">
     <div class="common-profile-title">
-      <img src="/static/images/kusama.png" alt="" />
+      <img src="/static/parachain-icon/kusama.png" alt="" />
       <span>KSM {{ totalCount }}</span>
     </div>
     <div class="nftNavCon">

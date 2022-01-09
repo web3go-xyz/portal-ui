@@ -1,7 +1,7 @@
 <template>
   <div class="ProfileNFT ProfileNFT-rmrk">
     <div class="common-profile-title">
-      <img src="/static/images/polkadot.svg" alt="" />
+      <img src="/static/parachain-icon/polkadot.png" alt="" />
       <span>DOT {{ totalCount }}</span>
     </div>
     <div class="nftNavCon">
