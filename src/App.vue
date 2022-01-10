@@ -163,7 +163,7 @@ export default {
           nav: "Balance",
         },
         query: {
-          address: this.inputValue,
+          address: this.inputValue.trim(),
         },
       });
     },
