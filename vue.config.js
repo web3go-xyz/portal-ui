@@ -19,5 +19,6 @@ module.exports = {
     },
     devServer: {
         port: 10005,
-    }
+    },
+    parallel: false
 }
