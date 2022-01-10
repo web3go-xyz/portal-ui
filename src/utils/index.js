@@ -136,7 +136,7 @@ export function html2Img(el, transferSuccessFn) {
                             formData.append("file", file2);
                             imgUpload(formData).then((d) => {
                                 resolve({
-                                    address: `https://web3go.xyz/img/${d}`,
+                                    address: `https://web3go.xyz/img-upload/${d}`,
                                     base64: canvas1.toDataURL(),
                                 });
                             });
