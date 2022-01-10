@@ -77,22 +77,22 @@
 <script>
 import {
   getKusamaCrowdloanContributions,
-  getKusamaParaChainList
+  getKusamaParaChainList,
 } from "@/api/profile/crowdloan";
 import { formatKUSAMA } from "@/filters";
 export default {
   name: "ProfileCrodloanKusama",
   props: {
     addressList: {
-      type: Array
-    }
+      type: Array,
+    },
   },
   data() {
     return {
       query: {
         pageSize: 10,
         pageIndex: 1,
-        orderBys: []
+        orderBys: [],
       },
       listData: [],
       totalamount: "",
@@ -105,30 +105,30 @@ export default {
           value: "projectName",
           img: this.getIcon,
           click: this.goDetail,
-          className: "parachain collection"
+          className: "parachain collection",
         },
         {
           col: 4,
           title: "Amount（KSM）",
           align: "right",
           filter: formatKUSAMA,
-          value: "amount"
+          value: "amount",
         },
         {
           col: 4,
           offset: 2,
           title: "BlockNumber",
           align: "right",
-          value: "blockNumber"
+          value: "blockNumber",
         },
         {
           col: 4,
           title: "Time",
           offset: 4,
           filter: this.filterTimestamp_created_at,
-          value: "createdTime"
-        }
-      ]
+          value: "createdTime",
+        },
+      ],
     };
   },
   created() {},
@@ -141,7 +141,7 @@ export default {
         (this.query.pageIndex - 1) * this.query.pageSize,
         this.query.pageIndex * this.query.pageSize
       );
-    }
+    },
   },
   methods: {
     goDetail(row) {
@@ -151,8 +151,8 @@ export default {
           crowdloanId: row.crowdloanId,
           lastUpdateTime: row.createdTime,
           projectName: row.projectName,
-          iconPath: row.icon
-        }
+          iconPath: row.icon,
+        },
       });
     },
     getIcon(item) {
@@ -160,40 +160,46 @@ export default {
     },
     init() {
       this.loading = true;
-      const account = this.addressList.filter(
-        item => item.network === "kusama"
-      )[0].value;
-      getKusamaParaChainList().then(res => {
+
+      getKusamaParaChainList().then((res) => {
         this.allParachainList = res.list;
-        getKusamaCrowdloanContributions({
-          account
-        }).then(res => {
-          this.loading = false;
-          this.totalCount = res.length;
-          this.totalamount = formatKUSAMA(
-            this.totalCount
-              .map(item => +item.amount)
-              .reduce((prev, curr) => {
-                return prev + curr;
-              })
-          );
-          let list = res;
-          if (list) {
-            for (const d of list) {
-              let paraId = d.paraId;
-              let findParachainInfo = this.allParachainList.find(t => {
-                return t.paraId === paraId;
-              });
-              if (findParachainInfo) {
-                d.icon = findParachainInfo.icon;
-                d.projectName = findParachainInfo.projectName;
-              }
-            }
-          }
-          this.listData = list;
-        });
+        this.loadData();
       });
     },
+    loadData() {
+      const account = this.addressList.filter(
+        (item) => item.network === "kusama"
+      )[0].value;
+      getKusamaCrowdloanContributions({
+        account,
+      }).then((res) => {
+        this.loading = false;
+
+        let list = res;
+        this.totalCount = list.length || 0;
+        this.totalamount = formatKUSAMA(
+          list
+            .map((item) => +item.amount)
+            .reduce((prev, curr) => {
+              return prev + curr;
+            })
+        );
+        if (list) {
+          for (const d of list) {
+            let paraId = d.paraId;
+            let findParachainInfo = this.allParachainList.find((t) => {
+              return t.paraId === paraId;
+            });
+            if (findParachainInfo) {
+              d.icon = findParachainInfo.icon;
+              d.projectName = findParachainInfo.projectName;
+            }
+          }
+        }
+        this.listData = list;
+      });
+    },
+
     filterTimestamp_created_at(str) {
       return this.$moment(str).format("YYYY-MM-DD hh:mm:ss");
     },
@@ -202,7 +208,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
-    }
+    },
   },
   watch: {
     addressList(val) {
@@ -210,8 +216,8 @@ export default {
         this.addressList = val;
         this.init();
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
