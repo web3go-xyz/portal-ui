@@ -151,7 +151,7 @@ export default {
           crowdloanId: row.crowdloanId,
           lastUpdateTime: row.createdTime,
           projectName: row.projectName,
-          iconPath: row.icon,
+          iconPath: this.getIcon(row),
         },
       });
     },
