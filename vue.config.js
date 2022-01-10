@@ -16,5 +16,8 @@ module.exports = {
             'echarts': 'echarts',
             'axios': 'axios',
         })
+    },
+    devServer: {
+        port: 10005,
     }
 }

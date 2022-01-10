@@ -1,6 +1,8 @@
 {
-    "name": "my-app",
-    "version": "0.1.0",
+    "name": "portal-ui",
+    "version": "1.0.0",
+    "description": "web3go portal ui",
+    "author": "team@web3go.xyz",
     "private": true,
     "scripts": {
         "start": "vue-cli-service serve",
