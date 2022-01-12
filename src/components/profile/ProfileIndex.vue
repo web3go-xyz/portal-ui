@@ -137,7 +137,7 @@ export default {
   },
   data() {
     return {
-      showZeroBalance: true,
+      showZeroBalance: false,
       allChains: [],
       addressList: [],
       balanceNavData: [],
@@ -186,7 +186,7 @@ export default {
       this.allChains = d;
       ss58transform({
         account: this.$route.query.address,
-        // account: "15MtNMKZUFjHoWzqQzQ8ntuXaAB8KHb3QSf5SeXfkqpBh45i",
+        // account: "12hAtDZJGt4of3m2GqZcUCVAjZPALfvPwvtUTFZPQUbdX1Ud",
         networks: d.map((v) => v.network),
         filter_no_symbol: true,
       }).then((data) => {
@@ -286,9 +286,7 @@ export default {
     },
     getTableData() {
       this.balanceNavData = JSON.parse(JSON.stringify(this.filterAddressList));
-      if (this.balanceNavData.length) {
-        this.$refs.component.rowClick(this.balanceNavData[0]);
-      }
+      
       this.balanceNavData.forEach((v) => {
         getPrice({
           symbol: v.symbols[0],
