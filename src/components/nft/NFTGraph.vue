@@ -5,7 +5,7 @@
       <img src="../../assets/images/nft/logo.png" alt="" class="nftHead-logo" />
       <div class="nftHead-con">
         <h2 class="nftHead-con-title">NFT Garden</h2>
-        <p class="nftHead-con-des">By Web3go Offical Team</p>
+        <p class="nftHead-con-des">By Web3go Official Team</p>
       </div>
     </div>
     <div class="nftNav">
