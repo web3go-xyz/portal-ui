@@ -7,12 +7,7 @@
     <div class="big-bg">
       <div class="info-wrap">
         <div class="info-left">
-          <Identicon
-            class="icon"
-            :size="56"
-            :theme="'substrate'"
-            value="0x62C4eE3905aCB37106dfA2175226afFa6DDf3032"
-          />
+          <img class="icon" :src="makeBlockie($route.query.id)" alt="" />
           <div class="right">
             <div class="title">
               <span>Delegator</span>
@@ -60,12 +55,9 @@
 <script>
 import Action from "./Action";
 import Reward from "./Reward";
-import Identicon from "@polkadot/vue-identicon";
+import makeBlockie from "ethereum-blockies-base64";
 
 export default {
-  components: {
-    Identicon,
-  },
   data() {
     return {
       currentNav: {
@@ -85,6 +77,9 @@ export default {
     };
   },
   methods: {
+    makeBlockie(address) {
+      return makeBlockie("0x13a61daC75e2F66721dcaEdA726be1E636928800");
+    },
     goToNav(v) {
       this.currentNav = v;
     },

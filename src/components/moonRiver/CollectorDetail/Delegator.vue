@@ -2,7 +2,12 @@
   <div class="table-wrap">
     <el-table
       v-loading="loading"
-      :data="tableData.slice((pageIndex - 1) * pageSize, pageIndex * pageSize)"
+      :data="
+        collectorData.allNominators.slice(
+          (pageIndex - 1) * pageSize,
+          pageIndex * pageSize
+        )
+      "
     >
       <el-table-column label="Rank" width="90">
         <template slot-scope="scope">
@@ -45,12 +50,10 @@
       <el-pagination
         background
         layout="prev, pager, next,sizes,jumper"
-        :total="tableData.length"
+        :total="collectorData.allNominators.length"
         :current-page.sync="pageIndex"
         :page-size.sync="pageSize"
         :page-sizes="[10, 20, 50, 100]"
-        @current-change="getList"
-        @size-change="getList"
       >
       </el-pagination>
     </div>
@@ -58,22 +61,22 @@
 </template>
 
 <script>
-import { BigNumber } from "bignumber.js";
-
-import moonriverService from "@/api/moonriver";
-
 export default {
+  props: {
+    collectorData: {
+      type: Object,
+    },
+    loading: {
+      type: Boolean,
+    },
+  },
   data() {
     return {
       pageIndex: 1,
       pageSize: 10,
-      loading: false,
-      tableData: [],
     };
   },
-  created() {
-    this.getList();
-  },
+
   methods: {
     turnDelegatorActionPage(row) {
       this.$router.push({
@@ -83,48 +86,6 @@ export default {
           bonded: row.amount,
         },
       });
-    },
-    getList() {
-      this.loading = true;
-      moonriverService
-        .getRealtimeCollatorState({
-          collators: [this.$route.query.id],
-        })
-        .then((d) => {
-          this.loading = false;
-          if (d.length) {
-            const data = d[0];
-            data.bond = BigNumber(data.bond, 16).dividedBy(1e18);
-            let allAmount = BigNumber(0);
-            // 计算总和
-            data.topDelegations.forEach((sv) => {
-              sv.amount = BigNumber(sv.amount, 16).dividedBy(1e18);
-              allAmount = allAmount.plus(sv.amount);
-            });
-            data.topDelegations.forEach((sv) => {
-              sv.percent = sv.amount
-                .dividedBy(allAmount)
-                .multipliedBy(100)
-                .toFixed(2);
-            });
-            data.bottomDelegations.forEach((sv) => {
-              sv.amount = BigNumber(sv.amount, 16).dividedBy(1e18);
-              sv.percent = 0;
-            });
-            data.allNominators = [
-              ...data.topDelegations,
-              ...data.bottomDelegations,
-            ];
-            //排序小弟
-            data.allNominators.sort((a, b) => {
-              const totalB = b.amount;
-              const totalA = a.amount;
-              const result = totalB.minus(totalA);
-              return result;
-            });
-            this.tableData = data.allNominators;
-          }
-        });
     },
     shotFilter(str) {
       return str.slice(0, 6) + "..." + str.slice(str.length - 4, str.length);

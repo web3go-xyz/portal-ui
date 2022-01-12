@@ -1,12 +1,8 @@
-
-
 const state = {
-    addressTag: []
+    addressTag: [],
 }
 
 const mutations = {
-
-
     SET_ADDRESS_TAG: (state, addressTag) => {
         state.addressTag = addressTag
     },

@@ -1378,6 +1378,10 @@ export default {
               element.rankIndex = index;
             }
             this.tableData = nominatorRes;
+            localStorage.setItem(
+              "moonriverCollectorSortList",
+              JSON.stringify(nominatorRes)
+            );
             console.log("tableData", nominatorRes);
             this.$nextTick(() => {
               this.generateTableChart();
@@ -1853,9 +1857,6 @@ export default {
         name: "CollectorDetail",
         query: {
           id: row.id,
-          rank: $index + 1,
-          selfStake: this.getSelfStake(row),
-          totalStake: this.getTotalStake(row),
         },
         params: { data: row },
       });
