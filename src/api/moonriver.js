@@ -1,5 +1,6 @@
 import request from "@/utils/request";
 import utils from "@/utils/index";
+
 function formatUrl4Moonriver(url) {
     return utils.formatUrl(window.MOONRIVER_API || '/moonriver', url);
 }
@@ -107,8 +108,30 @@ export function getCollatorActionHistory(data) {
         data
     })
 }
-
-
+// 显示 当前Collator的所有的Reward History信息
+export function getCollatorRewardHistory(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-analysis/getCollatorRewardHistory'),
+        method: 'post',
+        data
+    })
+}
+// 显示 当前Delegator的所有的Action History信息
+export function getDelegatorActionHistory(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-analysis/getDelegatorActionHistory'),
+        method: 'post',
+        data
+    })
+}
+// 显示 当前Delagator的所有的Reward History信息
+export function getDelegatorRewardHistory(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-analysis/getDelegatorRewardHistory'),
+        method: 'post',
+        data
+    })
+}
 //获取订阅信息
 export function getMySubscribe(data) {
     return request({
@@ -148,6 +171,9 @@ export default {
     getNominatorReward,
     atStake,
     getCollatorActionHistory,
+    getCollatorRewardHistory,
+    getDelegatorActionHistory,
+    getDelegatorRewardHistory,
     getMySubscribe,
     unsubscribe,
     subscribe

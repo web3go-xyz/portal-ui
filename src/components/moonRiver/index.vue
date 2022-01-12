@@ -1850,7 +1850,7 @@ export default {
     },
     turnActionPage({ row, $index }) {
       this.$router.push({
-        name: "CollectorAction",
+        name: "CollectorDetail",
         query: {
           id: row.id,
           rank: $index + 1,

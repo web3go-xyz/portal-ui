@@ -1,6 +1,8 @@
 import { imgUpload } from "@/api/common";
 import domtoimage from 'dom-to-image';
 import { BigNumber } from "bignumber.js";
+import { Message } from 'element-ui'
+
 
 export function formatUrl(prefix, url) {
     if (url.indexOf('http') < 0) {
@@ -177,6 +179,17 @@ export function downloadFile(data, filename) {
     save_link.download = filename;
     save_link.click();
 }
+export function copy(text) {
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.setAttribute("value", text);
+    input.select();
+    if (document.execCommand("copy")) {
+        document.execCommand("copy");
+        Message.success("Address Copied");
+    }
+    document.body.removeChild(input);
+}
 export default {
     formatToken,
     formatTokenNumber,
@@ -187,6 +200,7 @@ export default {
     html2Img,
     share,
     downloadFile,
+    copy,
     formatUrl,
     KSM_RATIO,
     DOT_RATIO
