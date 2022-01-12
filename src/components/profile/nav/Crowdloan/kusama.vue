@@ -100,7 +100,7 @@ export default {
       loading: false,
       tableTitle: [
         {
-          col: 6,
+          col: 5,
           title: "Parachain",
           value: "projectName",
           img: this.getIcon,
@@ -108,25 +108,30 @@ export default {
           className: "parachain collection",
         },
         {
-          col: 4,
+          col: 3,
           title: "Amount（KSM）",
           align: "right",
           filter: formatKUSAMA,
           value: "amount",
         },
         {
-          col: 4,
+          col: 3,
           offset: 2,
           title: "BlockNumber",
           align: "right",
           value: "blockNumber",
         },
         {
-          col: 4,
+          col: 3,
           title: "Time",
           offset: 4,
           filter: this.filterTimestamp_created_at,
           value: "createdTime",
+        },
+        {
+          col: 4,
+          title: "Source",
+          value: "source",
         },
       ],
     };
