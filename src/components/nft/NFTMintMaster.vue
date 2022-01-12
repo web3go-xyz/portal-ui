@@ -208,21 +208,27 @@ export default {
         this.totalCount = res?.length;
         this.nftNavConListLoading = false;
         this.listData = res;
-        this.listTotal = res
-          .map(item => +item.mint_count)
-          .reduce((prev, curr) => {
-            return prev + curr;
-          });
+        this.listTotal=0;
+        if(res&& res.length>0){
+          this.listTotal = res
+            .map(item => +item.mint_count)
+            .reduce((prev, curr) => {
+              return prev + curr;
+            });
+        }
         this.initChart();
       });
     },
 
     initChart() {
-      const total = this.listData
+      let total=0;
+      if( this.listData&&  this.listData.length>0){
+        total = this.listData
         .map(item => +item.mint_volume)
         .reduce((prev, curr) => {
           return prev + curr;
         });
+      }
       this.mintVolumeTotal = this.formatedCap(total);
       const seriesData = this.listData
         .sort((b, a) => a.mint_volume - b.mint_volume)
