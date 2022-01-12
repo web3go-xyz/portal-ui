@@ -31,6 +31,7 @@ import DelegatorDetail from "@/components/moonRiver/DelegatorDetail";
 import MaintenanceDashboard from "@/components/sysConfig/MaintenanceDashboard";
 import AddressTagManage from "@/components/sysConfig/sub/AddressTagManage";
 import ParaChainManage from "@/components/sysConfig/sub/ParaChainManage";
+import RMRKNFTNameUpdate from "@/components/sysConfig/sub/RMRKNFTNameUpdate";
 
 
 import NFTProfiler from "@/components/nft/NftProfiler";
@@ -252,6 +253,16 @@ export default new Router({
                     },
                     components: {
                         sub: ParaChainManage
+                    }
+                },
+                {
+                    path: "/MaintenanceDashboard/RMRKNFTNameUpdate",
+                    name: "MaintenanceDashboard-RMRKNFTNameUpdate",
+                    meta: {
+                        noHead: true
+                    },
+                    components: {
+                        sub: RMRKNFTNameUpdate
                     }
                 }
             ]

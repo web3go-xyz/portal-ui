@@ -13,18 +13,20 @@
         }}</el-menu-item>
       </el-menu>
     </div>
-    <div>
+    <div v-show="showSub">
       <router-view name="sub" />
     </div>
   </div>
 </template>
 
 <script>
+import platformApi from "@/api/platform";
 export default {
   name: "MaintenanceDashboard",
   data() {
     return {
       name: "Maintenance Dashboard",
+      showSub: false,
       activeIndex: "AddressTagManage",
       menus: [
         {
@@ -37,14 +39,55 @@ export default {
           name: "ParaChain Manage",
           routeName: "MaintenanceDashboard-ParaChainManage",
         },
+        {
+          index: "RMRKNFTNameUpdate",
+          name: "RMRK NFT NameUpdate",
+          routeName: "MaintenanceDashboard-RMRKNFTNameUpdate",
+        },
       ],
     };
   },
   computed: {},
   mounted() {
-    this.handleSelect(this.activeIndex, "");
+    // this.showSub = true;
+    // this.handleSelect(this.activeIndex, "");
+    this.validateManagePrivilege();
   },
   methods: {
+    validateManagePrivilege() {
+      this.$prompt("Please input the code", "Notification", {
+        confirmButtonText: "Confirm",
+        showCancelButton: false,
+        inputType: "text",
+      })
+        .then(({ value }) => {
+          platformApi
+            .checkMaintenancePrivilege({ code: value })
+            .then((resp) => {
+              if (resp === true) {
+                // this.$message({
+                //   type: "success",
+                //   message: "Pass",
+                // });
+                this.showSub = true;
+                this.handleSelect(this.activeIndex, "");
+              } else {
+                window.location.reload();
+              }
+            });
+
+          //
+        })
+        .catch(() => {
+          this.$message({
+            type: "error",
+            message: "Code invalid",
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        });
+    },
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
 

@@ -15,7 +15,18 @@ function queryDataBoardViewCount(data) {
         method: "post",
         data
     });
-} export default {
+};
+
+function checkMaintenancePrivilege(data) {
+    return request({
+        url: "/platform/checkMaintenancePrivilege",
+        method: "post",
+        data
+    });
+
+};
+export default {
     reportDataBoardViewCount,
     queryDataBoardViewCount,
+    checkMaintenancePrivilege
 };

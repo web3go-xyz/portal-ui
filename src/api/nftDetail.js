@@ -75,3 +75,10 @@ export function getNFT(data) {
         data
     })
 }
+export function updateCollectionEntityName(data) {
+    return request({
+        url: formatUrl4Rmrk("/rmrk-analysis/updateCollectionEntityName"),
+        method: "post",
+        data
+    });
+}
