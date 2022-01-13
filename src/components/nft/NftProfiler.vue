@@ -171,7 +171,7 @@ import {
   getCollectionStatistic,
   getTopTradedCollections,
   getAvgPriceVolumeOfCollection,
-  getTotalCollectionVolumes
+  getTotalCollectionVolumes,
 } from "@/api/nftProfiler";
 import { formatKUSAMA } from "../../filters";
 export default {
@@ -181,7 +181,7 @@ export default {
       query: {
         pageSize: 10,
         pageIndex: 1,
-        orderBys: []
+        orderBys: [],
       },
       listData: [],
       latest7days: [],
@@ -195,69 +195,65 @@ export default {
           title: "NFT Collection",
           align: "left",
           value: "name",
-          className: "collection"
+          className: "collection",
         },
         {
           col: 2,
           value: "collection_volume",
-          title: "Volume"
+          title: "Volume",
         },
         {
           col: 2,
           value: "collection_transactions",
-          title: "Transactions"
+          title: "Transactions",
         },
         {
           col: 3,
           value: "max_price_list",
-          title: "Max Price(List)"
+          title: "Max Price(List)",
         },
         {
           col: 2,
           value: "avg_price_list",
-          title: "Avg"
+          title: "Avg",
         },
         {
           col: 2,
           value: "min_price_list",
-          title: "Min"
+          title: "Min",
         },
         {
           col: 3,
           value: "max_price",
-          title: "Max Price(Sale)"
+          title: "Max Price(Sale)",
         },
         {
           col: 2,
           value: "avg_price",
-          title: "Avg"
+          title: "Avg",
         },
         {
           col: 1,
           value: "min_price",
-          title: "Min"
+          title: "Min",
         },
         {
           col: 2,
           title: "Buyer",
-          value: "buyer_count"
+          value: "buyer_count",
         },
         {
           col: 2,
           value: "timestamp_created_at",
-          title: "Created"
-        }
-      ]
+          title: "Created",
+        },
+      ],
     };
   },
   created() {
     const arr = [];
     for (let i = 6; i >= 0; i--) {
-      arr.push(
-        this.$moment()
-          .subtract(i, "days")
-          .format("YYYY-MM-DD")
-      );
+      arr.push(this.$moment().subtract(i, "days").format("YYYY-MM-DD"));
     }
     this.latest7days = arr;
   },
@@ -271,8 +267,8 @@ export default {
         query: {
           back: this.$router.currentRoute.name,
           id: item.id,
-          symbol: item.symbol
-        }
+          symbol: item.symbol,
+        },
       });
     },
     init() {
@@ -281,12 +277,12 @@ export default {
       this.getTopTradedCollections();
     },
     getTotalCollectionVolumes() {
-      getTotalCollectionVolumes().then(res => {
+      getTotalCollectionVolumes().then((res) => {
         this.collectionVolume = res.collection_volume;
       });
     },
     getTopTradedCollectionsSort(sort, order, index) {
-      this.tableTitle = this.tableTitle.map(item => {
+      this.tableTitle = this.tableTitle.map((item) => {
         if (item.sort) {
           item.sort = null;
         }
@@ -304,8 +300,8 @@ export default {
         pageSize: this.query.pageSize,
         pageIndex: this.query.pageIndex,
         orderBys: this.query.orderBys,
-        collection_id: ""
-      }).then(res => {
+        collection_id: "",
+      }).then((res) => {
         this.nftNavConListLoading = false;
         this.listData = res.list;
         this.totalCount = res.totalCount;
@@ -314,54 +310,60 @@ export default {
     getTopTradedCollections() {
       this.nftNavConTopLoading = true;
       getTopTradedCollections({
-        start_time: this.$moment()
-          .subtract(7, "days")
-          .format("YYYY-MM-DD"),
+        start_time: this.$moment().subtract(7, "days").format("YYYY-MM-DD"),
         end_time: this.$moment().format("YYYY-MM-DD"),
         interaction: "BUY",
-        topN: 5
-      }).then(getTopTradedCollectionsRes => {
+        topN: 5,
+      }).then((getTopTradedCollectionsRes) => {
         if (getTopTradedCollectionsRes.length) {
           Promise.all(
-            getTopTradedCollectionsRes.map(item => {
+            getTopTradedCollectionsRes.map((item) => {
               return getAvgPriceVolumeOfCollection({
                 collection_id: item.collection_id,
-                query_days: this.latest7days
+                query_days: this.latest7days,
               });
             })
-          ).then(getAvgPriceVolumeOfCollectionRes => {
+          ).then((getAvgPriceVolumeOfCollectionRes) => {
             this.nftNavConTopLoading = false;
             const chartDom = document.getElementById("nftNavConTop-line");
             const myChart = echarts.init(chartDom);
             const series = [];
             const legendData = [];
             for (let i = 0; i < getTopTradedCollectionsRes.length; i++) {
-              const collection_id = getTopTradedCollectionsRes[
-                i
-              ].collection_id.split("-")[1];
+              const collection_id =
+                getTopTradedCollectionsRes[i].collection_id.split("-")[1];
               const volume = getAvgPriceVolumeOfCollectionRes[i].map(
-                item => +formatKUSAMA(item.volume || 0).replaceAll(",", "")
+                (item) => +formatKUSAMA(item.volume || 0).replaceAll(",", "")
               );
               series.push({
                 name: collection_id,
                 type: "line",
                 smooth: true,
                 lineStyle: {
-                  width: 3
+                  width: 3,
                 },
-                data: [...volume]
+                data: [...volume],
               });
               legendData.push(collection_id);
             }
             const option = {
+              title: {
+                subtext: "Unit: KSM",
+                subtextStyle: {
+                  fontSize: "14",
+                  fontWeight: "bold",
+                },
+                top: "0",
+                right: "0",
+              },
               color: [
                 "rgba(58, 118, 240, 1)",
                 "rgba(95, 204, 186, 1)",
-                "rgba(255, 125, 0, 1)"
+                "rgba(255, 125, 0, 1)",
               ],
               tooltip: {
                 trigger: "axis",
-                formatter: params => {
+                formatter: (params) => {
                   return `
                       <div class="echart-tooltip-formatter-popover">
                         ${params[0].axisValue}
@@ -387,7 +389,7 @@ export default {
                         </div>
                       </div>
                           `;
-                }
+                },
               },
               legend: {
                 data: legendData,
@@ -400,48 +402,48 @@ export default {
                 itemStyle: {},
                 textStyle: {
                   color: "#7F7E7E",
-                  fontSize: 14
-                }
+                  fontSize: 14,
+                },
               },
               grid: {
                 containLabel: true,
                 left: 10,
                 top: 70,
                 bottom: 0,
-                right: 10
+                right: 10,
               },
               xAxis: [
                 {
                   type: "category",
                   data: this.latest7days,
                   axisLine: {
-                    show: false
+                    show: false,
                   },
                   axisTick: {
-                    show: false
+                    show: false,
                   },
                   axisLabel: {
                     color: "#A9A9A9",
-                    fontSize: 14
-                  }
-                }
+                    fontSize: 14,
+                  },
+                },
               ],
               yAxis: [
                 {
                   type: "value",
                   axisLabel: {
                     color: "#A9A9A9",
-                    fontSize: 14
+                    fontSize: 14,
                   },
                   splitLine: {
                     lineStyle: {
                       color: "rgba(232, 232, 232, 1)",
-                      type: "dashed"
-                    }
-                  }
-                }
+                      type: "dashed",
+                    },
+                  },
+                },
               ],
-              series
+              series,
             };
             myChart.setOption(option);
           });
@@ -461,10 +463,10 @@ export default {
     },
     goto(routeName) {
       this.$router.push({
-        name: routeName
+        name: routeName,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
