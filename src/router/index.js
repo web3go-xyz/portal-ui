@@ -25,13 +25,13 @@ import CDPProfiler from "@/components/cdpProfiler/CDPProfiler";
 import CDPDetail from "@/components/cdpProfiler/CDPDetail";
 import CustomQuery from "@/components/customQuery/CustomQuery";
 
-import MoonRiver from "@/components/moonRiver/index";
+import Moonriver from "@/components/moonRiver/index";
 import CollectorDetail from "@/components/moonRiver/CollectorDetail";
 import DelegatorDetail from "@/components/moonRiver/DelegatorDetail";
 
-import moonBeam from "@/components/moonBeam/index";
-import moonBeamCollectorDetail from "@/components/moonBeam/CollectorDetail";
-import moonBeamDelegatorDetail from "@/components/moonBeam/DelegatorDetail";
+import Moonbeam from "@/components/moonBeam/index";
+import MoonbeamCollectorDetail from "@/components/moonBeam/CollectorDetail";
+import MoonbeamDelegatorDetail from "@/components/moonBeam/DelegatorDetail";
 
 import MaintenanceDashboard from "@/components/sysConfig/MaintenanceDashboard";
 import AddressTagManage from "@/components/sysConfig/sub/AddressTagManage";
@@ -211,9 +211,9 @@ export default new Router({
             component: CustomQuery
         },
         {
-            path: "/MoonRiver",
-            name: "MoonRiver",
-            component: MoonRiver
+            path: "/Moonriver",
+            name: "Moonriver",
+            component: Moonriver
         },
         {
             path: "/CollectorDetail",
@@ -232,25 +232,25 @@ export default new Router({
             component: DelegatorDetail
         },
         {
-            path: "/moonBeam",
-            name: "moonBeam",
-            component: moonBeam
+            path: "/Moonbeam",
+            name: "Moonbeam",
+            component: Moonbeam 
         },
         {
-            path: "/moonBeamCollectorDetail",
-            name: "moonBeamCollectorDetail",
+            path: "/MoonbeamCollectorDetail",
+            name: "MoonbeamCollectorDetail",
             meta: {
                 noHead: true
             },
-            component: moonBeamCollectorDetail
+            component: MoonbeamCollectorDetail
         },
         {
-            path: "/moonBeamDelegatorDetail",
-            name: "moonBeamDelegatorDetail",
+            path: "/MoonbeamDelegatorDetail",
+            name: "MoonbeamDelegatorDetail",
             meta: {
                 noHead: true
             },
-            component: moonBeamDelegatorDetail
+            component: MoonbeamDelegatorDetail
         },
         {
             path: "/MaintenanceDashboard",

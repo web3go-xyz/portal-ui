@@ -1,7 +1,7 @@
 <template>
   <div class="content profile-defi-kraura">
     <div class="common-profile-title">
-      <img src="@/assets/images/home_slices/karura.png" alt="" />
+      <img src="@/assets/images/home/karura.png" alt="" />
       <span>Karura CDP</span>
     </div>
     <div class="cdp-list">
@@ -268,10 +268,10 @@ export default {
     margin: 10px 16px;
   }
   .icon-total {
-    background: url("./../../../../assets/images/cdp-total.png");
+    background: url("./../../../../assets/images/cdp/cdp-total.png");
   }
   .icon-debt {
-    background: url("./../../../../assets/images/cdp-debt.png");
+    background: url("./../../../../assets/images/cdp/cdp-debt.png");
   }
   .statistic-item .value {
     float: left;
@@ -307,10 +307,10 @@ export default {
 }
 body.white-theme .profile-defi-kraura {
   .icon-total {
-    background-image: url("./../../../../assets/images/cdp-total2.png");
+    background-image: url("./../../../../assets/images/cdp/cdp-total2.png");
   }
   .icon-debt {
-    background-image: url("./../../../../assets/images/cdp-debt2.png");
+    background-image: url("./../../../../assets/images/cdp/cdp-debt2.png");
   }
   .statistic-item .value .title {
     color: rgba(41, 40, 40, 0.6);
@@ -371,7 +371,7 @@ body.white-theme .profile-defi-kraura {
 
   .bg {
     position: absolute;
-    background: url(./../../../../assets/images/cdp-bg.png);
+    background: url(./../../../../assets/images/cdp/cdp-bg.png);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;

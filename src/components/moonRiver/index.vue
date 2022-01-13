@@ -18,7 +18,7 @@
         >
       </div>
       <div v-else class="wallet-wrap">
-        <img class="icon" src="@/assets/images/wallet-login-icon.png" alt="" />
+        <img class="icon" src="@/assets/images/moonriver/wallet-login-icon.png" alt="" />
         <div class="number">
           <el-tooltip :content="linkAccount.address" placement="top">
             <span> {{ shotFilter(linkAccount.address) }}</span>
@@ -86,21 +86,21 @@
     <div class="big-bg">
       <div class="info-wrap">
         <div class="info-item">
-          <img src="@/assets/images/moonriver1.png" alt="" />
+          <img src="@/assets/images/moonriver/icon3.png" alt="" />
           <div class="right">
             <div class="title">Round Index</div>
             <div class="number">{{ roundInfo.current }}</div>
           </div>
         </div>
         <div class="info-item">
-          <img src="@/assets/images/moonriver2.png" alt="" />
+          <img src="@/assets/images/moonriver/icon1.png" alt="" />
           <div class="right">
             <div class="title">Block Number</div>
             <div class="number">{{ blockNumber }}</div>
           </div>
         </div>
         <div class="info-item">
-          <img src="@/assets/images/moonriver3.png" alt="" />
+          <img src="@/assets/images/moonriver/icon2.png" alt="" />
           <div class="right">
             <div class="title">Round Porgress</div>
             <div class="number">
@@ -361,7 +361,7 @@
                       getCollectorRank(scope.row) < parseInt(maxCollector * 0.9)
                     "
                     slot="reference"
-                    src="@/assets/images/stake-safe.png"
+                    src="@/assets/images/moonriver/stake-safe.png"
                     alt=""
                   />
                   <img
@@ -371,7 +371,7 @@
                       parseInt(maxCollector * 0.9)
                     "
                     slot="reference"
-                    src="@/assets/images/stake-danger.png"
+                    src="@/assets/images/moonriver/stake-danger.png"
                     alt=""
                   />
                 </el-popover>
@@ -524,7 +524,7 @@
                     class="tooltip-icon"
                     v-if="getStakeRank(scope.row) >= maxNominator - 10"
                     slot="reference"
-                    src="@/assets/images/stake-danger.png"
+                    src="@/assets/images/moonriver/stake-danger.png"
                     alt=""
                   />
                 </el-popover>

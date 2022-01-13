@@ -125,12 +125,12 @@ export default {
     getIcon(obj) {
       const map = {
         "RMRK NFT": "/static/images/rmrk-logo.png",
-        Moonriver: require("@/assets/images/home_slices/moonriver.png"),
-        Karura: require("@/assets/images/home_slices/karura.png"),
+        Moonriver: require("@/assets/images/home/moonriver.png"),
+        Karura: require("@/assets/images/home/karura.png"),
         Kusama: "/static/images/kusama.png",
         Polkadot: "/static/images/polkadot.svg",
-        ERC20: require("@/assets/images/home_slices/erc20.png"),
-        Custom: require("@/assets/images/home_slices/customQuery.png"),
+        ERC20: require("@/assets/images/home/erc20.png"),
+        Custom: require("@/assets/images/home/customQuery.png"),
       };
       return map[obj.type];
     },
@@ -188,7 +188,7 @@ export default {
 
       if (d.type == "Moonriver") {
         this.$router.push({
-          name: "MoonRiver",
+          name: "Moonriver",
           params: {
             data: d,
           },

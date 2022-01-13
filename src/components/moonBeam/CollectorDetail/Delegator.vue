@@ -86,7 +86,7 @@ export default {
     },
     turnDelegatorActionPage(row) {
       this.$router.push({
-        name: "DelegatorDetail",
+        name: "MoonbeamDelegatorDetail",
         query: {
           id: row.owner,
           bonded: row.amount,

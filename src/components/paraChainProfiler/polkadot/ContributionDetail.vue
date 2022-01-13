@@ -28,7 +28,7 @@
           </div>
           <div class="head-mian-item">
             <p>
-              <img src="@/assets/images/kusama_detail_raised.png" alt="" /><span
+              <img src="@/assets/images/crowdloan/kusama_detail_raised.png" alt="" /><span
                 >Total raised</span
               >
             </p>
@@ -42,7 +42,7 @@
           <div class="head-mian-item">
             <p class="contributions">
               <img
-                src="@/assets/images/kusama_detail_contributions.png"
+                src="@/assets/images/crowdloan/kusama_detail_contributions.png"
                 alt=""
               /><span>Number of contributions</span>
             </p>
@@ -51,7 +51,7 @@
           <div class="head-mian-item">
             <p class="contributions">
               <img
-                src="@/assets/images/kusama_detail_contributor.png"
+                src="@/assets/images/crowdloan/kusama_detail_contributor.png"
                 alt=""
               /><span>Number of contributors</span>
             </p>
@@ -60,7 +60,7 @@
           <div class="head-mian-item">
             <p>
               <img
-                src="@/assets/images/kusama_detail_progress.png"
+                src="@/assets/images/crowdloan/kusama_detail_progress.png"
                 alt=""
               /><span>Cap</span>
             </p>
@@ -73,7 +73,7 @@
           </div>
           <div class="head-mian-item">
             <p>
-              <img src="@/assets/images/kusama_detail_ration.png" alt="" /><span
+              <img src="@/assets/images/crowdloan/kusama_detail_ration.png" alt="" /><span
                 >Progress</span
               >
             </p>
@@ -229,7 +229,7 @@
                   <span class="rank" v-if="index < 3"
                     ><img
                       :src="
-                        require(`@/assets/images/kusama_detail_top${
+                        require(`@/assets/images/crowdloan/kusama_detail_top${
                           index + 1
                         }.png`)
                       "
@@ -292,7 +292,7 @@
                   <span class="rank" v-if="index < 3"
                     ><img
                       :src="
-                        require(`@/assets/images/kusama_detail_top${
+                        require(`@/assets/images/crowdloan/kusama_detail_top${
                           index + 1
                         }.png`)
                       "

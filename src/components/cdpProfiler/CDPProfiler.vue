@@ -334,10 +334,10 @@ export default {
     margin: 10px 16px;
   }
   .icon-total {
-    background: url("./../../assets/images/cdp-total.png");
+    background: url("./../../assets/images/cdp/cdp-total.png");
   }
   .icon-debt {
-    background: url("./../../assets/images/cdp-debt.png");
+    background: url("./../../assets/images/cdp/cdp-debt.png");
   }
   .statistic-item .value {
     float: left;
@@ -373,10 +373,10 @@ export default {
 }
 body.white-theme .cdp-page {
   .icon-total {
-    background-image: url("./../../assets/images/cdp-total2.png");
+    background-image: url("./../../assets/images/cdp/cdp-total2.png");
   }
   .icon-debt {
-    background-image: url("./../../assets/images/cdp-debt2.png");
+    background-image: url("./../../assets/images/cdp/cdp-debt2.png");
   }
   .statistic-item .value .title {
     color: rgba(41, 40, 40, 0.6);

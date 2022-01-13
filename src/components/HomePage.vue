@@ -118,14 +118,10 @@
                 class="card-item"
                 v-for="d in monriverDashboardListFilter"
                 :key="d.id"
-                @click="showCardDetail('MoonRiver', d)"
+                @click="showCardDetail(d.type, d)"
               >
                 <div class="card-item-head">
-                  <img
-                    src="./../assets/images/home_slices/moonriver.png"
-                    alt=""
-                    class="logo"
-                  />
+                  <img :src="d.icon" alt="" class="logo" />
                   <span class="type">{{ mapCardType(d.type) }}</span>
                 </div>
                 <div class="card-item-con">
@@ -155,7 +151,7 @@
               >
                 <div class="card-item-head">
                   <img
-                    src="./../assets/images/home_slices/karura.png"
+                    src="./../assets/images/home/karura.png"
                     alt=""
                     class="logo"
                   />
@@ -189,7 +185,7 @@
               >
                 <div class="card-item-head">
                   <img
-                    src="./../assets/images/home_slices/erc20.png"
+                    src="./../assets/images/home/erc20.png"
                     alt=""
                     class="logo"
                   />
@@ -235,7 +231,7 @@
               >
                 <div class="card-item-head">
                   <img
-                    src="./../assets/images/home_slices/customQuery.png"
+                    src="./../assets/images/home/customQuery.png"
                     alt=""
                     class="logo"
                   />
@@ -428,6 +424,10 @@ export default {
               tag: "Moonriver",
             },
             {
+              name: "Moonbeam",
+              tag: "Moonbeam",
+            },
+            {
               name: "Crowdloan",
               tag: "Crowdloan",
             },
@@ -525,12 +525,22 @@ export default {
       ],
       moonriverDashboardList: [
         {
+          id: "Moonbeam-1",
+          type: "Moonbeam",
+          name: " Stake Analysis",
+          description: "Moonbeam Analysis to simulate stake",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Polkadot", "Moonbeam"],
+          icon: require(`./../assets/images/home/moonbeam.png`),
+        },
+        {
           id: "Moonriver-1",
           type: "Moonriver",
           name: " Stake Analysis",
           description: "Moonriver Analysis to simulate stake",
           created: "Web3go Offical Team",
-          tags: ["Featured", "Polkadot", "Kusama", "Moonriver"],
+          tags: ["Featured", "Kusama", "Moonriver"],
+          icon: require(`./../assets/images/home/moonriver.png`),
         },
       ],
       rmrkNFTDashboardList: [
@@ -613,6 +623,7 @@ export default {
       const map = {
         "RMRK NFT": "RMRK NFT Garden",
         Moonriver: "Moonriver Staking",
+        Moonbeam: "Moonbeam Staking",
         Karura: "Karura  CDPs",
         Kusama: "Kusama Parachain Crowdloans",
         Polkadot: "Polkadot Parachain Crowdloans",
@@ -634,6 +645,7 @@ export default {
     mapCardType(type) {
       const obj = {
         Moonriver: "Moonriver Staking",
+        Moonbeam: "Moonbeam Staking",
         Karura: "Karura  CDPs",
         Kusama: "Kusama Parachain Crowdloans",
         Polkadot: "Polkadot Parachain Crowdloans",
@@ -642,7 +654,11 @@ export default {
     },
     getCardLineImg(type) {
       const types = ["Moonriver", "Karura", "Kusama", "Polkadot", "ERC20"];
-      const num = types.indexOf(type) > -1 ? types.indexOf(type) + 2 : 9;
+
+      let num = types.indexOf(type) > -1 ? types.indexOf(type) + 2 : 9;
+      if (type === "Moonbeam") {
+        num = 2;
+      }
       return require(`./../assets/images/home/card-line${num}.png`);
     },
 
@@ -736,9 +752,17 @@ export default {
         this.handleCustomQueryActionCommand(d.id + "-view");
       }
 
-      if (type == "MoonRiver") {
+      if (type == "Moonriver") {
         this.$router.push({
-          name: "MoonRiver",
+          name: "Moonriver",
+          params: {
+            data: d,
+          },
+        });
+      }
+      if (type == "Moonbeam") {
+        this.$router.push({
+          name: "Moonbeam",
           params: {
             data: d,
           },

@@ -67,7 +67,7 @@ export default {
     },
     turnCollectorActionPage(row) {
       this.$router.push({
-        name: "CollectorDetail",
+        name: "MoonbeamCollectorDetail",
         query: {
           id: row.collator,
         },

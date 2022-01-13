@@ -206,10 +206,10 @@ import { Decimal } from "decimal.js";
 import wsService from "@/api/wallet-analysis";
 import logoImg from "@/assets/images/logo.png";
 import copyImg from "@/assets/images/copy.png";
-import cardIcon1 from "@/assets/images/cardIcon1.png";
-import cardIcon2 from "@/assets/images/cardIcon2.png";
-import cardIcon3 from "@/assets/images/cardIcon3.png";
-import cardIcon4 from "@/assets/images/cardIcon4.png";
+import cardIcon1 from "@/assets/images/erc20/cardIcon1.png";
+import cardIcon2 from "@/assets/images/erc20/cardIcon2.png";
+import cardIcon3 from "@/assets/images/erc20/cardIcon3.png";
+import cardIcon4 from "@/assets/images/erc20/cardIcon4.png";
 
 export default {
   name: "WalletProfilerDetail",
