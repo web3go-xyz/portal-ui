@@ -124,7 +124,7 @@
         <el-tab-pane label="My Stake" name="2"></el-tab-pane>
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
-        <el-table v-loading="loading" :data="tableData">
+        <el-table v-loading="loading" :data="onePageTableData">
           <el-table-column label="Rank" width="90">
             <template slot-scope="scope">
               <div
@@ -413,6 +413,19 @@
             </template>
           </el-table-column>
         </el-table>
+        <div class="pagination-wrap">
+          <el-pagination
+            background
+            layout="prev, pager, next,sizes,jumper"
+            :total="tableData.length"
+            :current-page.sync="pageIndex"
+            @size-change="generateTableChart"
+            @current-change="generateTableChart"
+            :page-size.sync="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+          >
+          </el-pagination>
+        </div>
       </div>
       <div v-show="activeTab == 2" class="tab-content tab-content2">
         <div class="search-wrap">
@@ -728,6 +741,9 @@ import moonriverService from "@/api/moonriver";
 export default {
   data() {
     return {
+      chartInstances: [],
+      pageIndex: 1,
+      pageSize: 10,
       currentSimulate: {},
       freeBalance: null,
       linkLoading: false,
@@ -785,6 +801,12 @@ export default {
     }
   },
   computed: {
+    onePageTableData() {
+      return this.tableData.slice(
+        (this.pageIndex - 1) * this.pageSize,
+        this.pageIndex * this.pageSize
+      );
+    },
     startRoundIndex() {
       return this.roundInfo.current - 11 - 1;
     },
@@ -1166,29 +1188,27 @@ export default {
         this.roundInfo = d;
         // 获取大哥列表
         moonriverService.getRealtimeCollatorCandidatePool().then((c) => {
-          // 一次性获取小弟列表
-          const nominatorPromiseArr = [];
           let collatorAccounts = [];
           c.forEach((v) => {
             collatorAccounts.push(v.owner);
           });
-          nominatorPromiseArr.push(
+          // 一次性获取大哥详情
+          const getCollectorDetailPromise =
             moonriverService.getRealtimeCollatorState({
               collators: collatorAccounts,
-            })
-          );
+            });
 
           //获取大哥totalReward信息
           const getCollectorTotalRewardPromise =
             moonriverService.getCollatorTotalReward({
-              collators: c.map((v) => v.owner),
+              collators: collatorAccounts,
             });
           // 获取大哥的历史10次reward
           const getCollector10RewardPromise =
             moonriverService.getCollatorReward({
               startRoundIndex: this.startRoundIndex,
               endRoundIndex: this.endRoundIndex,
-              accounts: c.map((v) => v.owner),
+              accounts: collatorAccounts,
             });
           // 获取小弟的历史10次totalStake
           const getNominator10TotalStakePromise = moonriverService.atStake({
@@ -1203,7 +1223,7 @@ export default {
             });
 
           const allPromiseArr = [
-            ...nominatorPromiseArr,
+            getCollectorDetailPromise,
             getCollectorTotalRewardPromise,
             getCollector10RewardPromise,
             getNominator10TotalStakePromise,
@@ -1212,11 +1232,8 @@ export default {
 
           Promise.all(allPromiseArr).then((d) => {
             this.loading = false;
-            // 整理小弟列表
-            let nominatorRes = d.slice(0, nominatorPromiseArr.length);
-            if (Array.isArray(nominatorRes) && nominatorRes.length > 0) {
-              nominatorRes = nominatorRes[0];
-            }
+            // 整理大哥列表
+            let nominatorRes = d[0];
             nominatorRes.forEach((v) => {
               v.bond = BigNumber(v.bond, 16).dividedBy(1e18);
               v.topDelegations.forEach((sv) => {
@@ -1242,7 +1259,7 @@ export default {
               return result;
             });
             // 塞入totalReward
-            const totalRewardRes = d[nominatorPromiseArr.length];
+            const totalRewardRes = d[1];
             nominatorRes.forEach((v) => {
               const find = totalRewardRes.collators.find(
                 (sv) => sv.account.toLowerCase() == v.id.toLowerCase()
@@ -1255,7 +1272,7 @@ export default {
             });
             // debugger
             // 塞入10次大哥reward
-            const getCollector10RewardRes = d[nominatorPromiseArr.length + 1];
+            const getCollector10RewardRes = d[2];
             nominatorRes.forEach((v) => {
               const arr = [];
               for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
@@ -1279,8 +1296,7 @@ export default {
               v.historyReward = arr;
             });
             // 塞入10次小弟totalStake
-            const getNominator10TotalStakeRes =
-              d[nominatorPromiseArr.length + 2];
+            const getNominator10TotalStakeRes = d[3];
             nominatorRes.forEach((v) => {
               const arr = [];
               for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
@@ -1303,13 +1319,7 @@ export default {
             });
             // 塞入10次小弟totalReward (坑点：历史数据返回可能缺失某个roundIndex)
 
-            const getNorminator10RewardRes = d[nominatorPromiseArr.length + 3];
-            console.log(
-              "getNorminator10RewardRes:",
-              getNorminator10RewardRes,
-              ",nominatorRes:",
-              nominatorRes
-            );
+            const getNorminator10RewardRes = d[4];
             nominatorRes.forEach((v) => {
               const arr = [];
               for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
@@ -1392,9 +1402,7 @@ export default {
               JSON.stringify(nominatorRes)
             );
             console.log("tableData", nominatorRes);
-            this.$nextTick(() => {
-              this.generateTableChart();
-            });
+            this.generateTableChart();
             if (this.searchAccount) {
               this.getMyStackList();
             }
@@ -1403,84 +1411,75 @@ export default {
       });
     },
     generateTableChart() {
-      let self = this;
-      console.log(
-        " charInstance update with ",
-        this.tableData.length,
-        " charts"
-      );
-      this.tableData.forEach((v) => {
-        let chartId = `tableChart${v.id}`;
-        let charInstance = self.charts[chartId];
-        if (charInstance) {
-          //console.log(' charInstance clear:',chartId);
-          charInstance.clear();
-        } else {
-          //console.log(' charInstance init:',chartId);
-          charInstance = echarts.init(this.$refs[chartId]);
-        }
-        charInstance.setOption({
-          grid: {
-            left: 0,
-            top: 0,
-            bottom: 0,
-            right: 0,
-          },
-          xAxis: {
-            data: v.historyReward.map((v) => "round" + v.roundIndex),
-            axisLine: {
-              show: false,
+      this.$nextTick(() => {
+        this.chartInstances.forEach((v) => {
+          v.dispose();
+        });
+        this.chartInstances = [];
+        this.onePageTableData.forEach((v) => {
+          let chartId = `tableChart${v.id}`;
+          const charInstance = echarts.init(this.$refs[chartId]);
+          charInstance.setOption({
+            grid: {
+              left: 0,
+              top: 0,
+              bottom: 0,
+              right: 0,
             },
-            axisTick: {
-              show: false,
-            },
-            axisLabel: {
-              show: false,
-            },
-          },
-          yAxis: {
-            axisLabel: {
-              show: false,
-            },
-            splitLine: {
-              show: false,
-            },
-          },
-          series: [
-            {
-              name: "balance",
-              type: "line",
-              data: v.historyReward.map((v) => v.reward.toNumber()),
-              itemStyle: {
-                color: "#17c684",
+            xAxis: {
+              data: v.historyReward.map((v) => "round" + v.roundIndex),
+              axisLine: {
+                show: false,
               },
-              symbol: "none",
-              silent: true,
-              areaStyle: {
-                color: {
-                  type: "linear",
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [
-                    {
-                      offset: 0,
-                      color: "rgba(105, 231, 201, 0.35)", // 0% 处的颜色
-                    },
-                    {
-                      offset: 1,
-                      color: "rgba(56, 203, 152, 0)", // 100% 处的颜色
-                    },
-                  ],
+              axisTick: {
+                show: false,
+              },
+              axisLabel: {
+                show: false,
+              },
+            },
+            yAxis: {
+              axisLabel: {
+                show: false,
+              },
+              splitLine: {
+                show: false,
+              },
+            },
+            series: [
+              {
+                name: "balance",
+                type: "line",
+                data: v.historyReward.map((v) => v.reward.toNumber()),
+                itemStyle: {
+                  color: "#17c684",
+                },
+                symbol: "none",
+                silent: true,
+                areaStyle: {
+                  color: {
+                    type: "linear",
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: "rgba(105, 231, 201, 0.35)", // 0% 处的颜色
+                      },
+                      {
+                        offset: 1,
+                        color: "rgba(56, 203, 152, 0)", // 100% 处的颜色
+                      },
+                    ],
+                  },
                 },
               },
-            },
-          ],
+            ],
+          });
+          this.chartInstances.push(charInstance);
         });
-
-        self.charts[chartId] = charInstance;
-        //console.log(' charInstance update:',chartId);
       });
     },
     async handleLinkAccount() {
@@ -1884,6 +1883,9 @@ export default {
     color: rgba(41, 40, 40, 0.8);
     font-weight: bold;
   }
+  .pagination-wrap {
+    margin-top: 10px;
+  }
   .el-icon-data-line {
     margin-right: 4px;
   }
@@ -1939,6 +1941,7 @@ export default {
       padding: 0;
       padding-left: 16px;
       &:hover {
+        color: #38cb98 !important;
         opacity: 0.7;
       }
     }
