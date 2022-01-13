@@ -191,197 +191,12 @@
           <el-table-column>
             <template slot-scope="scope">
               <div class="div-operation">
-                <el-popover
-                  popper-class="simulate-popover"
-                  @show="showDetail(scope.$index, scope.row)"
-                  placement="left"
-                  trigger="click"
+                <span
+                  @click="showDetail(scope.$index, scope.row)"
+                  :ref="'simulateBtn' + scope.row.id"
+                  class="table-operation-span"
+                  ><i class="el-icon-data-line"></i>Simulate</span
                 >
-                  <div class="simulate-popover-content">
-                    <div
-                      class="detail-chart"
-                      :ref="'detailChart' + scope.row.id"
-                    ></div>
-                    <div class="title statistic-title">
-                      <span>RPM Statistic</span>
-                      <el-tooltip
-                        placement="top"
-                        trigger="hover"
-                        content='RPM, Rewards Per MOVR. To simplify the calculation, we define RPM as "rewards per MOVR when nominating to the specific collator"'
-                      >
-                        <i class="el-icon-warning-outline"></i>
-                      </el-tooltip>
-                    </div>
-                    <div class="statistic">
-                      <div class="item">
-                        <span class="label">Min:</span
-                        ><span
-                          >{{ scope.row.mimRPM | roundNumber(7) }} MOVR</span
-                        >
-                      </div>
-                      <div class="item">
-                        <span class="label">Max:</span
-                        ><span
-                          >{{ scope.row.maxRPM | roundNumber(7) }} MOVR</span
-                        >
-                      </div>
-                      <div class="item">
-                        <span class="label">Average:</span
-                        ><span
-                          >{{
-                            scope.row.averageRPM | roundNumber(7)
-                          }}
-                          MOVR</span
-                        >
-                      </div>
-                      <div class="item">
-                        <span class="label"> RPM Valatility Score: </span>
-                        <span class="yellow">{{
-                          scope.row.standardDeviation | roundNumber(8)
-                        }}</span>
-                        <el-tooltip
-                          placement="top"
-                          trigger="hover"
-                          content="The volatility of rewards. We use standard deviation to indicate the volatility of rewards. The less the volatility is, the rewards of nominating this collator are relatively stable(according to the latest 10 rounds)"
-                        >
-                          <i class="el-icon-warning-outline"></i>
-                        </el-tooltip>
-                      </div>
-                    </div>
-                    <div class="title">Estimate Reward</div>
-                    <div class="input-wrap">
-                      <span class="label">Stake</span>
-                      <el-input class="input" v-model="inputValue"></el-input>
-                      <span class="unit">MOVR</span>
-                      <el-tooltip
-                        class="tip"
-                        placement="top"
-                        trigger="hover"
-                        content="Input the quantity of MOVR to estimate the rewards in real-time. Estimated reward = Quantity * RPM, RPM is calculated according to the standard deviation"
-                      >
-                        <i class="el-icon-warning-outline"></i>
-                      </el-tooltip>
-                      <i class="el-icon-right"></i>
-                      <span class="yellow">{{
-                        getBoundaryReward(scope.row)
-                      }}</span>
-                      <span class="unit">MOVR</span>
-                    </div>
-                    <div class="title">
-                      <span>Competitor </span>
-                      <el-tooltip
-                        placement="top"
-                        trigger="hover"
-                        content="The real-time data of MOVR staked by the nominators and the corresponding ranking are listed here"
-                      >
-                        <i class="el-icon-warning-outline"></i>
-                      </el-tooltip>
-                    </div>
-                    <div class="competitor-wrap">
-                      <div class="item">
-                        <div class="item-top">
-                          <span class="title">Current Rank:</span>
-                          <span class="number yellow">{{
-                            getSimulateRank(scope.row)
-                          }}</span>
-                        </div>
-                        <div class="progress-wrap">
-                          <el-progress
-                            :text-inside="true"
-                            :stroke-width="16"
-                            :percentage="getSumulatePercent(scope.row)"
-                          ></el-progress>
-                        </div>
-                      </div>
-                      <div class="item">
-                        <div class="item-top">
-                          <span class="title"
-                            >Rank {{ maxNominator }} Stake:</span
-                          >
-                          <span class="number"
-                            >{{
-                              getSingleNominatorStakeByRank(
-                                scope.row,
-                                parseInt(maxNominator)
-                              )
-                            }}
-                            MOVR</span
-                          >
-                        </div>
-                        <div class="progress-wrap">
-                          <el-progress
-                            :text-inside="true"
-                            :stroke-width="16"
-                            :percentage="
-                              getSumulatePercentByRank(scope.row, maxNominator)
-                            "
-                          ></el-progress>
-                        </div>
-                      </div>
-                      <div class="item">
-                        <div class="item-top">
-                          <span class="title"
-                            >Rank
-                            {{ parseInt(maxNominator * 0.9) }} Stake:</span
-                          >
-                          <span class="number"
-                            >{{
-                              getSingleNominatorStakeByRank(
-                                scope.row,
-                                parseInt(maxNominator * 0.9)
-                              )
-                            }}
-                            MOVR</span
-                          >
-                        </div>
-                        <div class="progress-wrap">
-                          <el-progress
-                            :text-inside="true"
-                            :stroke-width="16"
-                            :percentage="
-                              getSumulatePercentByRank(
-                                scope.row,
-                                parseInt(maxNominator * 0.9)
-                              )
-                            "
-                          ></el-progress>
-                        </div>
-                      </div>
-                      <div class="item">
-                        <div class="item-top">
-                          <span class="title"
-                            >Rank
-                            {{ parseInt(maxNominator * 0.5) }} Stake:</span
-                          >
-                          <span class="number"
-                            >{{
-                              getSingleNominatorStakeByRank(
-                                scope.row,
-                                parseInt(maxNominator * 0.5)
-                              )
-                            }}
-                            MOVR</span
-                          >
-                        </div>
-                        <div class="progress-wrap">
-                          <el-progress
-                            :text-inside="true"
-                            :stroke-width="16"
-                            :percentage="
-                              getSumulatePercentByRank(
-                                scope.row,
-                                parseInt(maxNominator * 0.5)
-                              )
-                            "
-                          ></el-progress>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <span slot="reference" class="table-operation-span"
-                    ><i class="el-icon-data-line"></i>Simulate</span
-                  >
-                </el-popover>
                 <el-tooltip effect="light" placement="bottom">
                   <div slot="content">
                     Add current collator into watch list with specified
@@ -728,6 +543,189 @@
         </el-table>
       </div>
     </div>
+    <div class="fixed-popover">
+      <el-popover
+        @hide="removeScrollEvent"
+        ref="popover"
+        placement="left"
+        popper-class="simulate-popover"
+      >
+        <div v-if="currentSimulate.id" class="simulate-popover-content">
+          <div
+            class="detail-chart"
+            :ref="'detailChart' + currentSimulate.id"
+          ></div>
+          <div class="title statistic-title">
+            <span>RPM Statistic</span>
+            <el-tooltip placement="top" trigger="hover">
+              <div slot="content" class="tooltip-300px">
+                RPM, Rewards Per MOVR. To simplify the calculation, we define
+                RPM as "rewards per MOVR when nominating to the specific
+                collator"
+              </div>
+              <i class="el-icon-warning-outline"></i>
+            </el-tooltip>
+          </div>
+          <div class="statistic">
+            <div class="item">
+              <span class="label">Min:</span
+              ><span>{{ currentSimulate.mimRPM | roundNumber(7) }} MOVR</span>
+            </div>
+            <div class="item">
+              <span class="label">Max:</span
+              ><span>{{ currentSimulate.maxRPM | roundNumber(7) }} MOVR</span>
+            </div>
+            <div class="item">
+              <span class="label">Average:</span
+              ><span
+                >{{ currentSimulate.averageRPM | roundNumber(7) }} MOVR</span
+              >
+            </div>
+            <div class="item">
+              <span class="label"> RPM Valatility Score: </span>
+              <span class="yellow">{{
+                currentSimulate.standardDeviation | roundNumber(8)
+              }}</span>
+              <el-tooltip placement="top" trigger="hover">
+                <div slot="content" class="tooltip-300px">
+                  The volatility of rewards. We use standard deviation to
+                  indicate the volatility of rewards. The less the volatility
+                  is, the rewards of nominating this collator are relatively
+                  stable(according to the latest 10 rounds)
+                </div>
+                <i class="el-icon-warning-outline"></i>
+              </el-tooltip>
+            </div>
+          </div>
+          <div class="title">Estimate Reward</div>
+          <div class="input-wrap">
+            <span class="label">Stake</span>
+            <el-input class="input" v-model="inputValue"></el-input>
+            <span class="unit">MOVR</span>
+            <el-tooltip class="tip" placement="top" trigger="hover">
+              <div slot="content" class="tooltip-300px">
+                Input the quantity of MOVR to estimate the rewards in real-time.
+                Estimated reward = Quantity * RPM, RPM is calculated according
+                to the standard deviation
+              </div>
+              <i class="el-icon-warning-outline"></i>
+            </el-tooltip>
+            <i class="el-icon-right"></i>
+            <span class="yellow">{{ getBoundaryReward(currentSimulate) }}</span>
+            <span class="unit">MOVR</span>
+          </div>
+          <div class="title">
+            <span>Competitor </span>
+            <el-tooltip placement="top" trigger="hover">
+              <div slot="content" class="tooltip-300px">
+                The real-time data of MOVR staked by the nominators and the
+                corresponding ranking are listed here
+              </div>
+              <i class="el-icon-warning-outline"></i>
+            </el-tooltip>
+          </div>
+          <div class="competitor-wrap">
+            <div class="item">
+              <div class="item-top">
+                <span class="title">Current Rank:</span>
+                <span class="number yellow">{{
+                  getSimulateRank(currentSimulate)
+                }}</span>
+              </div>
+              <div class="progress-wrap">
+                <el-progress
+                  :text-inside="true"
+                  :stroke-width="16"
+                  :percentage="getSumulatePercent(currentSimulate)"
+                ></el-progress>
+              </div>
+            </div>
+            <div class="item">
+              <div class="item-top">
+                <span class="title">Rank {{ maxNominator }} Stake:</span>
+                <span class="number"
+                  >{{
+                    getSingleNominatorStakeByRank(
+                      currentSimulate,
+                      parseInt(maxNominator)
+                    )
+                  }}
+                  MOVR</span
+                >
+              </div>
+              <div class="progress-wrap">
+                <el-progress
+                  :text-inside="true"
+                  :stroke-width="16"
+                  :percentage="
+                    getSumulatePercentByRank(currentSimulate, maxNominator)
+                  "
+                ></el-progress>
+              </div>
+            </div>
+            <div class="item">
+              <div class="item-top">
+                <span class="title"
+                  >Rank {{ parseInt(maxNominator * 0.9) }} Stake:</span
+                >
+                <span class="number"
+                  >{{
+                    getSingleNominatorStakeByRank(
+                      currentSimulate,
+                      parseInt(maxNominator * 0.9)
+                    )
+                  }}
+                  MOVR</span
+                >
+              </div>
+              <div class="progress-wrap">
+                <el-progress
+                  :text-inside="true"
+                  :stroke-width="16"
+                  :percentage="
+                    getSumulatePercentByRank(
+                      currentSimulate,
+                      parseInt(maxNominator * 0.9)
+                    )
+                  "
+                ></el-progress>
+              </div>
+            </div>
+            <div class="item">
+              <div class="item-top">
+                <span class="title"
+                  >Rank {{ parseInt(maxNominator * 0.5) }} Stake:</span
+                >
+                <span class="number"
+                  >{{
+                    getSingleNominatorStakeByRank(
+                      currentSimulate,
+                      parseInt(maxNominator * 0.5)
+                    )
+                  }}
+                  MOVR</span
+                >
+              </div>
+              <div class="progress-wrap">
+                <el-progress
+                  :text-inside="true"
+                  :stroke-width="16"
+                  :percentage="
+                    getSumulatePercentByRank(
+                      currentSimulate,
+                      parseInt(maxNominator * 0.5)
+                    )
+                  "
+                ></el-progress>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span slot="reference" class="table-operation-span"
+          ><i class="el-icon-data-line"></i>Simulate</span
+        >
+      </el-popover>
+    </div>
   </div>
 </template>
 
@@ -741,6 +739,7 @@ import moonriverService from "@/api/moonriver";
 export default {
   data() {
     return {
+      scrollHandler: null,
       chartInstances: [],
       pageIndex: 1,
       pageSize: 10,
@@ -826,7 +825,7 @@ export default {
     getInfoPercentage() {
       const percent =
         (this.blockNumber - this.roundInfo.first) / this.roundInfo.length;
-      if (!percent || percent === Infinity) {
+      if (!percent || percent === Infinity || percent < 0) {
         return 0;
       }
       return Number((percent * 100).toFixed(2));
@@ -1270,7 +1269,6 @@ export default {
                 v.totalReward = BigNumber(0);
               }
             });
-            // debugger
             // 塞入10次大哥reward
             const getCollector10RewardRes = d[2];
             nominatorRes.forEach((v) => {
@@ -1545,7 +1543,6 @@ export default {
         moonriverService
           .getMySubscribe({ subscribe_address: this.linkAccount.address })
           .then((resp) => {
-            //debugger;
             if (resp && resp.id) {
               self.linkAccountSubscribeData.subscribe_address =
                 resp.subscribe_address;
@@ -1626,239 +1623,207 @@ export default {
       d.max = parseFloat(d.max.toFixed(fixedNumber));
       return d;
     },
+    removeScrollEvent() {
+      if (this.scrollHandler) {
+        window.removeEventListener("scroll", this.scrollHandler);
+      }
+    },
     showDetail(rowIndex, row) {
-      this.currentSimulate = { ...row, rowIndex };
-      const detailChart = echarts.init(this.$refs[`detailChart${row.id}`]);
-      //debugger;
-      let totalStake_yAxis = this.getyAxisMinMax(
-        row.historyNominatorTotalStake.map((v) => v.nominatorsStake.toNumber()),
-        0.005,
-        0
-      );
-      console.log(totalStake_yAxis);
-      let totalReward_yAxis = this.getyAxisMinMax(
-        row.historyNominatorTotalReward.map((v) => v.reward.toNumber()),
-        0.005,
-        2
-      );
-      console.log(totalReward_yAxis);
-      let RPM_yAxis = this.getyAxisMinMax(
-        row.historyRPM.map((v) => v.RPM.toNumber()),
-        0.1,
-        6
-      );
-      console.log(RPM_yAxis);
-
-      detailChart.setOption({
-        title: {
-          left: -5,
-          text: "Reward History ( Latest 10 rounds )",
-          textStyle: {
-            color: "#292828",
-          },
-        },
-        tooltip: {
-          trigger: "axis",
-          formatter: function (val) {
-            return `
-            ${val[0].axisValue}<br/>
-            ${val[0].marker} ${
-              val[0].seriesName
-            }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[0].value.toFixed(
-              2
-            )} MOVR</span><br/>
-            ${val[1].marker} ${
-              val[1].seriesName
-            }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[1].value.toFixed(
-              2
-            )} MOVR</span><br/>
-            ${val[2].marker} ${
-              val[2].seriesName
-            }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[2].value.toFixed(
-              7
-            )} MOVR</span>
-            `;
-          },
-        },
-        grid: {
-          left: 0,
-          bottom: 60,
-          right: "10%",
-          containLabel: true,
-        },
-        xAxis: {
-          data: row.historyReward.map((v) => "round " + v.roundIndex),
-          axisLine: {
-            show: false,
-          },
-          axisTick: {
-            show: false,
-          },
-          axisLabel: {
-            color: "rgba(41, 40, 40, 0.4)",
-          },
-        },
-        yAxis: [
-          {
-            max: totalStake_yAxis.max,
-            min: totalStake_yAxis.min,
-            position: "left",
-            nameLocation: "start",
-            nameTextStyle: {
-              color: "rgba(41, 40, 40, 0.4)",
-              lineHeight: 40,
-            },
-            name: "Total Stake",
-            axisLabel: {
-              color: "rgba(41, 40, 40, 0.4)",
-            },
-            splitLine: {
-              show: false,
-              lineStyle: {
-                type: "dashed",
-                color: "rgba(41, 40, 40, 0.4)",
-              },
-            },
-          },
-          {
-            max: totalReward_yAxis.max,
-            min: totalReward_yAxis.min,
-            position: "right",
-            nameLocation: "start",
-            nameTextStyle: {
-              color: "rgba(41, 40, 40, 0.4)",
-              lineHeight: 40,
-            },
-            offset: 10,
-            name: "Total Reward",
-            axisLabel: {
-              color: "rgba(41, 40, 40, 0.4)",
-            },
-            splitLine: {
-              show: false,
-              lineStyle: {
-                type: "dashed",
-                color: "rgba(41, 40, 40, 0.4)",
-              },
-            },
-          },
-          {
-            max: RPM_yAxis.max,
-            min: RPM_yAxis.min,
-            position: "right",
-            nameLocation: "start",
-            nameTextStyle: {
-              color: "rgba(41, 40, 40, 0.4)",
-              lineHeight: 40,
-              padding: [0, 0, 0, 30],
-            },
-            offset: 60,
-            name: "RPM",
-            axisLabel: {
-              color: "rgba(41, 40, 40, 0.4)",
-            },
-            splitLine: {
-              show: false,
-              lineStyle: {
-                type: "dashed",
-                color: "rgba(41, 40, 40, 0.4)",
-              },
-            },
-          },
-        ],
-        series: [
-          {
-            name: "Total Stake (Delegator):",
-            yAxisIndex: 0,
-            type: "line",
-            data: row.historyNominatorTotalStake.map((v) =>
+      // popover关闭再打开可能会冲突，需要延迟
+      setTimeout(() => {
+        this.currentSimulate = { ...row, rowIndex };
+        // popover定位，以及随滚动条滚动
+        const ref = this.$refs.popover;
+        const clickBtn = this.$refs["simulateBtn" + row.id];
+        if (this.scrollHandler) {
+          window.removeEventListener("scroll", this.scrollHandler);
+        }
+        this.scrollHandler = () => {
+          ref.$el.style.top = clickBtn.getBoundingClientRect().top + "px";
+          ref.$el.style.left = clickBtn.getBoundingClientRect().left + "px";
+        };
+        this.scrollHandler();
+        window.addEventListener("scroll", this.scrollHandler);
+        // 点击外部的时候可能会让popover关闭，有冲突
+        setTimeout(() => {
+          ref.doShow();
+          const detailChart = echarts.init(this.$refs[`detailChart${row.id}`]);
+          let totalStake_yAxis = this.getyAxisMinMax(
+            row.historyNominatorTotalStake.map((v) =>
               v.nominatorsStake.toNumber()
             ),
-            itemStyle: {
-              color: "#38CB98",
-            },
-            // areaStyle: {
-            //   color: {
-            //     type: "linear",
-            //     x: 0,
-            //     y: 0,
-            //     x2: 0,
-            //     y2: 1,
-            //     colorStops: [
-            //       {
-            //         offset: 0,
-            //         color: "rgba(105, 231, 201, 0.35)", // 0% 处的颜色
-            //       },
-            //       {
-            //         offset: 1,
-            //         color: "rgba(56, 203, 152, 0)", // 100% 处的颜色
-            //       },
-            //     ],
-            //   },
-            // },
-          },
-          {
-            name: "Total Reward (Delegator):",
-            yAxisIndex: 1,
+            0.005,
+            0
+          );
+          console.log(totalStake_yAxis);
+          let totalReward_yAxis = this.getyAxisMinMax(
+            row.historyNominatorTotalReward.map((v) => v.reward.toNumber()),
+            0.005,
+            2
+          );
+          console.log(totalReward_yAxis);
+          let RPM_yAxis = this.getyAxisMinMax(
+            row.historyRPM.map((v) => v.RPM.toNumber()),
+            0.1,
+            6
+          );
+          console.log(RPM_yAxis);
 
-            type: "line",
-            data: row.historyNominatorTotalReward.map((v) =>
-              v.reward.toNumber()
-            ),
-            itemStyle: {
-              color: "rgba(91, 127, 255, 1)",
+          detailChart.setOption({
+            title: {
+              left: -5,
+              text: "Reward History ( Latest 10 rounds )",
+              textStyle: {
+                color: "#292828",
+              },
             },
-            // areaStyle: {
-            //   color: {
-            //     type: "linear",
-            //     x: 0,
-            //     y: 0,
-            //     x2: 0,
-            //     y2: 1,
-            //     colorStops: [
-            //       {
-            //         offset: 0,
-            //         color: "blue", // 0% 处的颜色
-            //       },
-            //       {
-            //         offset: 1,
-            //         color: "rgba(56, 203, 152, 0)", // 100% 处的颜色
-            //       },
-            //     ],
-            //   },
-            // },
-          },
-          {
-            name: "RPM(Reward Per MOVR):",
-            yAxisIndex: 2,
-            type: "line",
-            data: row.historyRPM.map((v) => v.RPM.toNumber()),
-            itemStyle: {
-              color: "rgba(255, 86, 48, 1)",
+            tooltip: {
+              trigger: "axis",
+              formatter: function (val) {
+                return `
+              ${val[0].axisValue}<br/>
+              ${val[0].marker} ${
+                  val[0].seriesName
+                }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[0].value.toFixed(
+                  2
+                )} MOVR</span><br/>
+              ${val[1].marker} ${
+                  val[1].seriesName
+                }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[1].value.toFixed(
+                  2
+                )} MOVR</span><br/>
+              ${val[2].marker} ${
+                  val[2].seriesName
+                }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[2].value.toFixed(
+                  7
+                )} MOVR</span>
+              `;
+              },
             },
-            // areaStyle: {
-            //   color: {
-            //     type: "linear",
-            //     x: 0,
-            //     y: 0,
-            //     x2: 0,
-            //     y2: 1,
-            //     colorStops: [
-            //       {
-            //         offset: 0,
-            //         color: "blue", // 0% 处的颜色
-            //       },
-            //       {
-            //         offset: 1,
-            //         color: "rgba(56, 203, 152, 0)", // 100% 处的颜色
-            //       },
-            //     ],
-            //   },
-            // },
-          },
-        ],
-      });
-      this.detailChart = detailChart;
+            grid: {
+              left: 0,
+              bottom: 60,
+              right: "10%",
+              containLabel: true,
+            },
+            xAxis: {
+              data: row.historyReward.map((v) => "round " + v.roundIndex),
+              axisLine: {
+                show: false,
+              },
+              axisTick: {
+                show: false,
+              },
+              axisLabel: {
+                color: "rgba(41, 40, 40, 0.4)",
+              },
+            },
+            yAxis: [
+              {
+                max: totalStake_yAxis.max,
+                min: totalStake_yAxis.min,
+                position: "left",
+                nameLocation: "start",
+                nameTextStyle: {
+                  color: "rgba(41, 40, 40, 0.4)",
+                  lineHeight: 40,
+                },
+                name: "Total Stake",
+                axisLabel: {
+                  color: "rgba(41, 40, 40, 0.4)",
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    type: "dashed",
+                    color: "rgba(41, 40, 40, 0.4)",
+                  },
+                },
+              },
+              {
+                max: totalReward_yAxis.max,
+                min: totalReward_yAxis.min,
+                position: "right",
+                nameLocation: "start",
+                nameTextStyle: {
+                  color: "rgba(41, 40, 40, 0.4)",
+                  lineHeight: 40,
+                },
+                offset: 10,
+                name: "Total Reward",
+                axisLabel: {
+                  color: "rgba(41, 40, 40, 0.4)",
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    type: "dashed",
+                    color: "rgba(41, 40, 40, 0.4)",
+                  },
+                },
+              },
+              {
+                max: RPM_yAxis.max,
+                min: RPM_yAxis.min,
+                position: "right",
+                nameLocation: "start",
+                nameTextStyle: {
+                  color: "rgba(41, 40, 40, 0.4)",
+                  lineHeight: 40,
+                  padding: [0, 0, 0, 30],
+                },
+                offset: 60,
+                name: "RPM",
+                axisLabel: {
+                  color: "rgba(41, 40, 40, 0.4)",
+                },
+                splitLine: {
+                  show: false,
+                  lineStyle: {
+                    type: "dashed",
+                    color: "rgba(41, 40, 40, 0.4)",
+                  },
+                },
+              },
+            ],
+            series: [
+              {
+                name: "Total Stake (Delegator):",
+                yAxisIndex: 0,
+                type: "line",
+                data: row.historyNominatorTotalStake.map((v) =>
+                  v.nominatorsStake.toNumber()
+                ),
+                itemStyle: {
+                  color: "#38CB98",
+                },
+              },
+              {
+                name: "Total Reward (Delegator):",
+                yAxisIndex: 1,
+
+                type: "line",
+                data: row.historyNominatorTotalReward.map((v) =>
+                  v.reward.toNumber()
+                ),
+                itemStyle: {
+                  color: "rgba(91, 127, 255, 1)",
+                },
+              },
+              {
+                name: "RPM(Reward Per MOVR):",
+                yAxisIndex: 2,
+                type: "line",
+                data: row.historyRPM.map((v) => v.RPM.toNumber()),
+                itemStyle: {
+                  color: "rgba(255, 86, 48, 1)",
+                },
+              },
+            ],
+          });
+          this.detailChart = detailChart;
+        }, 10);
+      }, 10);
     },
     turnActionPage({ row, $index }) {
       this.$router.push({
@@ -1882,6 +1847,10 @@ export default {
   /deep/ .el-progress-bar__innerText {
     color: rgba(41, 40, 40, 0.8);
     font-weight: bold;
+  }
+  .fixed-popover > span {
+    opacity: 0;
+    position: fixed;
   }
   .pagination-wrap {
     margin-top: 10px;
@@ -2009,6 +1978,7 @@ export default {
       }
     }
     .tab-content1 {
+      position: relative;
       .table-chart {
         width: 216px;
         height: 69px;
