@@ -128,7 +128,7 @@ export default {
           filter: this.filterTimestamp_created_at,
           value: "createdTime",
         },
-         {
+        {
           col: 4,
           title: "Source",
           value: "source",
@@ -183,13 +183,16 @@ export default {
 
         let list = res;
         this.totalCount = list.length || 0;
-        this.totalamount = formatDOT(
-          list
-            .map((item) => +item.amount)
-            .reduce((prev, curr) => {
-              return prev + curr;
-            })
-        );
+        this.totalamount = 0;
+        if (list && list.length > 0) {
+          this.totalamount = formatDOT(
+            list
+              .map((item) => +item.amount)
+              .reduce((prev, curr) => {
+                return prev + curr;
+              })
+          );
+        }
         if (list) {
           for (const d of list) {
             let paraId = d.paraId;
