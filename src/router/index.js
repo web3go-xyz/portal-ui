@@ -24,9 +24,14 @@ import ParaChainCrowdloanContributionDetail4Polkadot from "@/components/paraChai
 import CDPProfiler from "@/components/cdpProfiler/CDPProfiler";
 import CDPDetail from "@/components/cdpProfiler/CDPDetail";
 import CustomQuery from "@/components/customQuery/CustomQuery";
+
 import MoonRiver from "@/components/moonRiver/index";
 import CollectorDetail from "@/components/moonRiver/CollectorDetail";
 import DelegatorDetail from "@/components/moonRiver/DelegatorDetail";
+
+import moonBeam from "@/components/moonBeam/index";
+import moonBeamCollectorDetail from "@/components/moonBeam/CollectorDetail";
+import moonBeamDelegatorDetail from "@/components/moonBeam/DelegatorDetail";
 
 import MaintenanceDashboard from "@/components/sysConfig/MaintenanceDashboard";
 import AddressTagManage from "@/components/sysConfig/sub/AddressTagManage";
@@ -225,6 +230,27 @@ export default new Router({
                 noHead: true
             },
             component: DelegatorDetail
+        },
+        {
+            path: "/moonBeam",
+            name: "moonBeam",
+            component: moonBeam
+        },
+        {
+            path: "/moonBeamCollectorDetail",
+            name: "moonBeamCollectorDetail",
+            meta: {
+                noHead: true
+            },
+            component: moonBeamCollectorDetail
+        },
+        {
+            path: "/moonBeamDelegatorDetail",
+            name: "moonBeamDelegatorDetail",
+            meta: {
+                noHead: true
+            },
+            component: moonBeamDelegatorDetail
         },
         {
             path: "/MaintenanceDashboard",
