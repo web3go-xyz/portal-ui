@@ -75,6 +75,9 @@
     <div class="coming" v-if="isShowComing">
       <img src="./assets/images/coming.png" alt="" />
       <p>Coming soon...</p>
+
+      <identity-icon-plus :addressInfo="addressInfo1"></identity-icon-plus>
+      <identity-icon-plus :addressInfo="addressInfo2"></identity-icon-plus>
     </div>
     <router-view class="common-view" v-else />
   </div>
@@ -85,10 +88,21 @@ import request from "@/utils/request";
 import "@/assets/font/rubik/index.css";
 import logoImg from "@/assets/images/logo.png";
 import plusImg from "@/assets/images/home/plus.png";
+import IdentityIconPlus from "./components/ui-elements/IdentityIconPlus.vue";
 export default {
+  components: { IdentityIconPlus },
   name: "App",
   data() {
     return {
+      addressInfo1: {
+        address: "5DbqSiw5j4jcb5BB1yuYYp88QVcgoZaYn9R3vff1BR2Cpa77",
+        iconSize: 48,
+      },
+      addressInfo2: {
+        address: "0x10a2F17d8150B76359e9CEd567FC348C71A74B46",
+        isEthereum: true,
+        iconSize: 48,
+      },
       inputValue: "",
       userInfo: null,
       actNav: {
@@ -340,7 +354,7 @@ export default {
   height: 100%;
   outline: none;
   margin-left: 30px;
-  padding-right:15px;
+  padding-right: 15px;
   border: none;
   background: #f5f7f9;
 }
