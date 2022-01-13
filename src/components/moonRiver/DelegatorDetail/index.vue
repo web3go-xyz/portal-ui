@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     makeBlockie(address) {
-      return makeBlockie("0x13a61daC75e2F66721dcaEdA726be1E636928800");
+      return makeBlockie(address);
     },
     goToNav(v) {
       this.currentNav = v;

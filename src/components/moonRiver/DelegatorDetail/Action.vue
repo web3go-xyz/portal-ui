@@ -1,15 +1,16 @@
 <template>
   <div class="table-wrap">
     <el-table v-loading="loading" :data="tableData">
-      <el-table-column  label="Collator">
+      <el-table-column label="Collator">
         <template slot-scope="scope">
-          <el-tooltip :content="scope.row.collator" placement="top">
-            <span
-              class="delegator-span"
-              @click="turnCollectorActionPage(scope.row)"
-              >{{ shotFilter(scope.row.collator) }}</span
-            >
-          </el-tooltip>
+          <div class="icon-cell">
+            <img class="icon" :src="makeBlockie(scope.row.collator)" alt="" />
+            <el-tooltip :content="scope.row.collator" placement="top">
+              <span class="span" @click="turnCollectorActionPage(scope.row)">{{
+                shotFilter(scope.row.collator)
+              }}</span>
+            </el-tooltip>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="roundindex" label="RoundIndex"> </el-table-column>
@@ -47,6 +48,7 @@
 
 <script>
 import moonriverService from "@/api/moonriver";
+import makeBlockie from "ethereum-blockies-base64";
 
 export default {
   data() {
@@ -62,6 +64,9 @@ export default {
     this.getList();
   },
   methods: {
+    makeBlockie(address) {
+      return makeBlockie(address);
+    },
     turnCollectorActionPage(row) {
       this.$router.push({
         name: "CollectorDetail",
@@ -121,6 +126,23 @@ export default {
     cursor: pointer;
     &:hover {
       opacity: 0.7;
+    }
+  }
+  .icon-cell {
+    display: flex;
+    align-items: center;
+    .icon {
+      margin-right: 8px;
+      width: 32px;
+      height: 32px;
+    }
+    .span {
+      font-size: 14px;
+      color: rgba(56, 203, 152, 1);
+      cursor: pointer;
+      &:hover {
+        opacity: 0.7;
+      }
     }
   }
 }

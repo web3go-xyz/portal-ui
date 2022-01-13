@@ -25,13 +25,14 @@
       </el-table-column>
       <el-table-column prop="roundindex" label="Delegator">
         <template slot-scope="scope">
-          <el-tooltip :content="scope.row.owner" placement="top">
-            <span
-              class="delegator-span"
-              @click="turnDelegatorActionPage(scope.row)"
-              >{{ shotFilter(scope.row.owner) }}</span
-            >
-          </el-tooltip>
+          <div class="icon-cell">
+            <img class="icon" :src="makeBlockie(scope.row.owner)" alt="" />
+            <el-tooltip :content="scope.row.owner" placement="top">
+              <span class="span" @click="turnDelegatorActionPage(scope.row)">{{
+                shotFilter(scope.row.owner)
+              }}</span>
+            </el-tooltip>
+          </div>
         </template>
       </el-table-column>
 
@@ -61,6 +62,8 @@
 </template>
 
 <script>
+import makeBlockie from "ethereum-blockies-base64";
+
 export default {
   props: {
     collectorData: {
@@ -78,6 +81,9 @@ export default {
   },
 
   methods: {
+    makeBlockie(address) {
+      return makeBlockie(address);
+    },
     turnDelegatorActionPage(row) {
       this.$router.push({
         name: "DelegatorDetail",
@@ -139,12 +145,21 @@ export default {
       color: #ce7321;
     }
   }
-  .delegator-span {
-    font-size: 14px;
-    color: rgba(56, 203, 152, 1);
-    cursor: pointer;
-    &:hover {
-      opacity: 0.7;
+  .icon-cell {
+    display: flex;
+    align-items: center;
+    .icon {
+      margin-right: 8px;
+      width: 32px;
+      height: 32px;
+    }
+    .span {
+      font-size: 14px;
+      color: rgba(56, 203, 152, 1);
+      cursor: pointer;
+      &:hover {
+        opacity: 0.7;
+      }
     }
   }
 }

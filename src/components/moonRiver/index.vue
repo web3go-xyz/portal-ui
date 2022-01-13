@@ -140,13 +140,16 @@
             </template>
           </el-table-column>
 
-          <el-table-column prop="name" label="Collator">
+          <el-table-column width="150" label="Collator">
             <template slot-scope="scope">
-              <el-tooltip :content="scope.row.id" placement="top">
-                <span class="collector-span" @click="turnActionPage(scope)">{{
-                  shotFilter(scope.row.id)
-                }}</span>
-              </el-tooltip>
+              <div class="icon-cell">
+                <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
+                <el-tooltip :content="scope.row.id" placement="top">
+                  <span class="span" @click="turnActionPage(scope)">{{
+                    shotFilter(scope.row.id)
+                  }}</span>
+                </el-tooltip>
+              </div>
             </template>
           </el-table-column>
           <el-table-column label="Self Stake">
@@ -427,13 +430,16 @@
           </div>
         </div>
         <el-table class="my-stack-table" v-loading="loading" :data="tableData2">
-          <el-table-column prop="name" label="Collator">
+          <el-table-column width="190" label="Collator">
             <template slot-scope="scope">
-              <el-tooltip :content="scope.row.id" placement="top">
-                <span class="collector-span" @click="turnActionPage(scope)">{{
-                  shotFilter(scope.row.id)
-                }}</span>
-              </el-tooltip>
+              <div class="icon-cell">
+                <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
+                <el-tooltip :content="scope.row.id" placement="top">
+                  <span class="span" @click="turnActionPage(scope)">{{
+                    shotFilter(scope.row.id)
+                  }}</span>
+                </el-tooltip>
+              </div>
             </template>
           </el-table-column>
           <el-table-column label="Rank">
@@ -714,7 +720,7 @@
 
 <script>
 import { BigNumber } from "bignumber.js";
-
+import makeBlockie from "ethereum-blockies-base64";
 import moonriverService from "@/api/moonriver";
 // Required imports
 // import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -805,6 +811,9 @@ export default {
     },
   },
   methods: {
+    makeBlockie(address) {
+      return makeBlockie(address);
+    },
     clearSubscribe() {
       let self = this;
       moonriverService
@@ -1874,6 +1883,26 @@ export default {
   /deep/ .el-progress-bar__innerText {
     color: rgba(41, 40, 40, 0.8);
     font-weight: bold;
+  }
+  .el-icon-data-line {
+    margin-right: 4px;
+  }
+  .icon-cell {
+    display: flex;
+    align-items: center;
+    .icon {
+      margin-right: 8px;
+      width: 32px;
+      height: 32px;
+    }
+    .span {
+      font-size: 14px;
+      color: rgba(56, 203, 152, 1);
+      cursor: pointer;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
   }
   .collector-span {
     font-size: 14px;
