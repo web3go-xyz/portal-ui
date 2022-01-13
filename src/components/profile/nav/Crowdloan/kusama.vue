@@ -182,13 +182,16 @@ export default {
 
         let list = res;
         this.totalCount = list.length || 0;
-        this.totalamount = formatKUSAMA(
-          list
-            .map((item) => +item.amount)
-            .reduce((prev, curr) => {
-              return prev + curr;
-            })
-        );
+        this.totalamount = 0;
+        if (list && list.length > 0) {
+          this.totalamount = formatKUSAMA(
+            list
+              .map((item) => +item.amount)
+              .reduce((prev, curr) => {
+                return prev + curr;
+              })
+          );
+        }
         if (list) {
           for (const d of list) {
             let paraId = d.paraId;

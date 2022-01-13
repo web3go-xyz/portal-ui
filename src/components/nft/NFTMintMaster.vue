@@ -19,7 +19,7 @@
           <span class="title">Latest Mints</span>
           <el-tooltip
             effect="dark"
-            content="Latest NFT project sorted by mint count  in 24 hours"
+            content="Latest NFT project sorted by mint count  in 7 days"
             placement="top-start"
           >
             <img src="../../assets/images/nft/info.png" alt="" class="icon" />
@@ -114,11 +114,11 @@
       </div>
       <div class="nftNavConLine">
         <div class="nftNavConLine-head">
-          <span class="title">Minting Volume 24H</span>
+          <span class="title">Minting Volume 7D</span>
           <el-tooltip effect="dark" placement="top-start">
             <div slot="content" class="tooltip-300px">
-              Minting volume for projects that started minting in the last 24
-              hours, no gas fee included.
+              Minting volume for projects that started minting in the last 7
+              days, no gas fee included.
             </div>
             <img src="../../assets/images/nft/info.png" alt="" class="icon" />
           </el-tooltip>
@@ -154,7 +154,7 @@ export default {
       query: {
         pageSize: 5,
         pageIndex: 1,
-        orderBys: []
+        orderBys: [],
       },
       totalCount: 0,
       listData: [],
@@ -167,19 +167,19 @@ export default {
         {
           col: "8",
           value: "collection_name",
-          title: "collection"
+          title: "collection",
         },
         {
           col: "8",
           value: "mint_count",
-          title: "Minters"
+          title: "Minters",
         },
         {
           col: "8",
           value: "mint_first_timestamp",
-          title: "First Mint"
-        }
-      ]
+          title: "First Mint",
+        },
+      ],
     };
   },
   computed: {
@@ -188,7 +188,7 @@ export default {
         (this.query.pageIndex - 1) * this.query.pageSize,
         this.query.pageIndex * this.query.pageSize
       );
-    }
+    },
   },
   mounted() {
     this.init();
@@ -200,18 +200,16 @@ export default {
     getLatestMintStatistic() {
       this.nftNavConListLoading = true;
       getLatestMintStatistic({
-        start_time: this.$moment()
-          .subtract(1, "days")
-          .format("YYYY-MM-DD"),
-        end_time: this.$moment().format("YYYY-MM-DD")
-      }).then(res => {
+        start_time: this.$moment().subtract(7, "days").format("YYYY-MM-DD"),
+        end_time: this.$moment().format("YYYY-MM-DD"),
+      }).then((res) => {
         this.totalCount = res?.length;
         this.nftNavConListLoading = false;
         this.listData = res;
-        this.listTotal=0;
-        if(res&& res.length>0){
+        this.listTotal = 0;
+        if (res && res.length > 0) {
           this.listTotal = res
-            .map(item => +item.mint_count)
+            .map((item) => +item.mint_count)
             .reduce((prev, curr) => {
               return prev + curr;
             });
@@ -221,13 +219,13 @@ export default {
     },
 
     initChart() {
-      let total=0;
-      if( this.listData&&  this.listData.length>0){
+      let total = 0;
+      if (this.listData && this.listData.length > 0) {
         total = this.listData
-        .map(item => +item.mint_volume)
-        .reduce((prev, curr) => {
-          return prev + curr;
-        });
+          .map((item) => +item.mint_volume)
+          .reduce((prev, curr) => {
+            return prev + curr;
+          });
       }
       this.mintVolumeTotal = this.formatedCap(total);
       const seriesData = this.listData
@@ -244,14 +242,14 @@ export default {
             title: item.collection_name,
             point,
             value: utility.formatTokenNumber(mint_volume, utility.KSM_RATIO),
-            originValue: mint_volume
+            originValue: mint_volume,
           };
         });
       const OthersvvValue = seriesData
-        .map(item => +item.originValue)
+        .map((item) => +item.originValue)
         .reduce((a, b) => a + b);
       const OthersvvP = seriesData
-        .map(item => +item.point)
+        .map((item) => +item.point)
         .reduce((a, b) => a + b);
       const OthersvvPoint = (100 - OthersvvP).toFixed(2);
       seriesData.push({
@@ -262,12 +260,12 @@ export default {
         value: utility.formatTokenNumber(
           total - OthersvvValue,
           utility.KSM_RATIO
-        )
+        ),
       });
       const option = {
         tooltip: {
           trigger: "item",
-          formatter: params => {
+          formatter: (params) => {
             return `
               <div class="echart-tooltip-formatter-popover">
                 <div class="row">
@@ -276,7 +274,7 @@ export default {
                 </div>
               </div>
                   `;
-          }
+          },
         },
         legend: {
           icon: "circle",
@@ -284,8 +282,8 @@ export default {
           right: "25%",
           orient: "vertical",
           textStyle: {
-            color: "rgba(41, 40, 40, 0.8)"
-          }
+            color: "rgba(41, 40, 40, 0.8)",
+          },
         },
         series: [
           {
@@ -295,21 +293,21 @@ export default {
             avoidLabelOverlap: false,
             label: {
               show: false,
-              position: "center"
+              position: "center",
             },
             emphasis: {
               label: {
                 show: false,
                 fontSize: "13",
-                fontWeight: "bold"
-              }
+                fontWeight: "bold",
+              },
             },
             labelLine: {
-              show: false
+              show: false,
             },
-            data: seriesData
-          }
-        ]
+            data: seriesData,
+          },
+        ],
       };
       this.mintionList = seriesData;
       const echart = echarts.init(document.getElementById("nftNavConLine"));
@@ -333,16 +331,16 @@ export default {
         query: {
           back: this.$router.currentRoute.name,
           id: item.collection_id,
-          symbol: item.collection_name
-        }
+          symbol: item.collection_name,
+        },
       });
     },
     goto(routeName) {
       this.$router.push({
-        name: routeName
+        name: routeName,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
