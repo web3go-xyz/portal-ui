@@ -58,7 +58,7 @@
           <div class="nftNavConList-table-pagination">
             <el-pagination
               background
-              layout="prev, pager"
+              layout="prev, pager, next"
               :current-page.sync="query.pageIndex"
               :page-size.sync="query.pageSize"
               :page-sizes="[10, 20, 50, 100]"

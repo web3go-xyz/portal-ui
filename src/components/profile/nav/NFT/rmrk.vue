@@ -53,7 +53,7 @@
           <div class="nftNavConList-table-pagination">
             <el-pagination
               background
-              layout="prev, pager"
+              layout="prev, pager, next"
               :current-page.sync="query.pageIndex"
               :page-size.sync="query.pageSize"
               :page-sizes="[10, 20, 50, 100]"
@@ -79,7 +79,7 @@ export default {
       query: {
         pageSize: 10,
         pageIndex: 1,
-        orderBys: []
+        orderBys: [],
       },
       listData: [],
       totalCount: 0,
@@ -90,36 +90,36 @@ export default {
           title: "Collection",
           value: "collection_name",
           click: this.goDetail,
-          className: "collection"
+          className: "collection",
         },
         {
           col: 6,
           className: "collection",
-          click: this.goDetail,
+          click: this.goNftDetail,
           value: "nft_name",
-          title: "NFT"
+          title: "NFT",
         },
         {
           col: 4,
           align: "right",
           value: "price",
           filter: formatKUSAMA,
-          title: "Price"
+          title: "Price",
         },
         {
           col: 4,
           offset: 4,
           value: "own_date",
           filter: this.filterTimestamp_created_at,
-          title: "Own date"
-        }
-      ]
+          title: "Own date",
+        },
+      ],
     };
   },
   props: {
     addressList: {
-      type: Array
-    }
+      type: Array,
+    },
   },
   created() {},
   mounted() {
@@ -131,7 +131,7 @@ export default {
         (this.query.pageIndex - 1) * this.query.pageSize,
         this.query.pageIndex * this.query.pageSize
       );
-    }
+    },
   },
   methods: {
     goDetail(item) {
@@ -140,19 +140,27 @@ export default {
         query: {
           back: this.$router.currentRoute.name,
           id: item.collection_id,
-          symbol: item.symbol
-        }
+          symbol: item.symbol,
+        },
+      });
+    },
+    goNftDetail(item) {
+      this.$router.push({
+        name: "NftItemDetail",
+        query: {
+          id: item.nft_id,
+        },
       });
     },
     init() {
       if (!this.addressList || !this.addressList.length) return;
       const account_id = this.addressList.filter(
-        item => item.network === "kusama"
+        (item) => item.network === "kusama"
       )[0].value;
       this.loading = true;
       getAccountOwnedNFT({
-        account_id
-      }).then(res => {
+        account_id,
+      }).then((res) => {
         this.loading = false;
         this.listData = res.nft_list;
         this.totalCount = res.nft_list.length;
@@ -166,7 +174,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
-    }
+    },
   },
   watch: {
     addressList(val) {
@@ -174,8 +182,8 @@ export default {
         this.addressList = val;
         this.init();
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
