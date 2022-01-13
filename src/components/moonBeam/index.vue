@@ -1281,7 +1281,7 @@ export default {
                 const find = getCollector10RewardRes.rewards.find(
                   (sv) =>
                     sv.account.toLowerCase() == v.id.toLowerCase() &&
-                    sv.roundIndex == i
+                    Number(sv.roundIndex) == i
                 );
                 if (find) {
                   arr.push({
@@ -1297,13 +1297,15 @@ export default {
               }
               v.historyReward = arr;
             });
+            //debugger
             // 塞入10次小弟totalStake
             const getNominator10TotalStakeRes = d[3];
             nominatorRes.forEach((v) => {
               const arr = [];
               for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
                 const find = getNominator10TotalStakeRes.stakes.find(
-                  (sv) => sv.collatorAccount == v.id && sv.roundIndex == i
+                  (sv) =>
+                    sv.collatorAccount == v.id && Number(sv.roundIndex) == i
                 );
                 if (find) {
                   arr.push({
@@ -1328,7 +1330,7 @@ export default {
                 //按照collator分开reward数据
                 const find = getNorminator10RewardRes.rewards.find(
                   (sv) =>
-                    sv.roundIndex == i &&
+                    Number(sv.roundIndex) == i &&
                     sv.collator.toLowerCase() == v.id.toLowerCase()
                 );
                 if (find) {
@@ -1347,13 +1349,15 @@ export default {
             });
             // 计算历史RPM
             nominatorRes.forEach((v) => {
+              // debugger
               const arr = [];
               for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
+                //debugger;
                 const findTop = v.historyNominatorTotalReward.find(
-                  (sv) => sv.roundIndex == i
+                  (sv) => Number(sv.roundIndex) == i
                 );
                 const findBottom = v.historyNominatorTotalStake.find(
-                  (sv) => sv.roundIndex == i
+                  (sv) => Number(sv.roundIndex) == i
                 );
 
                 const result = new BigNumber(0);
@@ -1368,6 +1372,7 @@ export default {
                   roundIndex: i,
                   RPM: result,
                 });
+                console.log(`roundIndex=${i} RPM=${result.toNumber()}`);
               }
               v.historyRPM = arr;
               v.latestRPM = self.getLatestRPM(v.historyRPM);
