@@ -807,10 +807,10 @@ export default {
       );
     },
     startRoundIndex() {
-      return this.roundInfo.current - 11 - 1;
+      return this.roundInfo.current - 11 - 0;
     },
     endRoundIndex() {
-      return this.roundInfo.current - 2 - 1; //Reward延迟2round发放，在获取发放明细时，因为分区块发放的问题，目前系统是获取的前一round的数据， 因此还需要再减去1.
+      return this.roundInfo.current - 2 - 0; //Reward延迟2round发放
     },
     totalCollectorStake() {
       let result = BigNumber(0);
