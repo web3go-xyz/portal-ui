@@ -19,7 +19,7 @@ service.interceptors.request.use(
             // please modify it according to the actual situation
             config.headers['Authorization'] = `Bearer ${userInfo.token}`;
         }
-        config.headers['x-domain'] = `web3go.xyz`;
+        config.headers['xdomain'] = `web3go.xyz`;
         return config
     },
     error => {
