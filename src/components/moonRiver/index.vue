@@ -102,7 +102,7 @@
         <div class="info-item">
           <img src="@/assets/images/moonriver/icon2.png" alt="" />
           <div class="right">
-            <div class="title">Round Porgress</div>
+            <div class="title">Round Progress</div>
             <div class="number">
               {{ blockNumber - roundInfo.first }}/{{ roundInfo.length }}
             </div>
