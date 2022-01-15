@@ -96,9 +96,24 @@ export default {
     return {
       addressInfo1: {
         address: "5DbqSiw5j4jcb5BB1yuYYp88QVcgoZaYn9R3vff1BR2Cpa77",
-        iconSize: 48,
+        iconSize: 36,
+        identity: {
+          showMoreInfo: true,
+          id: "5DbqSiw5j4jcb5BB1yuYYp88QVcgoZaYn9R3vff1BR2Cpa77",
+          display: "PolkadotFund",
+          legal: "Web3 Foundation",
+          web: "http://web3.com",
+          riot: "",
+          email: "team@web3.com",
+          image: "",
+          twitter: "web3",
+          accountPublicKey: "12345678901234567890",
+          subOf: "Polkadot",
+        },
       },
       addressInfo2: {
+        
+        addressDisplayCompact:true,
         address: "0x10a2F17d8150B76359e9CEd567FC348C71A74B46",
         isEthereum: true,
         iconSize: 48,
