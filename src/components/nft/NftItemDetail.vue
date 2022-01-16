@@ -53,7 +53,7 @@
           </div>
           <div class="chart chart1" ref="chart1"></div>
         </div>
-        <div class="chart-item" v-loading="chartLoading">
+        <div class="chart-item table" v-loading="chartLoading">
           <div class="title">
             <span> NFT Activities Over Time </span>
             <el-tooltip
@@ -73,17 +73,33 @@
               </el-table-column>
               <el-table-column label="From">
                 <template slot-scope="scope">
-                  <span
-                    >{{ shorterAddress(scope.row.interactionAccount) }}
-                  </span>
+                  <identity-icon-plus
+                    :addressInfo="{
+                      address: scope.row.interactionAccount,
+                      addressDisplayCompact: true,
+                      iconSize: 18,
+                      fontSize: 12,
+                    }"
+                  ></identity-icon-plus>
                 </template>
               </el-table-column>
               <el-table-column label="To">
                 <template slot-scope="scope">
-                  <span>{{ shorterAddress(scope.row.caller) }} </span>
+                  <identity-icon-plus
+                    :addressInfo="{
+                      address: getToAccount(scope.row),
+                      addressDisplayCompact: true,
+                      iconSize: 18,
+                      fontSize: 12,
+                    }"
+                  ></identity-icon-plus>
                 </template>
               </el-table-column>
-              <el-table-column prop="interaction" label="Interaction">
+              <el-table-column
+                prop="interaction"
+                label="Interaction"
+                width="100"
+              >
               </el-table-column>
               <el-table-column
                 width="110"
@@ -95,7 +111,7 @@
                   <span>{{ scope.row.nftPrice | formatKUSAMA }} </span>
                 </template>
               </el-table-column>
-              <el-table-column width="110" label="BlockNumber">
+              <el-table-column width="100" label="BlockNumber">
                 <template slot-scope="scope">
                   <span
                     class="hover-item block-number"
@@ -113,16 +129,11 @@
 </template>
 
 <script>
+import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 import ipfsUtil from "@/utils/ipfsUtil";
-import {
-  getNFT,
-  getNFTs,
-  getCollections,
-  getTradeHistoryOfNFT,
-  getCollectionStatistic,
-  getPriceRangeOfCollection,
-} from "@/api/nftDetail";
+import { getNFT, getTradeHistoryOfNFT } from "@/api/nftDetail";
 export default {
+  components: { IdentityIconPlus },
   data() {
     return {
       ntfLink: "",
@@ -146,6 +157,15 @@ export default {
   },
   mounted() {},
   methods: {
+    getToAccount(row) {
+      if (row.interaction === "BUY" || row.interaction === "LIST") {
+        return row.caller;
+      }
+      if (row.interaction === "SEND") {
+        return row.meta;
+      }
+      return row.interactionAccount;
+    },
     clickBlockNumber(blockNumber) {
       window.open(`https://kusama.subscan.io/block/${blockNumber}`);
     },
@@ -401,12 +421,15 @@ export default {
     .chart-item {
       text-align: left;
       padding: 32px;
-      flex: 1;
+      flex: 2;
       height: 425px;
       margin-right: 24px;
       margin-bottom: 24px;
       background: #ffffff;
       border-radius: 10px;
+      &.table {
+        flex: 3;
+      }
       &:last-child {
         margin-right: 0;
       }

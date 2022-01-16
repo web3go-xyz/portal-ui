@@ -40,24 +40,18 @@
             :data="tableData"
             style="width: 100%"
           >
-            <el-table-column label="Address" prop="crowdloanId">
+            <el-table-column label="Address" prop="crowdloanId" width="320">
               <template slot-scope="scope">
-                <span class="copyImg" @click="copy(scope.row.account)">
-                  <el-tooltip content="copy" placement="top">
-                    <img :src="copyImg" alt="" class="copy" />
-                  </el-tooltip>
-                </span>
-                <span class="crowdloanId">
-                  {{ filterId(scope.row.account) }}
-                  <input
-                    v-model="scope.row.account"
-                    :copyId="scope.row.account"
-                  />
-                </span>
+                <identity-icon-plus
+                  :addressInfo="{
+                    address: scope.row.account,
+                    addressDisplayCompact: true,
+                  }"
+                ></identity-icon-plus>
               </template>
             </el-table-column>
 
-            <el-table-column prop="crowdloanCount">
+            <el-table-column prop="crowdloanCount" align="center">
               <template slot="header">
                 <el-tooltip
                   content="Number of campaigns contributed"
@@ -120,7 +114,11 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column label="Number of contributions" prop="Total">
+            <el-table-column
+              label="Number of contributions"
+              prop="Total"
+              align="center"
+            >
               <template slot-scope="scope">
                 <span class="total">
                   {{ scope.row.contributionCount }}
@@ -138,7 +136,9 @@
 import utility from "@/utils/index";
 import copyImg from "@/assets/images/copy.png";
 import service from "@/api/paraChain-analysis-polkadot";
+import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 export default {
+  components: { IdentityIconPlus },
   name: "ParaChainAnalytics",
   data() {
     return {

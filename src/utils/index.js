@@ -201,31 +201,45 @@ export async function loadAddressIdentityAsync(addressInfo) {
     let valueStr = localStorage.getItem(ls_key);
     if (valueStr) {
         console.debug('identityData localStorage ', valueStr);
-        return JSON.parse(valueStr);
-    }
-    else {
+        let json = JSON.parse(valueStr);
 
-        //request api to get identity data
-        let response = await request({
-            url: identity_api_path,
-            method: 'post',
-            data: { address: address }
-        });
-        if (response) {
-            response.judgement = "No Judgement";
-            if (response.rawIdentityInJson) {
-                if (response.rawIdentityInJson.judgements) {
-                    let judgementsStr = JSON.stringify(response.rawIdentityInJson.judgements).toLowerCase();
-                    if (judgementsStr.indexOf('knowngood') > -1) {
-                        response.judgement = "KnownGood";
-                    }
-                    if (judgementsStr.indexOf('reasonable') > -1) {
-                        response.judgement = "Reasonable";
-                    }
+        //check if the cache expire
+        if (json.expire > (new Date().getTime())) {
+            return json;
+        }
+        else {
+            localStorage.removeItem(ls_key);
+        }
+    }
+
+    let identityData = {
+        identity:
+        {
+        },
+        expire: (new Date().getTime()) + 1000 * 60 * 60 * 24  // keep cache with 24 hr
+    };
+
+    //request api to get identity data
+    let response = await request({
+        url: identity_api_path,
+        method: 'post',
+        data: { address: address }
+    });
+    if (response) {
+        response.judgement = "No Judgement";
+        if (response.rawIdentityInJson) {
+            if (response.rawIdentityInJson.judgements) {
+                let judgementsStr = JSON.stringify(response.rawIdentityInJson.judgements).toLowerCase();
+                if (judgementsStr.indexOf('knowngood') > -1) {
+                    response.judgement = "KnownGood";
+                }
+                if (judgementsStr.indexOf('reasonable') > -1) {
+                    response.judgement = "Reasonable";
                 }
             }
         }
-        let identityData = {
+
+        identityData = {
             identity:
             {
                 // showMoreInfo: true,
@@ -237,16 +251,18 @@ export async function loadAddressIdentityAsync(addressInfo) {
                 accountPublicKey: response.accountPublicKey || "",
                 subOf: response.subOf || "",
                 judgement: response.judgement || "",
-            }
+            },
+            expire: (new Date().getTime()) + 1000 * 5  // keep cache with 24 hr
         };
         console.debug('identityData api ', identityData);
 
-        let jsonStr = JSON.stringify(identityData);
-        localStorage.setItem(ls_key, jsonStr);
-        return identityData;
-
-
     }
+
+    let jsonStr = JSON.stringify(identityData);
+    localStorage.setItem(ls_key, jsonStr);
+    return identityData;
+
+
 };
 
 export default {

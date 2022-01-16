@@ -14,24 +14,41 @@
       </div>
     </div>
     <div class="address" v-if="!showIdentity">
-      <div class="address-display" v-if="addressDisplayCompact">
+      <div
+        class="address-display"
+        v-if="addressDisplayCompact"
+        v-bind:style="{ 'font-size': fontSize + 'px' }"
+      >
         {{ compactAddress(address) }}
       </div>
 
-      <div class="address-display" v-else>
+      <div
+        class="address-display"
+        v-else
+        v-bind:style="{ 'font-size': fontSize + 'px' }"
+      >
         {{ address }}
       </div>
     </div>
-    <div class="identity" v-if="showIdentity">
+    <div
+      class="identity"
+      v-if="showIdentity"
+      v-bind:style="{ 'font-size': fontSize + 'px' }"
+    >
       <div class="judgement" :class="judgement_icon" v-if="judgement_icon">
         <el-tooltip :effect="tooltipTheme" placement="top">
           <div slot="content">{{ judgement_desc }}</div>
-          <span class="material-icons"> {{ judgement_icon }} </span>
+          <span
+            class="material-icons"
+            v-bind:style="{ 'font-size': fontSize + 'px' }"
+          >
+            {{ judgement_icon }}
+          </span>
         </el-tooltip>
       </div>
       <el-tooltip :effect="tooltipTheme" placement="top">
         <div slot="content" @click="copy(address)">{{ address }}</div>
-        <div class="display">
+        <div class="display" v-bind:style="{ 'font-size': fontSize + 'px' }">
           {{ identity.display }}
         </div>
       </el-tooltip>
@@ -44,7 +61,12 @@
           <div slot="content" @click="copy(identity.legal)">
             Legal name:&nbsp;{{ identity.legal }}
           </div>
-          <span class="material-icons"> account_circle </span>
+          <span
+            class="material-icons"
+            v-bind:style="{ 'font-size': fontSize + 'px' }"
+          >
+            account_circle
+          </span>
         </el-tooltip>
       </div>
       <div class="item email" v-if="identity.email">
@@ -52,7 +74,12 @@
           <div slot="content" @click="copy(identity.email)">
             Email:&nbsp;{{ identity.email }}
           </div>
-          <span class="material-icons"> mail_outline </span>
+          <span
+            class="material-icons"
+            v-bind:style="{ 'font-size': fontSize + 'px' }"
+          >
+            mail_outline
+          </span>
         </el-tooltip>
       </div>
       <div class="item web" v-if="identity.web">
@@ -60,7 +87,12 @@
           <div slot="content" @click="copy(identity.web)">
             Web:&nbsp;{{ identity.web }}
           </div>
-          <span class="material-icons"> language </span>
+          <span
+            class="material-icons"
+            v-bind:style="{ 'font-size': fontSize + 'px' }"
+          >
+            language
+          </span>
         </el-tooltip>
       </div>
       <div class="item twitter" v-if="identity.twitter">
@@ -68,7 +100,10 @@
           <div slot="content" @click="copy(identity.twitter)">
             Twitter:&nbsp;{{ identity.twitter }}
           </div>
-          <img src="@/assets/images/twitter-logo.svg" />
+          <img
+            src="@/assets/images/twitter-logo.svg"
+            v-bind:style="{ width: fontSize + 'px' }"
+          />
         </el-tooltip>
       </div>
       <div class="item public-key" v-if="identity.accountPublicKey">
@@ -76,7 +111,12 @@
           <div slot="content" @click="copy(identity.accountPublicKey)">
             Public key:&nbsp;{{ identity.accountPublicKey }}
           </div>
-          <span class="material-icons"> key </span>
+          <span
+            class="material-icons"
+            v-bind:style="{ 'font-size': fontSize + 'px' }"
+          >
+            key
+          </span>
         </el-tooltip>
       </div>
     </div>
@@ -125,15 +165,16 @@ export default {
     },
   },
   computed: {
-    tooltipTheme() {
-      return this.addressInfo.tooltipTheme || "light";
+    address() {
+      return this.addressInfo.address;
     },
     iconSize() {
       return this.addressInfo.iconSize || 32;
     },
-    address() {
-      return this.addressInfo.address;
+    fontSize() {
+      return this.addressInfo.fontSize || 16;
     },
+
     addressDisplayCompact() {
       return this.addressInfo.addressDisplayCompact || false;
     },
@@ -199,6 +240,9 @@ export default {
       }
       return "";
     },
+    tooltipTheme() {
+      return this.addressInfo.tooltipTheme || "light";
+    },
   },
   methods: {
     updateIdentity() {
@@ -236,7 +280,8 @@ export default {
     },
     compactAddress(address) {
       if (address && address.length > 20) {
-        let subLength = address.length / 5;
+        let rangeLength = Math.ceil(address.length / 4);
+        let subLength = address.length / rangeLength;
         return (
           address.substring(0, subLength) +
           "..." +
