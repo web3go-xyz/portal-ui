@@ -172,7 +172,7 @@ export default {
       return this.addressInfo.iconSize || 32;
     },
     fontSize() {
-      return this.addressInfo.fontSize || 16;
+      return this.addressInfo.fontSize || 18;
     },
 
     addressDisplayCompact() {
