@@ -6,6 +6,8 @@
 
 // import Vue from 'vue'
 // import ElementUI from 'element-ui';  // import js scripts from CDN
+// material-design-icons-iconfont
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
 import './style/theme/index.less'
 import './style/whiteTheme/index.less'

@@ -75,6 +75,10 @@
     <div class="coming" v-if="isShowComing">
       <img src="./assets/images/coming.png" alt="" />
       <p>Coming soon...</p>
+
+      <!-- <identity-icon-plus :addressInfo="addressInfo1"></identity-icon-plus>
+      <identity-icon-plus :addressInfo="addressInfo2"></identity-icon-plus>
+      <identity-icon-plus :addressInfo="addressInfo3"></identity-icon-plus> -->
     </div>
     <router-view class="common-view" v-else />
   </div>
@@ -85,10 +89,43 @@ import request from "@/utils/request";
 import "@/assets/font/rubik/index.css";
 import logoImg from "@/assets/images/logo.png";
 import plusImg from "@/assets/images/home/plus.png";
+import IdentityIconPlus from "./components/ui-elements/IdentityIconPlus.vue";
 export default {
+  components: { IdentityIconPlus },
   name: "App",
   data() {
     return {
+      addressInfo1: {
+        address: "5DbqSiw5j4jcb5BB1yuYYp88QVcgoZaYn9R3vff1BR2Cpa77",
+        iconSize: 32,
+        identity: {
+          showMoreInfo: true,
+          id: "5DbqSiw5j4jcb5BB1yuYYp88QVcgoZaYn9R3vff1BR2Cpa77",
+          display: "PolkadotFund",
+          legal: "Web3 Foundation",
+          web: "http://web3.com",
+          riot: "",
+          email: "team@web3.com",
+          image: "",
+          twitter: "@twitter_web3",
+          accountPublicKey: "12345678901234567890",
+          subOf: "Polkadot",
+          judgement: "Reasonable",
+        },
+      },
+      addressInfo2: {
+        addressDisplayCompact: true,
+        address: "0x10a2F17d8150B76359e9CEd567FC348C71A74B46",
+        isEthereum: true,
+        iconSize: 48,
+        enableDynamicLoading: false,
+      },
+      addressInfo3: {
+        address: "12Y8b4C9ar162cBgycxYgxxHG7cLVs8gre9Y5xeMjW3izqer",
+        identity:{
+           showMoreInfo: false,
+        }
+      },
       inputValue: "",
       userInfo: null,
       actNav: {
@@ -340,7 +377,7 @@ export default {
   height: 100%;
   outline: none;
   margin-left: 30px;
-  padding-right:15px;
+  padding-right: 15px;
   border: none;
   background: #f5f7f9;
 }

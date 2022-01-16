@@ -33,7 +33,7 @@ export function amountFixed(b) {
 export function shorterAddress(address) {
     if (address && address.length > 20) {
         // debugger
-        let subLength = address.length / 4;
+        let subLength = address.length / 5;
         return address.substring(0, subLength) + '...' + address.substring(address.length - subLength);
     } else {
         return address;

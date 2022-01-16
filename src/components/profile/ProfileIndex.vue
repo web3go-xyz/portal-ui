@@ -2,9 +2,12 @@
   <div class="profile-index-page">
     <div class="info-wrap">
       <div class="info-left">
-        <Identicon :size="48" :theme="'polkadot'" :value="polkadotAddress" />
-        <!-- <img class="left-img" :src="getMainIcon()" alt="" /> -->
-        <div class="text-wrap">
+        <identity-icon-plus
+          :addressInfo="polkadotAddressInfo"
+        ></identity-icon-plus>
+
+        <!-- <Identicon :size="48" :theme="'polkadot'" :value="polkadotAddress" /> -->
+        <!-- <div class="text-wrap">
           <div class="title">{{ $route.query.address | shorterAddress }}</div>
           <div class="copy-wrap">
             <span class="text">{{ $route.query.address }}</span>
@@ -16,7 +19,7 @@
               class="copy hover-item"
             />
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="split"></div>
       <div class="item">
@@ -113,6 +116,7 @@
 <script>
 // import Identicon from "@vue-polkadot/vue-identicon";
 import Identicon from "@polkadot/vue-identicon";
+import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 import {
   getAllSupportedChains,
   ss58transform,
@@ -134,6 +138,7 @@ export default {
     Staking,
     NFT,
     Identicon,
+    IdentityIconPlus,
   },
   data() {
     return {
@@ -168,12 +173,23 @@ export default {
           component: NFT,
         },
       ],
+      polkadotAddressInfo: {
+        address: "",
+        identity: {
+          showMoreInfo: true,
+        },
+      },
     };
   },
   watch: {
     queryAddress(newValue, oldValue) {
       if (newValue != oldValue) {
         this.init();
+      }
+    },
+    polkadotAddress(newValue, oldValue) {
+      if (newValue != oldValue) {
+        this.polkadotAddressInfo.address = newValue;
       }
     },
   },
@@ -286,7 +302,7 @@ export default {
     },
     getTableData() {
       this.balanceNavData = JSON.parse(JSON.stringify(this.filterAddressList));
-      
+
       this.balanceNavData.forEach((v) => {
         getPrice({
           symbol: v.symbols[0],
