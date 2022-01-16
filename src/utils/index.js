@@ -2,7 +2,7 @@ import { imgUpload } from "@/api/common";
 import domtoimage from 'dom-to-image';
 import { BigNumber } from "bignumber.js";
 import { Message } from 'element-ui'
-
+import request from "@/utils/request";
 
 export function formatUrl(prefix, url) {
     if (url.indexOf('http') < 0) {
@@ -190,6 +190,65 @@ export function copy(text) {
     }
     document.body.removeChild(input);
 }
+
+
+const identity_api_path = "https://web3go.xyz/polkadot-identity/polkadot-identity-analysis/getIdentityInfo";
+export async function loadAddressIdentityAsync(addressInfo) {
+    let address = addressInfo.address || '';
+
+    //find localstorage
+    let ls_key = 'identity_address_' + address;
+    let valueStr = localStorage.getItem(ls_key);
+    if (valueStr) {
+        console.debug('identityData localStorage ', valueStr);
+        return JSON.parse(valueStr);
+    }
+    else {
+
+        //request api to get identity data
+        let response = await request({
+            url: identity_api_path,
+            method: 'post',
+            data: { address: address }
+        });
+        if (response) {
+            response.judgement = "No Judgement";
+            if (response.rawIdentityInJson) {
+                if (response.rawIdentityInJson.judgements) {
+                    let judgementsStr = JSON.stringify(response.rawIdentityInJson.judgements).toLowerCase();
+                    if (judgementsStr.indexOf('knowngood') > -1) {
+                        response.judgement = "KnownGood";
+                    }
+                    if (judgementsStr.indexOf('reasonable') > -1) {
+                        response.judgement = "Reasonable";
+                    }
+                }
+            }
+        }
+        let identityData = {
+            identity:
+            {
+                // showMoreInfo: true,
+                display: response.display || "",
+                legal: response.legal || "",
+                web: response.web || "",
+                email: response.email || "",
+                twitter: response.twitter || "",
+                accountPublicKey: response.accountPublicKey || "",
+                subOf: response.subOf || "",
+                judgement: response.judgement || "",
+            }
+        };
+        console.debug('identityData api ', identityData);
+
+        let jsonStr = JSON.stringify(identityData);
+        localStorage.setItem(ls_key, jsonStr);
+        return identityData;
+
+
+    }
+};
+
 export default {
     formatToken,
     formatTokenNumber,
@@ -203,5 +262,7 @@ export default {
     copy,
     formatUrl,
     KSM_RATIO,
-    DOT_RATIO
+    DOT_RATIO,
+
+    loadAddressIdentityAsync
 }

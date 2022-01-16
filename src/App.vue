@@ -76,8 +76,9 @@
       <img src="./assets/images/coming.png" alt="" />
       <p>Coming soon...</p>
 
-      <identity-icon-plus :addressInfo="addressInfo1"></identity-icon-plus>
+      <!-- <identity-icon-plus :addressInfo="addressInfo1"></identity-icon-plus>
       <identity-icon-plus :addressInfo="addressInfo2"></identity-icon-plus>
+      <identity-icon-plus :addressInfo="addressInfo3"></identity-icon-plus> -->
     </div>
     <router-view class="common-view" v-else />
   </div>
@@ -96,7 +97,7 @@ export default {
     return {
       addressInfo1: {
         address: "5DbqSiw5j4jcb5BB1yuYYp88QVcgoZaYn9R3vff1BR2Cpa77",
-        iconSize: 36,
+        iconSize: 32,
         identity: {
           showMoreInfo: true,
           id: "5DbqSiw5j4jcb5BB1yuYYp88QVcgoZaYn9R3vff1BR2Cpa77",
@@ -106,17 +107,24 @@ export default {
           riot: "",
           email: "team@web3.com",
           image: "",
-          twitter: "web3",
+          twitter: "@twitter_web3",
           accountPublicKey: "12345678901234567890",
           subOf: "Polkadot",
+          judgement: "Reasonable",
         },
       },
       addressInfo2: {
-        
-        addressDisplayCompact:true,
+        addressDisplayCompact: true,
         address: "0x10a2F17d8150B76359e9CEd567FC348C71A74B46",
         isEthereum: true,
         iconSize: 48,
+        enableDynamicLoading: false,
+      },
+      addressInfo3: {
+        address: "12Y8b4C9ar162cBgycxYgxxHG7cLVs8gre9Y5xeMjW3izqer",
+        identity:{
+           showMoreInfo: false,
+        }
       },
       inputValue: "",
       userInfo: null,
