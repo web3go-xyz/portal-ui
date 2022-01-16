@@ -13,7 +13,7 @@
         />
       </div>
     </div>
-    <div class="address" v-if="!showIdentity" @click="copy(address)">
+    <div class="address" v-if="!showIdentity">
       <div class="address-display" v-if="addressDisplayCompact">
         {{ compactAddress(address) }}
       </div>
@@ -22,7 +22,7 @@
         {{ address }}
       </div>
     </div>
-    <div class="identity" v-if="showIdentity" @click="copy(address)">
+    <div class="identity" v-if="showIdentity">
       <div class="judgement" :class="judgement_icon" v-if="judgement_icon">
         <el-tooltip :effect="tooltipTheme" placement="top">
           <div slot="content">{{ judgement_desc }}</div>
@@ -30,7 +30,7 @@
         </el-tooltip>
       </div>
       <el-tooltip :effect="tooltipTheme" placement="top">
-        <div slot="content">{{ address }}</div>
+        <div slot="content" @click="copy(address)">{{ address }}</div>
         <div class="display">
           {{ identity.display }}
         </div>
@@ -39,49 +39,41 @@
 
     <div class="copy-action"></div>
     <div class="identity-more-info" v-if="showIdentityMoreInfo">
-      <div
-        class="item legal"
-        v-if="identity.legal"
-        @click="copy(identity.legal)"
-      >
+      <div class="item legal" v-if="identity.legal">
         <el-tooltip :effect="tooltipTheme" placement="top">
-          <div slot="content">Legal name:&nbsp;{{ identity.legal }}</div>
+          <div slot="content" @click="copy(identity.legal)">
+            Legal name:&nbsp;{{ identity.legal }}
+          </div>
           <span class="material-icons"> account_circle </span>
         </el-tooltip>
       </div>
-      <div
-        class="item email"
-        v-if="identity.email"
-        @click="copy(identity.email)"
-      >
+      <div class="item email" v-if="identity.email">
         <el-tooltip :effect="tooltipTheme" placement="top">
-          <div slot="content">Email:&nbsp;{{ identity.email }}</div>
+          <div slot="content" @click="copy(identity.email)">
+            Email:&nbsp;{{ identity.email }}
+          </div>
           <span class="material-icons"> mail_outline </span>
         </el-tooltip>
       </div>
-      <div class="item web" v-if="identity.web" @click="copy(identity.web)">
+      <div class="item web" v-if="identity.web">
         <el-tooltip :effect="tooltipTheme" placement="top">
-          <div slot="content">Web:&nbsp;{{ identity.web }}</div>
+          <div slot="content" @click="copy(identity.web)">
+            Web:&nbsp;{{ identity.web }}
+          </div>
           <span class="material-icons"> language </span>
         </el-tooltip>
       </div>
-      <div
-        class="item twitter"
-        v-if="identity.twitter"
-        @click="copy(identity.twitter)"
-      >
+      <div class="item twitter" v-if="identity.twitter">
         <el-tooltip :effect="tooltipTheme" placement="top">
-          <div slot="content">Twitter:&nbsp;{{ identity.twitter }}</div>
+          <div slot="content" @click="copy(identity.twitter)">
+            Twitter:&nbsp;{{ identity.twitter }}
+          </div>
           <img src="@/assets/images/twitter-logo.svg" />
         </el-tooltip>
       </div>
-      <div
-        class="item public-key"
-        v-if="identity.accountPublicKey"
-        @click="copy(identity.accountPublicKey)"
-      >
+      <div class="item public-key" v-if="identity.accountPublicKey">
         <el-tooltip :effect="tooltipTheme" placement="top">
-          <div slot="content">
+          <div slot="content" @click="copy(identity.accountPublicKey)">
             Public key:&nbsp;{{ identity.accountPublicKey }}
           </div>
           <span class="material-icons"> key </span>
@@ -110,7 +102,7 @@ export default {
   data() {
     return {
       identity: {
-        showMoreInfo: true,
+        showMoreInfo: false,
         display: "",
         legal: "",
         web: "",
@@ -123,28 +115,14 @@ export default {
     };
   },
   created() {
-    let self = this;
-    if (self.addressInfo.identity) {
-      Object.assign(self.identity, self.addressInfo.identity);
-    }
-    if (this.addressInfo.enableDynamicLoading === false) {
-      return;
-    }
-
-    if (this.identity === undefined || !this.identity.display) {
-      if (this.loadAddressIdentityPromise) {
-        let promise = this.loadAddressIdentityPromise(this.addressInfo);
-        promise.then((info) => {
-          Object.assign(self.identity, info.identity);
-        });
-      } else {
-        let promise = this.loadAddressIdentityAsync(this.addressInfo);
-        promise.then((info) => {
-          Object.assign(self.identity, info.identity);
-        });
+    this.updateIdentity();
+  },
+  watch: {
+    address(newValue, oldValue) {
+      if (newValue != oldValue) {
+        this.updateIdentity();
       }
-      // console.log(this.identity);
-    }
+    },
   },
   computed: {
     tooltipTheme() {
@@ -223,6 +201,30 @@ export default {
     },
   },
   methods: {
+    updateIdentity() {
+      let self = this;
+      if (self.addressInfo.identity) {
+        Object.assign(self.identity, self.addressInfo.identity);
+      }
+      if (this.addressInfo.enableDynamicLoading === false) {
+        return;
+      }
+
+      if (this.identity === undefined || !this.identity.display) {
+        if (this.loadAddressIdentityPromise) {
+          let promise = this.loadAddressIdentityPromise(this.addressInfo);
+          promise.then((info) => {
+            Object.assign(self.identity, info.identity);
+          });
+        } else {
+          let promise = this.loadAddressIdentityAsync(this.addressInfo);
+          promise.then((info) => {
+            Object.assign(self.identity, info.identity);
+          });
+        }
+        // console.log(this.identity);
+      }
+    },
     loadAddressIdentityAsync(addressInfo) {
       if (this.$utils.loadAddressIdentityAsync) {
         return this.$utils.loadAddressIdentityAsync(addressInfo);
