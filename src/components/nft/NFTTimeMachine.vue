@@ -27,6 +27,7 @@
               style="width: 200px"
               v-model="query.filter_date"
               type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
               @change="refreshData(true)"
             >
             </el-date-picker>
@@ -37,7 +38,8 @@
                 <div>
                   NFT<el-tooltip effect="dark" placement="top-start">
                     <div slot="content" class="tooltip-300px">
-                      filter by NFT, we can view the nft's owner at the specific date.
+                      filter by NFT, we can view the nft's owner at the specific
+                      date.
                     </div>
                     <img
                       src="../../assets/images/nft/info.png"
@@ -50,7 +52,8 @@
                 <div>
                   Owner<el-tooltip effect="dark" placement="top-start">
                     <div slot="content" class="tooltip-300px">
-                     filter by owner, the list will show all the nfts owned at the specific date.
+                      filter by owner, the list will show all the nfts owned at
+                      the specific date.
                     </div>
                     <img
                       src="../../assets/images/nft/info.png"
@@ -94,7 +97,7 @@
             >
               <el-option
                 v-for="item in options4nfts"
-                :key="item.value"
+                :key="item.key"
                 :label="item.label"
                 :value="item.value"
               >
@@ -434,6 +437,7 @@ export default {
                 this.options4nfts.push({
                   label: d.name,
                   value: d.name,
+                  key: d.id,
                 });
               }
             }
