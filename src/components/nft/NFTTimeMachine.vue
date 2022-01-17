@@ -192,7 +192,7 @@
           </div>
           <div
             class="nftNavConList-table-pagination"
-            v-if="query.queryType == 'nft'"
+            v-show="query.queryType == 'nft'"
           >
             <el-pagination
               background
@@ -252,7 +252,6 @@ export default {
   },
   methods: {
     refreshData(resetFlag) {
-      this.totalCount = 0;
       if (this.query.queryType === "nft") {
         this.refreshDataByFilterNFT(resetFlag);
       }
@@ -294,6 +293,7 @@ export default {
     },
     refreshDataByFilterNFT(resetFlag) {
       if (resetFlag) {
+        console.log("resetFlag:", resetFlag);
         this.query.pageIndex = 1;
       }
       if (!this.query.filter_date) {
@@ -384,11 +384,11 @@ export default {
 
     handleSizeChange(val) {
       this.query.pageIndex = val;
-      this.refreshData();
+      this.refreshData(true);
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
-      this.refreshData();
+      this.refreshData(false);
     },
     goto(routeName) {
       this.$router.push({

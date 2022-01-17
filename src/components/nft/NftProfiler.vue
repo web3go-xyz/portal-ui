@@ -41,6 +41,19 @@
             </div>
             <img src="../../assets/images/nft/info.png" alt="" class="icon" />
           </el-tooltip>
+          <div style="float: right">
+            <el-date-picker
+              v-model="timeRange4collectionStatistic"
+              type="datetimerange"
+              range-separator="-"
+              start-placeholder="start date"
+              end-placeholder="end date"
+              :default-time="['00:00:00', '23:59:59']"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              @change="loadCollectionStatistic"
+            >
+            </el-date-picker>
+          </div>
         </div>
         <div
           class="nftNavConList-table"
@@ -172,7 +185,6 @@ import {
   getCollectionStatistic,
   getTopTradedCollections,
   getAvgPriceVolumeOfCollection,
-  getTotalCollectionVolumes,
 } from "@/api/nft/nftProfiler";
 import { formatKUSAMA } from "../../filters";
 export default {
@@ -184,6 +196,7 @@ export default {
         pageIndex: 1,
         orderBys: [],
       },
+      timeRange4collectionStatistic: ["", ""],
       listData: [],
       latest7days: [],
       totalCount: 0,
@@ -273,15 +286,10 @@ export default {
       });
     },
     init() {
-      this.getTotalCollectionVolumes();
-      this.getCollectionStatistic();
+      this.loadCollectionStatistic();
       this.getTopTradedCollections();
     },
-    getTotalCollectionVolumes() {
-      getTotalCollectionVolumes().then((res) => {
-        this.collectionVolume = res.collection_volume;
-      });
-    },
+
     getTopTradedCollectionsSort(sort, order, index) {
       this.tableTitle = this.tableTitle.map((item) => {
         if (item.sort) {
@@ -293,19 +301,29 @@ export default {
       this.query.pageSize = 10;
       this.query.pageIndex = 0;
       this.query.orderBys = [{ sort, order }];
-      this.getCollectionStatistic();
+      this.loadCollectionStatistic();
     },
-    getCollectionStatistic() {
+    loadCollectionStatistic() {
       this.nftNavConListLoading = true;
-      getCollectionStatistic({
+      let query = {
         pageSize: this.query.pageSize,
         pageIndex: this.query.pageIndex,
         orderBys: this.query.orderBys,
         collection_id: "",
-      }).then((res) => {
+      };
+      if (this.timeRange4collectionStatistic.length >= 2) {
+        let start_time = this.timeRange4collectionStatistic[0];
+        let end_time = this.timeRange4collectionStatistic[1];
+        if (start_time && end_time) {
+          query.start_time = start_time;
+          query.end_time = end_time;
+        }
+      }
+      getCollectionStatistic(query).then((res) => {
         this.nftNavConListLoading = false;
         this.listData = res.list;
         this.totalCount = res.totalCount;
+        this.collectionVolume = res.collection_volume;
       });
     },
     getTopTradedCollections() {
@@ -456,11 +474,11 @@ export default {
     },
     handleSizeChange(val) {
       this.query.pageIndex = val;
-      this.getCollectionStatistic();
+      this.loadCollectionStatistic();
     },
     handleCurrentChange(val) {
       this.query.pageIndex = val;
-      this.getCollectionStatistic();
+      this.loadCollectionStatistic();
     },
     goto(routeName) {
       this.$router.push({
