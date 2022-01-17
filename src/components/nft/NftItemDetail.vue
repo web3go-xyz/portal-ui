@@ -68,7 +68,13 @@
             <el-table :data="smallTableData" height="390">
               <el-table-column label="Time" sortable :sort-method="sortTime">
                 <template slot-scope="scope">
-                  <span>{{ $moment(scope.row.timestamp).fromNow() }} </span>
+                  <el-tooltip
+                    placement="top"
+                    trigger="hover"
+                    :content="scope.row.timestamp"
+                  >
+                    <span>{{ $moment(scope.row.timestamp).fromNow() }} </span>
+                  </el-tooltip>
                 </template>
               </el-table-column>
               <el-table-column label="From">

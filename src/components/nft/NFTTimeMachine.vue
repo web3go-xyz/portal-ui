@@ -19,15 +19,49 @@
       <div class="nftNavConInfo">
         <div class="nftNavConInfo-con">
           <div class="filter-item">
-            <span> Ownership at date:&nbsp;</span>
+            <!-- <span style="font-size: 36px" class="material-icons">
+              history
+            </span> -->
+            <span style="font-size: 18px"> Own NFT at date:&nbsp;</span>
             <el-date-picker
+              style="width: 200px"
               v-model="query.filter_date"
-              type="date"
+              type="datetime"
               @change="refreshData(true)"
             >
             </el-date-picker>
           </div>
           <div class="filter-item">
+            <el-radio-group v-model="query.queryType">
+              <el-radio-button label="nft">
+                <div>
+                  NFT<el-tooltip effect="dark" placement="top-start">
+                    <div slot="content" class="tooltip-300px">
+                      filter by NFT, we can view the nft's owner at the specific date.
+                    </div>
+                    <img
+                      src="../../assets/images/nft/info.png"
+                      alt=""
+                      class="tip-icon"
+                    />
+                  </el-tooltip></div
+              ></el-radio-button>
+              <el-radio-button v-model="query.queryType" label="owner">
+                <div>
+                  Owner<el-tooltip effect="dark" placement="top-start">
+                    <div slot="content" class="tooltip-300px">
+                     filter by owner, the list will show all the nfts owned at the specific date.
+                    </div>
+                    <img
+                      src="../../assets/images/nft/info.png"
+                      alt=""
+                      class="tip-icon"
+                    />
+                  </el-tooltip>
+                </div> </el-radio-button
+            ></el-radio-group>
+          </div>
+          <div class="filter-item" v-if="query.queryType == 'nft'">
             <el-select
               v-model="query.collection_id"
               filterable
@@ -47,7 +81,7 @@
               </el-option>
             </el-select>
           </div>
-          <div class="filter-item">
+          <div class="filter-item" v-if="query.queryType == 'nft'">
             <el-select
               v-model="query.nft_name"
               filterable
@@ -67,6 +101,14 @@
               </el-option>
             </el-select>
           </div>
+          <div class="filter-item" v-if="query.queryType == 'owner'">
+            <el-input
+              class="owner-address"
+              v-model="query.owner"
+              placeholder="search owner address on Kusama parachain"
+              @keyup.enter.native="refreshData(true)"
+            ></el-input>
+          </div>
         </div>
       </div>
       <div class="nftNavConList">
@@ -79,6 +121,7 @@
             </div>
             <img src="../../assets/images/nft/info.png" alt="" class="icon" />
           </el-tooltip>
+          <span style="margin-left: 10px">Total : {{ totalCount }}</span>
         </div>
         <div
           class="nftNavConList-table"
@@ -139,12 +182,15 @@
                       ></identity-icon-plus>
                     </div> </template
                 ></el-table-column>
-                <el-table-column prop="own_start_date" label="Own Date">
+                <el-table-column prop="own_start_date" label="First Own Date">
                 </el-table-column>
               </el-table>
             </div>
           </div>
-          <div class="nftNavConList-table-pagination">
+          <div
+            class="nftNavConList-table-pagination"
+            v-if="query.queryType == 'nft'"
+          >
             <el-pagination
               background
               layout="prev, pager, next,sizes,jumper"
@@ -173,6 +219,7 @@ export default {
   data() {
     return {
       query: {
+        queryType: "nft",
         pageSize: 10,
         pageIndex: 1,
         orderBys: [
@@ -184,6 +231,8 @@ export default {
         collection_id: "",
         nft_name: "",
         filter_date: new Date(),
+
+        owner: "",
       },
       listLoading: false,
       listData: [],
@@ -200,6 +249,47 @@ export default {
   },
   methods: {
     refreshData(resetFlag) {
+      this.totalCount = 0;
+      if (this.query.queryType === "nft") {
+        this.refreshDataByFilterNFT(resetFlag);
+      }
+
+      if (this.query.queryType === "owner") {
+        this.refreshDataByFilterOwner(resetFlag);
+      }
+    },
+    refreshDataByFilterOwner() {
+      let own_date = this.query.filter_date;
+      let owner = this.query.owner;
+      if (!own_date) {
+        return;
+      }
+      if (!owner) {
+        return;
+      }
+      this.listLoading = true;
+      let account_id_list = [owner];
+      historyApi
+        .getAccountOwnedNFTAtDate({
+          account_id_list: account_id_list,
+          own_date: own_date,
+        })
+        .then((resp) => {
+          this.listLoading = false;
+          this.listData = [];
+          if (resp) {
+            for (const d of resp) {
+              this.listData.push({
+                ...d,
+                own_start_date: d.start_date,
+                own_end_date: d.end_date,
+              });
+            }
+            this.totalCount = this.listData.length;
+          }
+        });
+    },
+    refreshDataByFilterNFT(resetFlag) {
       if (resetFlag) {
         this.query.pageIndex = 1;
       }
@@ -259,7 +349,7 @@ export default {
             // debugger
             for (let nft of nftList) {
               let findOwnship = ownershipList.find((t) => {
-                return t.interactionnft == nft.nft_id;
+                return t.interaction_nft == nft.nft_id;
               });
               if (findOwnship) {
                 nft.owner = findOwnship.owner;
@@ -480,6 +570,8 @@ export default {
 
         .filter-item {
           margin-right: 10px;
+          display: flex;
+          align-items: center;
         }
       }
     }
@@ -581,6 +673,14 @@ export default {
     cursor: pointer;
     font-weight: 500;
     color: #38cb98;
+  }
+  .owner-address.el-input {
+    width: 450px;
+  }
+  .tip-icon {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
   }
 }
 </style>

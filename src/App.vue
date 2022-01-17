@@ -122,9 +122,9 @@ export default {
       },
       addressInfo3: {
         address: "12Y8b4C9ar162cBgycxYgxxHG7cLVs8gre9Y5xeMjW3izqer",
-        identity:{
-           showMoreInfo: false,
-        }
+        identity: {
+          showMoreInfo: false,
+        },
       },
       inputValue: "",
       userInfo: null,
@@ -851,10 +851,10 @@ body.white-theme {
   background-color: #111;
 }
 .el-picker-panel__footer {
-  background-color: #212121;
+  // background-color: #212121;
 }
 .el-input--small .el-input__inner {
-  background-color: #212121;
+  // background-color: #212121;
 }
 .el-date-editor .el-range-separator {
   height: 43px;
@@ -920,14 +920,14 @@ body.white-theme {
 }
 .el-time-spinner__item {
   color: rgba(255, 255, 255, 0.6);
-  background-color: #181818;
+  // background-color: #181818;
 }
 .el-time-spinner__item:hover {
   background-color: #17c684;
 }
 .el-time-panel__footer {
   border-top: none;
-  background-color: #181818;
+  // background-color: #181818;
 }
 .el-button--text {
   color: #17c684;
@@ -975,7 +975,7 @@ body.white-theme {
 }
 .el-time-spinner__list::after,
 .el-time-spinner__list::before {
-  background: #181818;
+  // background: #181818;
 }
 .el-input.is-disabled .el-input__inner {
   background: #111;
