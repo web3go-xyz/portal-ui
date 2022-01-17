@@ -12,6 +12,7 @@
       <span @click="goto('NFTProfiler')">Market Overview</span>
       <span class="act">Mint Master</span>
       <span @click="goto('NFTGraph')">NFT Graph</span>
+      <span @click="goto('NFTTimeMachine')">Time Machine</span>
     </div>
     <div class="nftNavCon">
       <div class="nftNavConList">
@@ -144,7 +145,7 @@
 </template>
 
 <script>
-import { getLatestMintStatistic } from "@/api/nftMintMaster";
+import { getLatestMintStatistic } from "@/api/nft/nftMintMaster";
 import { formatKUSAMA } from "../../filters";
 import utility from "@/utils/index";
 export default {
@@ -398,7 +399,7 @@ export default {
     align-items: center;
     justify-content: flex-start;
     margin-top: 32px;
-    width: 445px;
+    width: 550px;
     border-radius: 4px;
     height: 40px;
     padding-left: 4px;

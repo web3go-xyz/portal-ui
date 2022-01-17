@@ -82,3 +82,15 @@ export function updateCollectionEntityName(data) {
         data
     });
 }
+export function getAllNFTs(data) {
+    return request({
+        url: formatUrl4Rmrk('/rmrk-analysis/getAllNFTs'),
+        method: 'post',
+        data
+    })
+}
+export default {
+    getCollections,
+    getNFTs,
+    getAllNFTs
+}

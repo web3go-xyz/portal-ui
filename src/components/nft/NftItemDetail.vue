@@ -131,7 +131,7 @@
 <script>
 import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 import ipfsUtil from "@/utils/ipfsUtil";
-import { getNFT, getTradeHistoryOfNFT } from "@/api/nftDetail";
+import { getNFT, getTradeHistoryOfNFT } from "@/api/nft/nftDetail";
 export default {
   components: { IdentityIconPlus },
   data() {

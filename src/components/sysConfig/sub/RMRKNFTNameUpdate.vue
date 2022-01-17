@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { getCollections, updateCollectionEntityName } from "@/api/nftDetail";
+import { getCollections, updateCollectionEntityName } from "@/api/nft/nftDetail";
 export default {
   name: "RMRKNFTNameUpdate",
   data() {

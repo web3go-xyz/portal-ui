@@ -12,6 +12,7 @@
       <span class="act">Market Overview</span>
       <span @click="goto('NFTMintMaster')">Mint Master</span>
       <span @click="goto('NFTGraph')">NFT Graph</span>
+      <span @click="goto('NFTTimeMachine')">Time Machine</span>
     </div>
 
     <div class="nftNavCon">
@@ -172,7 +173,7 @@ import {
   getTopTradedCollections,
   getAvgPriceVolumeOfCollection,
   getTotalCollectionVolumes,
-} from "@/api/nftProfiler";
+} from "@/api/nft/nftProfiler";
 import { formatKUSAMA } from "../../filters";
 export default {
   name: "NFTProfiler",
@@ -554,7 +555,7 @@ export default {
     justify-content: flex-start;
     margin-top: 32px;
     height: 40px;
-    width: 445px;
+    width: 550px;
     border-radius: 4px;
     padding-left: 4px;
     background: #ebeff3;

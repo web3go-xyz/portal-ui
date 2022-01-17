@@ -12,6 +12,7 @@
       <span @click="goto('NFTProfiler')">Market Overview</span>
       <span @click="goto('NFTMintMaster')">Mint Master</span>
       <span class="act">NFT Graph</span>
+      <span @click="goto('NFTTimeMachine')">Time Machine</span>
     </div>
     <div class="statistic">
       <div class="card">
@@ -131,14 +132,14 @@ export default {
     return {
       statisticInfo: {
         total_count_with_resource: 0,
-        total_count_with_children: 0
+        total_count_with_children: 0,
       },
       tooltipDelay: 500,
       activeType: "Resource",
       queryParams: {
         pageSize: 10,
         pageIndex: 1,
-        nft_name: ""
+        nft_name: "",
       },
       currentActiveNft: {},
       nftList: [],
@@ -151,23 +152,23 @@ export default {
         "#896CFD",
         "#A2ADC2",
         "#FF9214",
-        "#9FE080"
+        "#9FE080",
       ],
       nftSymbol: {
         symbol: "circle",
         symbolSize: 60,
-        itemStyle: { color: "#38CB98" }
+        itemStyle: { color: "#38CB98" },
       },
       resourceSymbol: {
         symbol: "diamond",
         symbolSize: 20,
-        itemStyle: { color: "#07F833" }
-      }
+        itemStyle: { color: "#07F833" },
+      },
     };
   },
   mounted() {
     let self = this;
-    nftGraphApi.getNFTResourceStatistic().then(resp => {
+    nftGraphApi.getNFTResourceStatistic().then((resp) => {
       self.statisticInfo = resp;
     });
     self.doSearch(true);
@@ -175,12 +176,12 @@ export default {
   methods: {
     goto(routeName) {
       this.$router.push({
-        name: routeName
+        name: routeName,
       });
     },
     refreshNFTResource() {
       let self = this;
-      nftGraphApi.getNFTResourceList(this.queryParams).then(resp => {
+      nftGraphApi.getNFTResourceList(this.queryParams).then((resp) => {
         self.nftList = resp.list;
         self.totalCount = resp.totalCount;
 
@@ -189,7 +190,7 @@ export default {
     },
     refreshNFTChildren() {
       let self = this;
-      nftGraphApi.getNFTChildrenList(this.queryParams).then(resp => {
+      nftGraphApi.getNFTChildrenList(this.queryParams).then((resp) => {
         self.nftList = resp.list;
         self.totalCount = resp.totalCount;
 
@@ -226,12 +227,12 @@ export default {
         tooltip: {
           trigger: "item",
           triggerOn: "click",
-          formatter: function(params, ticket, callback) {
-            ipfsUtil.buildImage(params).then(htmlContent => {
+          formatter: function (params, ticket, callback) {
+            ipfsUtil.buildImage(params).then((htmlContent) => {
               callback(ticket, htmlContent);
             });
             return params.name;
-          }
+          },
           // formatter: "{b}",
         },
         series: [
@@ -239,7 +240,7 @@ export default {
             expandAndCollapse: false,
             roam: true, //mouse drag and scale
             label: {
-              show: false
+              show: false,
             },
             type: "tree",
             data: [data],
@@ -255,10 +256,10 @@ export default {
             initialTreeDepth: 5,
             animationDurationUpdate: 750,
             emphasis: {
-              focus: "descendant"
-            }
-          }
-        ]
+              focus: "descendant",
+            },
+          },
+        ],
       });
       self.treeChartInstance.hideLoading();
     },
@@ -277,13 +278,13 @@ export default {
         self.treeChartInstance.showLoading();
       }
       if (self.activeType === "Resource") {
-        nftGraphApi.getNFTResourceTree({ nft_id: nft.id }).then(resp => {
+        nftGraphApi.getNFTResourceTree({ nft_id: nft.id }).then((resp) => {
           let data = self.formatNFTResourceTreeData(resp);
           self.refreshTreeChart(data, "tree");
         });
       }
       if (self.activeType === "Children") {
-        nftGraphApi.getNFTChildrenTree({ nft_id: nft.id }).then(resp => {
+        nftGraphApi.getNFTChildrenTree({ nft_id: nft.id }).then((resp) => {
           let data = self.formatNFTChildrenTreeData(resp);
           self.refreshTreeChart(data, "radial");
         });
@@ -300,14 +301,14 @@ export default {
         id: d.current.id,
         name: d.current.name,
         metadata: d.current.metadata,
-        children: []
+        children: [],
       };
 
       for (const r of d.resources) {
         data.children.push({
           ...self.resourceSymbol,
           ...r,
-          name: r.id
+          name: r.id,
         });
       }
       return data;
@@ -331,14 +332,14 @@ export default {
         id: node.currentNode.id,
         name: node.currentNode.name || node.currentNode.id,
         metadata: node.currentNode.metadata,
-        children: []
+        children: [],
       };
       if (node.currentNode.resources) {
         for (const r of node.currentNode.resources) {
           dataNode.children.push({
             ...self.resourceSymbol,
             ...r,
-            name: r.id
+            name: r.id,
           });
         }
       }
@@ -352,14 +353,14 @@ export default {
           const cNode = node.childrenNode[index];
           let nodeItem = this.getNode(cNode, nftSymbolSize);
           nodeItem.itemStyle = {
-            color: self.nftSymbolColors[index % self.nftSymbolColors.length]
+            color: self.nftSymbolColors[index % self.nftSymbolColors.length],
           };
           dataNode.children.push(nodeItem);
         }
       }
       return dataNode;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
@@ -418,7 +419,7 @@ export default {
     justify-content: flex-start;
     margin-top: 32px;
     height: 40px;
-    width: 445px;
+    width: 550px;
     border-radius: 4px;
     padding-left: 4px;
     background: #ebeff3;

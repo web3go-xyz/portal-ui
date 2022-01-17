@@ -157,7 +157,7 @@ import {
   getPriceRangeOfCollection,
   getTransactionsOfCollection,
   getTransactionCountOfCollection,
-} from "@/api/nftDetail";
+} from "@/api/nft/nftDetail";
 export default {
   data() {
     return {
