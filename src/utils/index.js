@@ -212,11 +212,12 @@ export async function loadAddressIdentityAsync(addressInfo) {
         }
     }
 
+    let expire = (new Date().getTime()) + 1000 * 60 * 60 * 24;  // keep cache with 24 hr
     let identityData = {
         identity:
         {
         },
-        expire: (new Date().getTime()) + 1000 * 60 * 60 * 24  // keep cache with 24 hr
+        expire: expire
     };
 
     //request api to get identity data
@@ -252,7 +253,7 @@ export async function loadAddressIdentityAsync(addressInfo) {
                 subOf: response.subOf || "",
                 judgement: response.judgement || "",
             },
-            expire: (new Date().getTime()) + 1000 * 5  // keep cache with 24 hr
+            expire: expire
         };
         console.debug('identityData api ', identityData);
 

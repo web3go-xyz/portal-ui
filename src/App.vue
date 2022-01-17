@@ -221,10 +221,10 @@ export default {
         if (resp) {
           // debugger
           self.$store.commit("app/SET_ADDRESS_TAG", resp.list);
-          console.log(
-            "$store.getters.addressTag:",
-            self.$store.getters.addressTag
-          );
+          // console.log(
+          //   "$store.getters.addressTag:",
+          //   self.$store.getters.addressTag
+          // );
         }
       });
     },
