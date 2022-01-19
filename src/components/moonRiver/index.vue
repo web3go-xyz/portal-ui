@@ -18,7 +18,11 @@
         >
       </div>
       <div v-else class="wallet-wrap">
-        <img class="icon" src="@/assets/images/moonriver/wallet-login-icon.png" alt="" />
+        <img
+          class="icon"
+          src="@/assets/images/moonriver/wallet-login-icon.png"
+          alt=""
+        />
         <div class="number">
           <el-tooltip :content="linkAccount.address" placement="top">
             <span> {{ shotFilter(linkAccount.address) }}</span>
@@ -175,8 +179,41 @@
             </template>
           </el-table-column>
           <el-table-column label="Latest RPM" prop="latestRPM">
+            <template slot="header" slot-scope="scope">
+              <div>
+                Latest RPM
+                <el-tooltip placement="top" trigger="hover">
+                  <div slot="content" class="tooltip-300px">
+                    RPM, Rewards Per MOVR. To simplify the calculation, we
+                    define RPM as "rewards per MOVR when nominating to the
+                    specific collator"
+                  </div>
+                  <i class="el-icon-warning-outline"></i>
+                </el-tooltip>
+              </div>
+            </template>
             <template slot-scope="scope">
               <span>{{ scope.row.latestRPM | roundNumber(8) }} MOVR</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="APR" prop="latestAPR">
+            <template slot="header" slot-scope="scope">
+              <div>
+                APR
+                <el-tooltip placement="top" trigger="hover">
+                  <div slot="content" class="tooltip-300px">
+                    APR means the annualized income pledged to the current
+                    collator.<br />Nearly {{ getRoundPerYear() }} rounds per
+                    year.
+                    <br />
+                    APR = Latest_RPM * Round_Per_Year * 100%
+                  </div>
+                  <i class="el-icon-warning-outline"></i>
+                </el-tooltip>
+              </div>
+            </template>
+            <template slot-scope="scope">
+              <span>{{ scope.row.latestAPR | roundNumber(2) }}%</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -988,6 +1025,15 @@ export default {
       }
       return 0;
     },
+    getRoundPerYear() {
+      let blockPerRound = this.roundInfo.length;
+      let roundPerYear = Math.ceil((365 * 24 * 3600) / 12 / blockPerRound);
+      return roundPerYear;
+    },
+    getLatestAPR(rpm) {
+      let roundPerYear = this.getRoundPerYear();
+      return roundPerYear * rpm * 100;
+    },
     resetAccountFilter() {
       this.searchAccount = this.linkAccount ? this.linkAccount.address : "";
     },
@@ -1367,6 +1413,8 @@ export default {
               }
               v.historyRPM = arr;
               v.latestRPM = self.getLatestRPM(v.historyRPM);
+              v.latestAPR = self.getLatestAPR(v.latestRPM);
+
               v.mimRPM = Math.min.apply(
                 null,
                 arr.map((sv) => sv.RPM.toNumber())

@@ -117,7 +117,7 @@
               <div
                 class="card-item"
                 v-for="d in monriverDashboardListFilter"
-                :key="d.id"
+                :key="d.id" 
                 @click="showCardDetail(d.type, d)"
               >
                 <div class="card-item-head">
@@ -657,7 +657,7 @@ export default {
 
       let num = types.indexOf(type) > -1 ? types.indexOf(type) + 2 : 9;
       if (type === "Moonbeam") {
-        num = 2;
+        num = 10;
       }
       return require(`./../assets/images/home/card-line${num}.png`);
     },
