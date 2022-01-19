@@ -206,7 +206,8 @@ export default {
     },
     toLogin() {
       this.isShowComing = false;
-      this.$router.push({ name: "Login" });
+      // this.$router.push({ name: "Login" });
+      this.$router.push({ name: "WalletLogin" });
     },
     toMyInfo() {
       this.isShowComing = false;
