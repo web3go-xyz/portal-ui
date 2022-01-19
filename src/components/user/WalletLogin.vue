@@ -35,17 +35,7 @@
 </template>
 
 <script>
-import {
-  web3Accounts,
-  web3Enable,
-  web3FromSource,
-} from "@polkadot/extension-dapp";
-import {
-  cryptoWaitReady,
-  decodeAddress,
-  signatureVerify,
-} from "@polkadot/util-crypto";
-import { u8aToHex } from "@polkadot/util";
+import login from './WalletLogin';
 export default {
   data() {
     return {
@@ -71,82 +61,8 @@ export default {
   },
   created() {},
   methods: {
-    hexDecode(hex) {
-      var j;
-      var hexes = hex.match(/.{1,4}/g) || [];
-      var back = "";
-      for (j = 0; j < hexes.length; j++) {
-        back += String.fromCharCode(parseInt(hexes[j], 16));
-      }
-      return back;
-    },
-    hexEncode(str) {
-      var hex, i;
-
-      var result = "";
-      for (i = 0; i < str.length; i++) {
-        hex = str.charCodeAt(i).toString(16);
-        result += ("000" + hex).slice(-4);
-      }
-
-      return result;
-    },
-    async testSigner() {
-      const extensions = await web3Enable("my cool dapp");
-
-      const allAccounts = await web3Accounts();
-      this.allAccounts = allAccounts;
-      console.log("allAccounts", allAccounts);
-      if (this.allAccounts.length) {
-        const account = allAccounts[0];
-
-        // to be able to retrieve the signer interface from this account
-        // we can use web3FromSource which will return an InjectedExtension type
-        const injector = await web3FromSource(account.meta.source);
-        // this injector object has a signer and a signRaw method
-        // to be able to sign raw bytes
-        const signRaw = injector?.signer?.signRaw;
-
-        if (signRaw) {
-          // after making sure that signRaw is defined
-          // we can use it to sign our message
-          let accountAddress = account.address;
-          let message = accountAddress;
-          message = "challenge message at 20210-11-21 10:00:00";
-          let messageEncoded = this.hexEncode(message);
-          const { signature } = await signRaw({
-            address: accountAddress,
-            data: messageEncoded,
-            type: "bytes",
-          });
-          console.log("signature", signature);
-          const isValid = await this.isValidSignature(
-            message,
-            signature,
-            accountAddress
-          );
-          console.log("isValid", isValid);
-          //fake account
-          let messageFake = accountAddress + "_fake";
-          let messageEncodedFake = this.hexEncode(messageFake);
-          const isValid_fake = await this.isValidSignature(
-            messageFake,
-            signature,
-            accountAddress
-          );
-          console.log("isValid_fake", isValid_fake);
-        }
-      }
-    },
-    async isValidSignature(message, signature, address) {
-      await cryptoWaitReady();
-      const publicKey = decodeAddress(address);
-      const hexPublicKey = u8aToHex(publicKey);
-      return signatureVerify(this.hexEncode(message), signature, hexPublicKey)
-        .isValid;
-    },
     handleLogin() {
-      this.testSigner();
+      login();
     },
   },
 };
