@@ -2,7 +2,7 @@
   <div class="moonriver-detail-page">
     <div class="common-back-title">
       <i class="el-icon-back" @click="$router.back()"></i>
-      <span class="text">{{ $route.query.id }}</span>
+      <span class="text">{{ address }}</span>
     </div>
     <div class="big-bg">
       <div class="info-wrap">
@@ -26,6 +26,21 @@
             <img src="@/assets/images/moonriver/icon3.png" alt="" />
           </div>
           <div class="label">Total Bonded(GLMR)</div>
+        </div>
+
+        <div class="item">
+          <div class="title">
+            <span>{{ rewardData.latestReward | roundNumber(2) }}</span>
+            <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
+          </div>
+          <div class="label">Latest Reward(GLMR)</div>
+        </div>
+        <div class="item">
+          <div class="title">
+            <span>{{ rewardData.totalReward | roundNumber(2) }}</span>
+            <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
+          </div>
+          <div class="label">Total Reward(GLMR)</div>
         </div>
       </div>
       <div class="nftNav-wrap">
@@ -84,10 +99,25 @@ export default {
           component: Action,
         },
       ],
+      rewardData: {
+        latestReward: 0,
+        totalReward: 0,
+      },
+      address: "",
     };
   },
   created() {
-    this.getCollectDetailData();
+    let self = this;
+    self.address = self.$route.query.id;
+    self.getCollectDetailData();
+
+    moonriverService
+      .getCollatorRewardStatistic({
+        collatorAccount: self.address,
+      })
+      .then((resp) => {
+        self.rewardData = resp;
+      });
   },
   computed: {
     collectorRank() {
@@ -97,7 +127,7 @@ export default {
       let collectorList;
       if (collectorListStr) {
         collectorList = JSON.parse(collectorListStr);
-        const find = collectorList.find((v) => v.id == this.$route.query.id);
+        const find = collectorList.find((v) => v.id == this.address);
         if (find) {
           return find.rankIndex + 1;
         }
@@ -110,7 +140,7 @@ export default {
       this.loading = true;
       moonriverService
         .getRealtimeCollatorState({
-          collators: [this.$route.query.id],
+          collators: [this.address],
         })
         .then((d) => {
           this.loading = false;

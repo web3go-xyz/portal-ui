@@ -89,7 +89,6 @@ export default {
         name: "MoonbeamDelegatorDetail",
         query: {
           id: row.owner,
-          bonded: row.amount,
         },
       });
     },

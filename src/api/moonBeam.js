@@ -4,6 +4,23 @@ import utils from "@/utils/index";
 function formatUrl4Moonriver(url) {
     return utils.formatUrl(window.MOONBEAM_API || '/moonbeam', url);
 }
+
+//get reward statistic of delegator
+export function getDelegatorRewardStatistic(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-analysis/getDelegatorRewardStatistic'),
+        method: 'post',
+        data
+    })
+}
+//get reward statistic of collator
+export function getCollatorRewardStatistic(data) {
+    return request({
+        url: formatUrl4Moonriver('/moonriver-analysis/getCollatorRewardStatistic'),
+        method: 'post',
+        data
+    })
+}
 // 获取当前区块高度
 export function getLatestBlockNumber(params) {
     return request({
@@ -158,6 +175,8 @@ export function subscribe(data) {
 }
 
 export default {
+    getCollatorRewardStatistic,
+    getDelegatorRewardStatistic,
     getLatestBlockNumber,
     getCurrentRoundInfo,
     getMaxNominatorsPerCollator,

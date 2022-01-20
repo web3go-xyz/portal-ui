@@ -2,21 +2,21 @@
   <div class="moonriver-detail-page">
     <div class="common-back-title">
       <i class="el-icon-back" @click="$router.back()"></i>
-      <span class="text">{{ $route.query.id }}</span>
+      <span class="text">{{ address }}</span>
     </div>
     <div class="big-bg">
       <div class="info-wrap">
         <div class="info-left">
-          <img class="icon" :src="makeBlockie($route.query.id)" alt="" />
+          <img class="icon" :src="makeBlockie(address)" alt="" />
           <div class="right">
             <div class="title">
               <span>Delegator</span>
             </div>
             <div class="copy-wrap">
-              <span class="text">{{ $route.query.id }}</span>
+              <span class="text">{{ address }}</span>
               <img
                 title="copy"
-                @click="$utils.copy($route.query.id)"
+                @click="$utils.copy(address)"
                 src="@/assets/images/profile/copy.png"
                 alt=""
                 class="copy hover-item"
@@ -27,10 +27,26 @@
         <div class="split"></div>
         <div class="item">
           <div class="title">
-            <span>{{ $route.query.bonded | roundNumber(2) }} GLMR</span>
+            <span>{{ bonded | roundNumber(2) }} GLMR</span>
             <img src="@/assets/images/moonriver/icon2.png" alt="" />
           </div>
-          <div class="label">Bonded</div>
+          <div class="label">Total Bonded</div>
+        </div>
+        <div class="split"></div>
+        <div class="item">
+          <div class="title">
+            <span>{{ rewardData.latestReward | roundNumber(2) }} GLMR</span>
+            <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
+          </div>
+          <div class="label">Latest Reward</div>
+        </div>
+        <div class="split"></div>
+        <div class="item">
+          <div class="title">
+            <span>{{ rewardData.totalReward | roundNumber(2) }} GLMR</span>
+            <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
+          </div>
+          <div class="label">Total Reward</div>
         </div>
       </div>
       <div class="nftNav-wrap">
@@ -56,25 +72,62 @@
 import Action from "./Action";
 import Reward from "./Reward";
 import makeBlockie from "ethereum-blockies-base64";
-
+import moonriverService from "@/api/moonBeam";
 export default {
   data() {
     return {
       currentNav: {
-        name: "Action",
-        component: Action,
+        name: "Reward",
+        component: Reward,
       },
       navList: [
-        {
-          name: "Action",
-          component: Action,
-        },
         {
           name: "Reward",
           component: Reward,
         },
+        {
+          name: "Action",
+          component: Action,
+        },
       ],
+      rewardData: {
+        latestReward: 0,
+        totalReward: 0,
+      },
+      address: "",
     };
+  },
+  computed: {
+    bonded() {
+      const collectorListStr = localStorage.getItem(
+        "moonriverCollectorSortList"
+      );
+      let bondSum = 0;
+      let collectorList;
+      if (collectorListStr) {
+        collectorList = JSON.parse(collectorListStr);
+        for (const c of collectorList) {
+          for (const n of c.allNominators) {
+            if (n.owner === this.address) {
+              bondSum += Number(n.amount);
+            }
+          }
+        }
+      }
+      return bondSum;
+    },
+  },
+  created() {
+    let self = this;
+    self.address = self.$route.query.id;
+
+    moonriverService
+      .getDelegatorRewardStatistic({
+        delegatorAccount: self.address,
+      })
+      .then((resp) => {
+        self.rewardData = resp;
+      });
   },
   methods: {
     makeBlockie(address) {
@@ -95,7 +148,7 @@ export default {
   .big-bg {
     padding: 24px 100px;
     .info-wrap {
-      width: 890px;
+      // width: 890px;
       border-radius: 10px;
       background: #ffffff;
       display: flex;

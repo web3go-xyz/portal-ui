@@ -293,6 +293,13 @@
           <div class="reset-account-btn" @click="resetAccountFilter()">
             reset
           </div>
+          <div
+            class="reward-history-btn"
+            v-show="searchAccount"
+            @click="turnDelegatorActionPage(searchAccount)"
+          >
+            reward history
+          </div>
         </div>
         <el-table class="my-stack-table" v-loading="loading" :data="tableData2">
           <el-table-column width="190" label="Collator">
@@ -1888,6 +1895,14 @@ export default {
     shotFilter(str) {
       return str.slice(0, 6) + "..." + str.slice(str.length - 4, str.length);
     },
+    turnDelegatorActionPage(account) {
+      this.$router.push({
+        name: "MoonbeamDelegatorDetail",
+        query: {
+          id: account,
+        },
+      });
+    },
   },
 };
 </script>
@@ -2087,6 +2102,20 @@ export default {
           border: 1px solid rgba(41, 40, 40, 0.3);
           font-size: 14px;
           color: rgba(41, 40, 40, 0.8);
+          cursor: pointer;
+          &:hover {
+            opacity: 0.7;
+          }
+        }
+        .reward-history-btn {
+          margin-left: 16px;
+          width: 120px;
+          height: 40px;
+          line-height: 40px;
+          background: #38cb98;
+          border-radius: 6px;
+          font-size: 14px;
+          color: white;
           cursor: pointer;
           &:hover {
             opacity: 0.7;
