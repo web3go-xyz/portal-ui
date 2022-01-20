@@ -1455,7 +1455,7 @@ export default {
             }
             this.tableData = nominatorRes;
             localStorage.setItem(
-              "moonriverCollectorSortList",
+              "moonbeamCollectorSortList",
               JSON.stringify(nominatorRes)
             );
             console.log("tableData", nominatorRes);

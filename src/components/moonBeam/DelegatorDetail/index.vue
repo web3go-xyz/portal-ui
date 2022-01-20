@@ -100,7 +100,7 @@ export default {
   computed: {
     bonded() {
       const collectorListStr = localStorage.getItem(
-        "moonriverCollectorSortList"
+        "moonbeamCollectorSortList"
       );
       let bondSum = 0;
       let collectorList;

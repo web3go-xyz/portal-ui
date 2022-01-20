@@ -89,7 +89,6 @@ export default {
         name: "DelegatorDetail",
         query: {
           id: row.owner,
-          bonded: row.amount,
         },
       });
     },

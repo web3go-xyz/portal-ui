@@ -122,7 +122,7 @@ export default {
   computed: {
     collectorRank() {
       const collectorListStr = localStorage.getItem(
-        "moonriverCollectorSortList"
+        "moonbeamCollectorSortList"
       );
       let collectorList;
       if (collectorListStr) {
