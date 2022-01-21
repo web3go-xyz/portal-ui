@@ -3,7 +3,7 @@
     <div class="back-title">
       <i
         class="el-icon-back"
-        @click="$router.push({ name: $route.query.back })"
+        @click="$router.back()"
       ></i>
       <span class="text">{{ infoData.name }}</span>
       <span class="time">{{
