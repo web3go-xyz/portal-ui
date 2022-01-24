@@ -193,6 +193,8 @@ export function copy(text) {
 
 
 const identity_api_path = "https://web3go.xyz/polkadot-identity/polkadot-identity-analysis/getIdentityInfo";
+
+//const identity_api_path = "http://localhost:20006/polkadot-identity-analysis/getIdentityInfo";
 export async function loadAddressIdentityAsync(addressInfo) {
     let address = addressInfo.address || '';
 

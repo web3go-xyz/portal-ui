@@ -144,15 +144,24 @@
             </template>
           </el-table-column>
 
-          <el-table-column width="150" label="Collator">
+          <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
-                <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
+                <identity-icon-plus
+                  @click.native="turnActionPage(scope)"
+                  :addressInfo="{
+                    address: scope.row.id,
+                    addressDisplayCompact: true,
+                    isEthereum: true,
+                    fontSize:16
+                  }"
+                ></identity-icon-plus>
+                <!-- <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
                 <el-tooltip :content="scope.row.id" placement="top">
-                  <span class="span" @click="turnActionPage(scope)">{{
+                  <span class="span" >{{
                     shotFilter(scope.row.id)
                   }}</span>
-                </el-tooltip>
+                </el-tooltip> -->
               </div>
             </template>
           </el-table-column>
@@ -302,15 +311,24 @@
           </div>
         </div>
         <el-table class="my-stack-table" v-loading="loading" :data="tableData2">
-          <el-table-column width="190" label="Collator">
+          <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
-                <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
+                 <identity-icon-plus
+                  @click.native="turnActionPage(scope)"
+                  :addressInfo="{
+                    address: scope.row.id,
+                    addressDisplayCompact: true,
+                    isEthereum: true,
+                    fontSize:16
+                  }"
+                ></identity-icon-plus>
+                <!-- <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
                 <el-tooltip :content="scope.row.id" placement="top">
                   <span class="span" @click="turnActionPage(scope)">{{
                     shotFilter(scope.row.id)
                   }}</span>
-                </el-tooltip>
+                </el-tooltip> -->
               </div>
             </template>
           </el-table-column>
@@ -774,13 +792,18 @@
 </template>
 
 <script>
+import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
+
 import { BigNumber } from "bignumber.js";
-import makeBlockie from "ethereum-blockies-base64";
 import moonriverService from "@/api/moonBeam";
+
 // Required imports
 // import { ApiPromise, WsProvider } from "@polkadot/api";
 // import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 export default {
+  components: {
+    IdentityIconPlus,
+  },
   data() {
     return {
       scrollHandler: null,
@@ -876,9 +899,6 @@ export default {
     },
   },
   methods: {
-    makeBlockie(address) {
-      return makeBlockie(address);
-    },
     clearSubscribe() {
       let self = this;
       moonriverService

@@ -4,12 +4,21 @@
       <el-table-column label="Collator">
         <template slot-scope="scope">
           <div class="icon-cell">
-            <img class="icon" :src="makeBlockie(scope.row.collator)" alt="" />
+            <identity-icon-plus
+              @click.native="turnCollectorActionPage(scope.row)"
+              :addressInfo="{
+                address: scope.row.collator,
+                addressDisplayCompact: true,
+                isEthereum: true,
+                fontSize: 16,
+              }"
+            ></identity-icon-plus>
+            <!-- <img class="icon" :src="makeBlockie(scope.row.collator)" alt="" />
             <el-tooltip :content="scope.row.collator" placement="top">
               <span class="span" @click="turnCollectorActionPage(scope.row)">{{
                 shotFilter(scope.row.collator)
               }}</span>
-            </el-tooltip>
+            </el-tooltip> -->
           </div>
         </template>
       </el-table-column>
@@ -45,10 +54,13 @@
 </template>
 
 <script>
+import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 import moonriverService from "@/api/moonriver";
-import makeBlockie from "ethereum-blockies-base64";
 
 export default {
+  components: {
+    IdentityIconPlus,
+  },
   data() {
     return {
       pageIndex: 1,
@@ -62,9 +74,6 @@ export default {
     this.getList();
   },
   methods: {
-    makeBlockie(address) {
-      return makeBlockie(address);
-    },
     turnCollectorActionPage(row) {
       this.$router.push({
         name: "CollectorDetail",

@@ -19,7 +19,12 @@
         v-if="addressDisplayCompact"
         v-bind:style="{ 'font-size': fontSize + 'px' }"
       >
-        {{ compactAddress(address) }}
+        <el-tooltip :effect="tooltipTheme" placement="top">
+          <div slot="content" @click="copy(address)">{{ address }}</div>
+          <div class="display" v-bind:style="{ 'font-size': fontSize + 'px' }">
+            {{ compactAddress(address) }}
+          </div>
+        </el-tooltip>
       </div>
 
       <div
@@ -249,25 +254,35 @@ export default {
       let self = this;
       if (self.addressInfo.identity) {
         Object.assign(self.identity, self.addressInfo.identity);
+        return;
       }
       if (this.addressInfo.enableDynamicLoading === false) {
         return;
       }
 
-      if (this.identity === undefined || !this.identity.display) {
-        if (this.loadAddressIdentityPromise) {
-          let promise = this.loadAddressIdentityPromise(this.addressInfo);
-          promise.then((info) => {
-            Object.assign(self.identity, info.identity);
-          });
-        } else {
-          let promise = this.loadAddressIdentityAsync(this.addressInfo);
-          promise.then((info) => {
-            Object.assign(self.identity, info.identity);
-          });
-        }
-        // console.log(this.identity);
+      self.identity = {
+        showMoreInfo: false,
+        display: "",
+        legal: "",
+        web: "",
+        email: "",
+        twitter: "",
+        accountPublicKey: "",
+        subOf: "",
+        judgement: "",
+      };
+      if (this.loadAddressIdentityPromise) {
+        let promise = this.loadAddressIdentityPromise(this.addressInfo);
+        promise.then((info) => {
+          Object.assign(self.identity, info.identity);
+        });
+      } else {
+        let promise = this.loadAddressIdentityAsync(this.addressInfo);
+        promise.then((info) => {
+          Object.assign(self.identity, info.identity);
+        });
       }
+      // console.log(this.identity);
     },
     loadAddressIdentityAsync(addressInfo) {
       if (this.$utils.loadAddressIdentityAsync) {
