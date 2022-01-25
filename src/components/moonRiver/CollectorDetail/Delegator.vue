@@ -14,12 +14,12 @@
           <div
             class="rank-icon"
             :class="{
-              first: scope.$index + 1 == 1,
-              second: scope.$index + 1 == 2,
-              third: scope.$index + 1 == 3,
+              first: scope.row.rank == 1,
+              second: scope.row.rank == 2,
+              third: scope.row.rank == 3,
             }"
           >
-            {{ scope.$index + 1 }}
+            {{ scope.row.rank }}
           </div>
         </template>
       </el-table-column>

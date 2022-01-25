@@ -24,7 +24,7 @@
           <div class="title">
             <span>{{ collectorData.TotalBonded | roundNumber(2) }}</span>
             <img src="@/assets/images/moonriver/icon3.png" alt="" />
-          </div> 
+          </div>
           <div class="label">Total Bonded(MOVR)</div>
         </div>
         <div class="item">
@@ -172,6 +172,10 @@ export default {
               const result = totalB.minus(totalA);
               return result;
             });
+            for (let index = 0; index < data.allNominators.length; index++) {
+              const element = data.allNominators[index];
+              element.rank = index + 1;
+            }
             // collector Total Bonded
             data.TotalBonded = data.bond.plus(allAmount);
             this.collectorData = data;

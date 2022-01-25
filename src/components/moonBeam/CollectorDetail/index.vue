@@ -174,6 +174,11 @@ export default {
               const result = totalB.minus(totalA);
               return result;
             });
+            for (let index = 0; index < data.allNominators.length; index++) {
+              const element = data.allNominators[index];
+              element.rank = index + 1;
+            }
+
             // collector Total Bonded
             data.TotalBonded = data.bond.plus(allAmount);
             this.collectorData = data;
