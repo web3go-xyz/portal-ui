@@ -40,50 +40,49 @@ async function isValidSignature(message, signature, address) {
         .isValid;
 }
 
-async function login() {
+export async function getAccounts() {
     const extensions = await web3Enable("my cool dapp");
 
     const allAccounts = await web3Accounts();
-    console.log("allAccounts", allAccounts);
-    if (allAccounts.length) {
-        const account = allAccounts[0];
+    return allAccounts;
+}
 
-        // to be able to retrieve the signer interface from this account
-        // we can use web3FromSource which will return an InjectedExtension type
-        const injector = await web3FromSource(account.meta.source);
-        // this injector object has a signer and a signRaw method
-        // to be able to sign raw bytes
-        const signRaw = injector && injector.signer && injector.signer.signRaw;
+export async function login(account, challenge) {
 
-        if (signRaw) {
-            // after making sure that signRaw is defined
-            // we can use it to sign our message
-            let accountAddress = account.address;
-            let message = accountAddress;
-            message = "challenge message at 20210-11-21 10:00:00";
-            let messageEncoded = hexEncode(message);
-            const { signature } = await signRaw({
-                address: accountAddress,
-                data: messageEncoded,
-                type: "bytes",
-            });
-            console.log("signature", signature);
-            const isValid = await isValidSignature(
-                message,
-                signature,
-                accountAddress
-            );
-            console.log("isValid", isValid);
-            //fake account
-            let messageFake = accountAddress + "_fake";
-            let messageEncodedFake = hexEncode(messageFake);
-            const isValid_fake = await isValidSignature(
-                messageFake,
-                signature,
-                accountAddress
-            );
-            console.log("isValid_fake", isValid_fake);
-        }
+    // to be able to retrieve the signer interface from this account
+    // we can use web3FromSource which will return an InjectedExtension type
+    const injector = await web3FromSource(account.meta.source);
+    // this injector object has a signer and a signRaw method
+    // to be able to sign raw bytes
+    const signRaw = injector && injector.signer && injector.signer.signRaw;
+
+    if (signRaw) {
+        // after making sure that signRaw is defined
+        // we can use it to sign our message
+        let accountAddress = account.address;
+        // const message = "challenge message at 20210-11-21 10:00:00";
+        const message = challenge;
+
+        const { signature } = await signRaw({
+            address: accountAddress,
+            data: message,
+            type: "bytes",
+        });
+        const isValid = await isValidSignature(
+            message,
+            signature,
+            accountAddress
+        );
+        console.log("isValid", isValid);
+        return signature;
+        //fake account
+        // let messageFake = accountAddress + "_fake";
+        // let messageEncodedFake = hexEncode(messageFake);
+        // const isValid_fake = await isValidSignature(
+        //     messageFake,
+        //     signature,
+        //     accountAddress
+        // );
+        // console.log("isValid_fake", isValid_fake);
     }
 }
-export default login;

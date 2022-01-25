@@ -16,6 +16,7 @@
         >
           <div class="btn-wrap">
             <el-button
+              v-if="challengeObj"
               :loading="loading"
               size="big"
               type="primary"
@@ -35,10 +36,13 @@
 </template>
 
 <script>
-import login from './WalletLogin';
+import { getAccounts, login } from "./WalletLogin";
+import { web3_nonce, web3_challenge } from "@/api/walletSignin";
 export default {
   data() {
     return {
+      challengeObj: null,
+      allAccounts: [],
       loginForm: {
         email: "",
         password: "",
@@ -59,10 +63,24 @@ export default {
       loading: false,
     };
   },
-  created() {},
+  async created() {
+    this.challengeObj = await web3_nonce();
+    this.allAccounts = await getAccounts();
+  },
   methods: {
-    handleLogin() {
-      login();
+    async handleLogin() {
+      if (this.allAccounts.length) {
+        const account = this.allAccounts[0];
+        const signature = await login(account, this.challengeObj.challenge);
+        const tokenObj = await web3_challenge({
+          signature,
+          identityNetwork: "polkadot",
+          scope: ["address", "balance"],
+          challenge: this.challengeObj.challenge,
+          address: account.address,
+          nonce: this.challengeObj.nonce,
+        });
+      }
     },
   },
 };

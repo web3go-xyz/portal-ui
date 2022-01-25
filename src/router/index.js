@@ -5,7 +5,7 @@ import HomePage from "@/components/HomePage";
 import ProfileHome from "@/components/profile/ProfileHome";
 import ProfileIndex from "@/components/profile/ProfileIndex";
 import Login from "@/components/user/Login";
-import WalletLogin from "@/components/user/WalletLogin";
+import WalletLogin from "@/components/user/WalletLogin.vue";
 import Register from "@/components/user/Register";
 import UserInfo from "@/components/user/UserInfo";
 import VerifyEmail from "@/components/user/VerifyEmail";
