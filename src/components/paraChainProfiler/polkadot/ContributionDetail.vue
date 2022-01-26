@@ -28,9 +28,10 @@
           </div>
           <div class="head-mian-item">
             <p>
-              <img src="@/assets/images/crowdloan/kusama_detail_raised.png" alt="" /><span
-                >Total raised</span
-              >
+              <img
+                src="@/assets/images/crowdloan/kusama_detail_raised.png"
+                alt=""
+              /><span>Total raised</span>
             </p>
             <el-tooltip
               :content="formatedTokenValue(info.totalRaisedValue)"
@@ -73,9 +74,10 @@
           </div>
           <div class="head-mian-item">
             <p>
-              <img src="@/assets/images/crowdloan/kusama_detail_ration.png" alt="" /><span
-                >Progress</span
-              >
+              <img
+                src="@/assets/images/crowdloan/kusama_detail_ration.png"
+                alt=""
+              /><span>Progress</span>
             </p>
             <h2>{{ info.progress }}%</h2>
           </div>
@@ -393,6 +395,7 @@ export default {
   },
   data() {
     return {
+      paraChainList: [],
       tokenRatio: 1000 * 1000 * 1000 * 10,
       msg: "Welcome to ParaChainCrowdloan Contribution Detail",
       info: {},
@@ -462,9 +465,19 @@ export default {
       refreshInterval: {},
     };
   },
-  mounted() {
+  async mounted() {
+    const resp = await service.getPolkParaChainList();
+    this.paraChainList = resp.list;
+    const d = await service.getPolkParaChainCrowdloanList({
+      crowdloanId: this.$route.query.crowdloanId,
+    });
+    const data = d.list[0];
     let self = this;
-    const query = this.$route.query;
+    const query = {
+      crowdloanId: data.crowdloanId,
+      projectName: this.getprojectName(data),
+      iconPath: this.getParachainNameIcon(data).iconPath,
+    };
     self.info = Object.assign(this.info, query);
     self.query = Object.assign(this.query, query);
     self.refreshAllData();
@@ -479,6 +492,53 @@ export default {
     }
   },
   methods: {
+    getParachainNameIcon(row) {
+      let nameIcon = { parachainName: "", iconPath: "" };
+      let parachainId = this.getParachainId(row);
+      if (parachainId) {
+        if (this.paraChainList) {
+          let findIcon = "";
+          for (let index = 0; index < this.paraChainList.length; index++) {
+            const element = this.paraChainList[index];
+            if (element.paraId == parachainId) {
+              findIcon = element.icon;
+              nameIcon.parachainName = element.projectName;
+              break;
+            }
+          }
+          if (!findIcon) {
+            findIcon = "unknown.svg";
+          }
+          nameIcon.iconPath = "static/parachain-icon/" + findIcon;
+        }
+      }
+      return nameIcon;
+    },
+    getprojectName(row) {
+      let parachainId = this.getParachainId(row);
+      let projectName = "";
+      if (parachainId) {
+        if (this.paraChainList) {
+          for (let index = 0; index < this.paraChainList.length; index++) {
+            const element = this.paraChainList[index];
+            if (element.paraId == parachainId) {
+              projectName = element.projectName;
+              break;
+            }
+          }
+        }
+      }
+      return projectName;
+    },
+    getParachainId(row) {
+      if (row && row.crowdloanId) {
+        let array = row.crowdloanId.split("-");
+        if (array.length > 0) {
+          return array[0];
+        }
+      }
+      return "";
+    },
     getContributorStatisticDisplayText() {
       if (this.query && this.query.projectName == "Acala") {
         return '<i class="el-icon-wallet"></i>Contributors For Acala LCDOT Vault: 59128';

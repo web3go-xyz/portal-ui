@@ -413,10 +413,10 @@ export default {
         name: "ParaChainCrowdloanContributionDetail4Polkadot",
         query: {
           crowdloanId: row.crowdloanId,
-          lastUpdateTime: row.lastUpdateTime,
-          projectName: row.projectName,
-          iconPath: row.iconPath,
-          chainType: self.parachainCrowdloanChainType,
+          // lastUpdateTime: row.lastUpdateTime,
+          // projectName: row.projectName,
+          // iconPath: row.iconPath,
+          // chainType: self.parachainCrowdloanChainType,
         },
         params: {
           paramsOnPage: this.query,
@@ -665,11 +665,11 @@ export default {
   }
   th:nth-child(4) .cell {
     text-align: left;
-    padding-left: 20px!important;
+    padding-left: 20px !important;
   }
   th:nth-child(5) .cell {
     text-align: left;
-    padding-left:0!important;
+    padding-left: 0 !important;
   }
   th.column-raise .cell {
     text-align: right !important;
