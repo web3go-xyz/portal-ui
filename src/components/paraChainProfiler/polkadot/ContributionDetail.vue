@@ -28,9 +28,10 @@
           </div>
           <div class="head-mian-item">
             <p>
-              <img src="@/assets/images/crowdloan/kusama_detail_raised.png" alt="" /><span
-                >Total raised</span
-              >
+              <img
+                src="@/assets/images/crowdloan/kusama_detail_raised.png"
+                alt=""
+              /><span>Total raised</span>
             </p>
             <el-tooltip
               :content="formatedTokenValue(info.totalRaisedValue)"
@@ -73,9 +74,10 @@
           </div>
           <div class="head-mian-item">
             <p>
-              <img src="@/assets/images/crowdloan/kusama_detail_ration.png" alt="" /><span
-                >Progress</span
-              >
+              <img
+                src="@/assets/images/crowdloan/kusama_detail_ration.png"
+                alt=""
+              /><span>Progress</span>
             </p>
             <h2>{{ info.progress }}%</h2>
           </div>
@@ -464,7 +466,11 @@ export default {
   },
   mounted() {
     let self = this;
-    const query = this.$route.query;
+    // const query = this.$route.query;
+    const queryStr = localStorage.getItem(
+      "ParaChainCrowdloanContributionDetail4PolkadotQuery"
+    );
+    const query = queryStr ? JSON.parse(queryStr) : {};
     self.info = Object.assign(this.info, query);
     self.query = Object.assign(this.query, query);
     self.refreshAllData();

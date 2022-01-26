@@ -486,7 +486,11 @@ export default {
   },
   mounted() {
     let self = this;
-    const query = this.$route.query;
+    // const query = this.$route.query;
+    const queryStr = localStorage.getItem(
+      "ParaChainCrowdloanContributionDetailQuery"
+    );
+    const query = queryStr ? JSON.parse(queryStr) : {};
     self.info = Object.assign(this.info, query);
     self.query = Object.assign(this.query, query);
     self.refreshAllData();
@@ -501,6 +505,26 @@ export default {
     }
   },
   methods: {
+    handleShareAll(key, elId, title) {
+      const el = document.querySelector(elId);
+      el.className = el.className + " hide2div";
+      utils
+        .html2Img(el, () => {
+          el.className = el.className.replace(" hide2div", "");
+        })
+        .then(({ address, base64 }) => {
+          if (key == "twitter") {
+            utils.share(
+              "https://web3go.xyz/#/ParaChainProfiler?chainType=Kusama",
+              `https://web3go.xyz/#${this.$route.fullPath}`,
+              address,
+              title
+            );
+          } else if (key == "download") {
+            utils.downloadFile(base64, title);
+          }
+        });
+    },
     formatedTokenValue(v) {
       return utils.formatToken(v, utils.KSM_RATIO);
     },
