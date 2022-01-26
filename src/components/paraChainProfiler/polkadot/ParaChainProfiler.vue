@@ -409,25 +409,15 @@ export default {
     },
     doSearch() {},
     viewContributionDetail(row) {
-      localStorage.setItem(
-        "ParaChainCrowdloanContributionDetail4PolkadotQuery",
-        JSON.stringify({
-          crowdloanId: row.crowdloanId,
-          lastUpdateTime: row.lastUpdateTime,
-          projectName: row.projectName,
-          iconPath: row.iconPath,
-          chainType: self.parachainCrowdloanChainType,
-        })
-      );
       this.$router.push({
         name: "ParaChainCrowdloanContributionDetail4Polkadot",
-        // query: {
-        //   crowdloanId: row.crowdloanId,
-        //   lastUpdateTime: row.lastUpdateTime,
-        //   projectName: row.projectName,
-        //   iconPath: row.iconPath,
-        //   chainType: self.parachainCrowdloanChainType,
-        // },
+        query: {
+          crowdloanId: row.crowdloanId,
+          // lastUpdateTime: row.lastUpdateTime,
+          // projectName: row.projectName,
+          // iconPath: row.iconPath,
+          // chainType: self.parachainCrowdloanChainType,
+        },
         params: {
           paramsOnPage: this.query,
         },
