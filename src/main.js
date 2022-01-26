@@ -22,7 +22,7 @@ import store from './store'
 import * as filters from './filters' // global filters
 import * as utils from './utils';
 import moment from 'moment';
-
+import mixin from './utils/mixin';
 Vue.prototype.$eventBus = new Vue()
 Vue.prototype.$moment = moment;
 Vue.prototype.$utils = utils;
@@ -30,6 +30,7 @@ Vue.prototype.$utils = utils;
 Object.keys(filters).forEach(key => {
     Vue.filter(key, filters[key])
 })
+Vue.mixin(mixin)
 
 Vue.config.productionTip = false
 
