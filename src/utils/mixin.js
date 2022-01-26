@@ -20,14 +20,14 @@ export default {
     },
     methods: {
         generateIframe(id) {
-            const { href } = this.$router.resolve({
+            const newRoute = this.$router.resolve({
                 path: this.$route.path,
                 query: {
                     ...this.$route.query,
                     iframe: id
                 },
             });
-            const iframeUrl = `<iframe src="${href}" width="600" height="400" frameborder="0" allowtransparency="true"></iframe>`;
+            const iframeUrl = `<iframe src="${location.origin}/${newRoute.href}" width="600" height="400" frameborder="0" allowtransparency="true"></iframe>`;
             console.log("iframeUrl:", iframeUrl);
         }
     },
