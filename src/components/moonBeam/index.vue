@@ -34,16 +34,36 @@
           <el-popover placement="bottom" width="400" trigger="click">
             <div class="popover-subscribe">
               <div class="subscribe-address">
-                <div class="title">Wallet address:</div>
+                <div class="title">My Wallet address:</div>
                 <div class="content">
                   {{ linkAccountSubscribeData.subscribe_address }}
+                </div>
+              </div>
+              <div class="subscribe-auto-notify-at-my-stake">
+                <div class="title">Auto Notify Config:</div>
+                <div class="content">
+                  <el-switch
+                    style="display: block"
+                    v-model="linkAccountSubscribeData.auto_notify_at_my_stake"
+                    :active-value="auto_notify_at_my_stake_active"
+                    :inactive-value="auto_notify_at_my_stake_inactive"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    :active-text="
+                      linkAccountSubscribeData.auto_notify_at_my_stake == 1
+                        ? 'Auto notify my stake'
+                        : 'Ignore my stake'
+                    "
+                    @change="updateAutoNotify()"
+                  >
+                  </el-switch>
                 </div>
               </div>
               <div
                 class="subscribe-email"
                 v-if="linkAccountSubscribeData.subscribe_email"
               >
-                <div class="title">Email account:</div>
+                <div class="title">My Email account:</div>
                 <div class="content">
                   {{ linkAccountSubscribeData.subscribe_email }}
                   <div
@@ -153,7 +173,7 @@
                     address: scope.row.id,
                     addressDisplayCompact: true,
                     isEthereum: true,
-                    fontSize:16
+                    fontSize: 16,
                   }"
                 ></identity-icon-plus>
                 <!-- <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
@@ -314,13 +334,13 @@
           <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
-                 <identity-icon-plus
+                <identity-icon-plus
                   @click.native="turnActionPage(scope)"
                   :addressInfo="{
                     address: scope.row.id,
                     addressDisplayCompact: true,
                     isEthereum: true,
-                    fontSize:16
+                    fontSize: 16,
                   }"
                 ></identity-icon-plus>
                 <!-- <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
@@ -806,6 +826,8 @@ export default {
   },
   data() {
     return {
+      auto_notify_at_my_stake_active:1,
+      auto_notify_at_my_stake_inactive:0,
       scrollHandler: null,
       chartInstances: [],
       pageIndex: 1,
@@ -840,6 +862,7 @@ export default {
         subscribe_address: "",
         watched_address: [],
         subscribe_email: "",
+        auto_notify_at_my_stake: 0,
       },
     };
   },
@@ -905,6 +928,8 @@ export default {
         .unsubscribe({
           subscribe_address: self.linkAccountSubscribeData.subscribe_address,
           cancel_watched_address: self.linkAccountSubscribeData.watched_address,
+          auto_notify_at_my_stake:
+            self.linkAccountSubscribeData.auto_notify_at_my_stake,
         })
         .then((resp) => {
           self.linkAccountSubscribeData.watched_address.splice(
@@ -963,7 +988,36 @@ export default {
       }
       return false;
     },
-    configDialog_subscribe_email(row) {
+    updateAutoNotify() {
+      let self = this;
+
+      let callback=()=>{
+        moonriverService
+          .subscribe({
+            subscribe_address: self.linkAccountSubscribeData.subscribe_address,
+            new_watched_address: [],
+            subscribe_email: self.linkAccountSubscribeData.subscribe_email,
+            auto_notify_at_my_stake:
+              self.linkAccountSubscribeData.auto_notify_at_my_stake,
+          })
+          .then((resp) => {
+            
+            self.$notify({
+              message: "Update Success",
+              position: "bottom-left",
+              showClose: false,
+              duration: 2000,
+              type: "success",
+            });
+          });
+      }
+      if (!self.linkAccountSubscribeData.subscribe_email) {
+        self.configDialog_subscribe_email(callback); 
+      }else{
+        callback();
+      }
+    },
+    configDialog_subscribe_email(callback) {
       let self = this;
       self
         .$prompt(
@@ -979,8 +1033,8 @@ export default {
         )
         .then(({ value }) => {
           self.linkAccountSubscribeData.subscribe_email = value;
-          if (row && row.id) {
-            self.subscribe(row);
+          if (callback) {
+            callback();
           }
         })
         .catch(() => {});
@@ -990,7 +1044,11 @@ export default {
       let collatorAddress = row.id;
       console.log(collatorAddress);
       if (!self.linkAccountSubscribeData.subscribe_email) {
-        self.configDialog_subscribe_email(row);
+        self.configDialog_subscribe_email(() => {
+          if (row && row.id) {
+            self.subscribe(row);
+          }
+        });
         return;
       }
 
@@ -1003,6 +1061,8 @@ export default {
             subscribe_address: self.linkAccountSubscribeData.subscribe_address,
             new_watched_address: [collatorAddress],
             subscribe_email: self.linkAccountSubscribeData.subscribe_email,
+            auto_notify_at_my_stake:
+              self.linkAccountSubscribeData.auto_notify_at_my_stake,
           })
           .then((resp) => {
             self.linkAccountSubscribeData.watched_address.push(collatorAddress);
@@ -1031,6 +1091,8 @@ export default {
           .unsubscribe({
             subscribe_address: self.linkAccountSubscribeData.subscribe_address,
             cancel_watched_address: [collatorAddress],
+            auto_notify_at_my_stake:
+              self.linkAccountSubscribeData.auto_notify_at_my_stake,
           })
           .then((resp) => {
             self.linkAccountSubscribeData.watched_address.splice(findIndex, 1);
@@ -1622,6 +1684,7 @@ export default {
           .getMySubscribe({ subscribe_address: this.linkAccount.address })
           .then((resp) => {
             if (resp && resp.id) {
+              self.linkAccountSubscribeData.auto_notify_at_my_stake=resp.auto_notify_at_my_stake;
               self.linkAccountSubscribeData.subscribe_address =
                 resp.subscribe_address;
               self.linkAccountSubscribeData.subscribe_email =
@@ -1636,6 +1699,7 @@ export default {
               self.linkAccountSubscribeData.subscribe_address =
                 this.linkAccount.address;
               self.linkAccountSubscribeData.subscribe_email = "";
+              self.linkAccountSubscribeData.auto_notify_at_my_stake=self.auto_notify_at_my_stake_inactive;
               self.linkAccountSubscribeData.watched_address = [];
             }
           });
@@ -2356,7 +2420,7 @@ export default {
 .popover-subscribe {
   padding: 10px 10px;
   .title {
-    margin-top: 5px;
+    margin-top: 10px;
     font-weight: bold;
   }
   .subscribe-address {
