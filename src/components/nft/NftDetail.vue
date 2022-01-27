@@ -224,7 +224,26 @@ export default {
     });
   },
   mounted() {
-    this.initCharts();
+    if (this.$route.query && this.$route.query.embedId) {
+      let embedId = this.$route.query.embedId;
+      if (embedId === "chart1") {
+        this.loadData1();
+      }
+      if (embedId === "chart2") {
+        this.loadData2();
+      }
+      if (embedId === "chart3") {
+        this.loadData3();
+      }
+      if (embedId === "chart4") {
+        this.loadData4();
+      }
+    } else {
+      this.loadData1();
+      this.loadData2();
+      this.loadData3();
+      this.loadData4();
+    }
     // this.generateIframe('chart1');
     // this.generateIframe('chart2');
     // this.generateIframe('chart3');
@@ -249,11 +268,8 @@ export default {
         query: this.$route.query,
       });
     },
-    initCharts() {
+    loadData1() {
       this.chart1Loading = true;
-      this.chart2Loading = true;
-      this.chart3Loading = true;
-      this.chart4Loading = true;
       getAvgPriceVolumeOfCollection({
         collection_id: this.$route.query.id,
         query_days: this.latest7days,
@@ -267,6 +283,9 @@ export default {
         );
         this.initChart1();
       });
+    },
+    loadData2() {
+      this.chart2Loading = true;
       getPriceRangeOfCollection({
         collection_id: this.$route.query.id,
         start_time: this.latest7daysStart,
@@ -314,6 +333,9 @@ export default {
           this.initChart2();
         });
       });
+    },
+    loadData3() {
+      this.chart3Loading = true;
       getTransactionsOfCollection({
         collection_id: this.$route.query.id,
         start_time: this.latest7daysStart,
@@ -329,6 +351,11 @@ export default {
         });
         this.initChart3();
       });
+    },
+
+    loadData4() {
+      this.chart4Loading = true;
+
       getTransactionCountOfCollection({
         collection_id: this.$route.query.id,
         start_time: this.latest7daysStart,
