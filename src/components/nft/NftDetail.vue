@@ -197,11 +197,11 @@ export default {
       this.infoData = d.list[0];
     });
   },
-  mounted() {
+  mounted() { 
     this.initCharts();
-    this.generateIframe('chart1');
-    this.generateIframe('chart2');
-    this.generateIframe('chart3');
+    // this.generateIframe('chart1');
+    // this.generateIframe('chart2');
+    // this.generateIframe('chart3');
 
   },
   methods: {
