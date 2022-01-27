@@ -19,6 +19,7 @@
         "decimal.js": "^10.3.1",
         "dom-to-image": "^2.6.0",
         "ethereum-blockies-base64": "^1.0.2",
+        "localforage": "^1.10.0",
         "material-design-icons-iconfont": "^6.1.1",
         "moment": "^2.29.1",
         "vue": "^2.6.11",

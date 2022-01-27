@@ -76,6 +76,7 @@ import moonriverService from "@/api/moonBeam";
 export default {
   data() {
     return {
+      bonded: null,
       currentNav: {
         name: "Reward",
         component: Reward,
@@ -97,26 +98,7 @@ export default {
       address: "",
     };
   },
-  computed: {
-    bonded() {
-      const collectorListStr = localStorage.getItem(
-        "moonbeamCollectorSortList"
-      );
-      let bondSum = 0;
-      let collectorList;
-      if (collectorListStr) {
-        collectorList = JSON.parse(collectorListStr);
-        for (const c of collectorList) {
-          for (const n of c.allNominators) {
-            if (n.owner === this.address) {
-              bondSum += Number(n.amount);
-            }
-          }
-        }
-      }
-      return bondSum;
-    },
-  },
+  computed: {},
   created() {
     let self = this;
     self.address = self.$route.query.id;
@@ -128,8 +110,25 @@ export default {
       .then((resp) => {
         self.rewardData = resp;
       });
+    this.getBonded();
   },
   methods: {
+    getBonded() {
+      this.$localforage.getItem("moonbeamCollectorSortList").then((str) => {
+        let bondSum = 0;
+        if (str) {
+          const collectorList = JSON.parse(str);
+          for (const c of collectorList) {
+            for (const n of c.allNominators) {
+              if (n.owner === this.address) {
+                bondSum += Number(n.amount);
+              }
+            }
+          }
+        }
+        this.bonded = bondSum;
+      });
+    },
     makeBlockie(address) {
       return makeBlockie(address);
     },
