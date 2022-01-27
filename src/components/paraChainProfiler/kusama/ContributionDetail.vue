@@ -572,7 +572,6 @@ export default {
         .then(({ address, base64 }) => {
           if (key == "twitter") {
             utils.share(
-              "https://web3go.xyz/#/ParaChainProfiler?chainType=Kusama",
               `https://web3go.xyz/#${this.$route.fullPath}`,
               address,
               title

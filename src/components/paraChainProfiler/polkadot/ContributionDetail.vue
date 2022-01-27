@@ -4,11 +4,37 @@
       <div class="g-wrap">
         <i class="el-icon-back" @click="$router.back()"></i>
         <span class="text">{{ info.paraId }} {{ query.projectName }}</span>
+        <div class="share-wrap-top">
+          <img
+            title="Share to Twitter"
+            @click="
+              handleShareAll(
+                'twitter',
+                '#share-all',
+                'Crowdloan Progress Updates! Check out our crowdloan data on @Web3Go'
+              )
+            "
+            src="@/assets/images/twitter@2x.png"
+            alt=""
+          />
+          <img
+            title="Capture snapshot"
+            @click="
+              handleShareAll(
+                'download',
+                '#share-all',
+                'Crowdloan Progress Updates! Check out our crowdloan data on @Web3Go'
+              )
+            "
+            src="@/assets/images/download@2x.png"
+            alt=""
+          />
+        </div>
       </div>
     </div>
     <div class="head extend-2-side-removed">
       <div class="g-wrap">
-        <div class="head-mian">
+        <div class="head-mian" id="share-all">
           <div class="head-mian-con">
             <div class="title">
               <img class="color" :src="query.iconPath" />
@@ -538,6 +564,25 @@ export default {
         }
       }
       return "";
+    },
+    handleShareAll(key, elId, title) {
+      const el = document.querySelector(elId);
+      el.className = el.className + " hide2div";
+      utils
+        .html2Img(el, () => {
+          el.className = el.className.replace(" hide2div", "");
+        })
+        .then(({ address, base64 }) => {
+          if (key == "twitter") {
+            utils.share(
+              `https://web3go.xyz/#${this.$route.fullPath}`,
+              address,
+              title
+            );
+          } else if (key == "download") {
+            utils.downloadFile(base64, title);
+          }
+        });
     },
     getContributorStatisticDisplayText() {
       if (this.query && this.query.projectName == "Acala") {
@@ -1388,6 +1433,13 @@ body.white-theme .contributionDetail .el-table .el-table__body {
   }
 }
 .contributionDetail {
+  .hide2div {
+    height: 400px;
+    padding-top: 300px;
+    .hide {
+      display: none;
+    }
+  }
   .share-wrap {
     position: absolute;
     right: 0;
@@ -1405,6 +1457,19 @@ body.white-theme .contributionDetail .el-table .el-table__body {
   }
   .history .share-wrap {
     right: 40px;
+  }
+  .share-wrap-top {
+    margin-top: 4px;
+    float: right;
+    img {
+      margin-left: 10px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
   }
 }
 
