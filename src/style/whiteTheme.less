@@ -259,6 +259,33 @@ body.white-theme {
 .el-tooltip__popper {
   font-size: 14px !important;
 }
-.tooltip-300px{
+
+.tooltip-300px {
   max-width: 300px;
+}
+
+.embed-copy-confirm {
+  .el-message-box__title {
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  .el-message-box__container::before {
+    display: block;
+    content: 'Copy this code to your website:'!important;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .el-message-box__message {
+    background: rgb(204, 213, 226);
+    font-family: ui-monospace;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 5px 10px;
+
+  }
+  .el-button--primary{
+    font-size: 14px;
+  }
 }

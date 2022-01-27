@@ -34,7 +34,23 @@ export default {
                 },
             });
             const iframeUrl = `<iframe src="${location.origin}/${newRoute.href}" width="600" height="400" frameborder="0" allowtransparency="true"></iframe>`;
-            console.log("iframeUrl:", iframeUrl);
+
+            this.$msgbox({
+                title: 'Embed Code',
+                message: iframeUrl,
+                customClass: 'embed-copy-confirm',
+                confirmButtonText: 'copy',
+            }).then(action => {
+                const input = document.createElement("input");
+                document.body.appendChild(input);
+                input.setAttribute("value", iframeUrl);
+                input.select();
+                if (document.execCommand("copy")) {
+                    document.execCommand("copy");
+                    this.$message.success("Copied!");
+                }
+                document.body.removeChild(input);
+            });
         }
     },
 }

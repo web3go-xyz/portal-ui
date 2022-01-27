@@ -94,7 +94,15 @@
     <div class="chart-wrap">
       <div class="row">
         <div id="chart1" class="chart-item" v-loading="chart1Loading">
-          <div class="title">Average Price & Volume</div>
+          <div class="title">
+            <span> Average Price & Volume </span>
+            <img
+              class="code-img"
+              @click="generateIframe('chart1')"
+              src="@/assets/images/code.svg"
+              alt=""
+            />
+          </div>
           <div class="chart chart1" ref="chart1"></div>
         </div>
         <div id="chart2" class="chart-item" v-loading="chart2Loading">
@@ -107,6 +115,12 @@
             >
               <img class="info-icon" src="@/assets/images/info-icon.png" />
             </el-tooltip>
+            <img
+              class="code-img"
+              @click="generateIframe('chart2')"
+              src="@/assets/images/code.svg"
+              alt=""
+            />
           </div>
           <div class="chart chart2" ref="chart2"></div>
         </div>
@@ -122,6 +136,12 @@
             >
               <img class="info-icon" src="@/assets/images/info-icon.png" />
             </el-tooltip>
+            <img
+              class="code-img"
+              @click="generateIframe('chart3')"
+              src="@/assets/images/code.svg"
+              alt=""
+            />
             <!-- <div class="checkbox-wrap">
               <el-checkbox v-model="checked">Drop extreme outliers</el-checkbox>
             </div> -->
@@ -139,6 +159,12 @@
             >
               <img class="info-icon" src="@/assets/images/info-icon.png" />
             </el-tooltip>
+            <img
+              class="code-img"
+              @click="generateIframe('chart4')"
+              src="@/assets/images/code.svg"
+              alt=""
+            />
           </div>
           <div class="chart chart4" ref="chart4"></div>
         </div>
@@ -197,12 +223,11 @@ export default {
       this.infoData = d.list[0];
     });
   },
-  mounted() { 
+  mounted() {
     this.initCharts();
     // this.generateIframe('chart1');
     // this.generateIframe('chart2');
     // this.generateIframe('chart3');
-
   },
   methods: {
     shorterAddress(address) {
@@ -932,6 +957,11 @@ export default {
       &:last-child {
         margin-right: 0;
       }
+      &:hover {
+        .code-img {
+          display: block !important;
+        }
+      }
       .title {
         position: relative;
         font-size: 20px;
@@ -943,6 +973,22 @@ export default {
           vertical-align: middle;
           width: 16px;
           height: 16px;
+        }
+        .code-img {
+          opacity: 0.2;
+          display: none;
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: 24px;
+          height: 24px;
+          padding: 3px 5px;
+          border-radius: 4px;
+          cursor: pointer;
+          &:hover {
+            background: #ccc;
+            opacity: 0.4;
+          }
         }
         .checkbox-wrap {
           position: absolute;
