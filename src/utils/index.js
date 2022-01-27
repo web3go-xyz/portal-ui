@@ -190,7 +190,23 @@ export function copy(text) {
     }
     document.body.removeChild(input);
 }
-
+export function fullScreenDom(id) {
+    // 去掉滚动条
+    const appEl = document.getElementById("app");
+    appEl.style.height = 0;
+    appEl.style.overflow = "hidden";
+    // 将元素放大到全屏
+    const el = document.getElementById(id);
+    el.style.left = 0;
+    el.style.top = 0;
+    el.style.width = "100vw";
+    el.style.height = "100vh";
+    el.style.margin = 0;
+    el.style.boxSizing = 'border-box';
+    el.style.position = "fixed";
+    el.style.background = "white";
+    el.style.zIndex = 9999;
+}
 
 const identity_api_path = "https://web3go.xyz/polkadot-identity/polkadot-identity-analysis/getIdentityInfo";
 
@@ -208,17 +224,14 @@ export async function loadAddressIdentityAsync(addressInfo) {
         //check if the cache expire
         if (json.expire > (new Date().getTime())) {
             return json;
-        }
-        else {
+        } else {
             localStorage.removeItem(ls_key);
         }
     }
 
-    let expire = (new Date().getTime()) + 1000 * 60 * 60 * 24;  // keep cache with 24 hr
+    let expire = (new Date().getTime()) + 1000 * 60 * 60 * 24; // keep cache with 24 hr
     let identityData = {
-        identity:
-        {
-        },
+        identity: {},
         expire: expire
     };
 
@@ -243,8 +256,7 @@ export async function loadAddressIdentityAsync(addressInfo) {
         }
 
         identityData = {
-            identity:
-            {
+            identity: {
                 // showMoreInfo: true,
                 display: response.display || "",
                 legal: response.legal || "",

@@ -1,10 +1,7 @@
 <template>
   <div class="layout">
     <div class="back-title">
-      <i
-        class="el-icon-back"
-        @click="$router.back()"
-      ></i>
+      <i class="el-icon-back" @click="$router.back()"></i>
       <span class="text">{{ infoData.name }}</span>
       <span class="time">{{
         $moment(infoData.timestamp_created_at).format("YYYY-MM-DD")
@@ -96,11 +93,11 @@
     </div>
     <div class="chart-wrap">
       <div class="row">
-        <div class="chart-item" v-loading="chart1Loading">
+        <div id="chart1" class="chart-item" v-loading="chart1Loading">
           <div class="title">Average Price & Volume</div>
           <div class="chart chart1" ref="chart1"></div>
         </div>
-        <div class="chart-item" v-loading="chart2Loading">
+        <div id="chart2" class="chart-item" v-loading="chart2Loading">
           <div class="title">
             <span> Price Range </span>
             <el-tooltip
@@ -115,7 +112,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="chart-item" v-loading="chart3Loading">
+        <div id="chart3" class="chart-item" v-loading="chart3Loading">
           <div class="title">
             <span> Individual Transactions </span>
             <el-tooltip
@@ -131,7 +128,7 @@
           </div>
           <div class="chart chart3" ref="chart3"></div>
         </div>
-        <div class="chart-item" v-loading="chart4Loading">
+        <div id="chart4" class="chart-item" v-loading="chart4Loading">
           <div class="title">
             <span> Transactions & Buyers </span>
             <el-tooltip
@@ -202,6 +199,10 @@ export default {
   },
   mounted() {
     this.initCharts();
+    this.generateIframe('chart1');
+    this.generateIframe('chart2');
+    this.generateIframe('chart3');
+
   },
   methods: {
     shorterAddress(address) {
