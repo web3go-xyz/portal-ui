@@ -1536,10 +1536,11 @@ export default {
               element.rankIndex = index;
             }
             this.tableData = nominatorRes;
-            localStorage.setItem(
+            this.$localforage.setItem(
               "moonbeamCollectorSortList",
               JSON.stringify(nominatorRes)
             );
+            
             console.log("tableData", nominatorRes);
             this.generateTableChart();
             if (this.searchAccount) {

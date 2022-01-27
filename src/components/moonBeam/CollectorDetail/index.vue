@@ -77,6 +77,7 @@ import { BigNumber } from "bignumber.js";
 export default {
   data() {
     return {
+      collectorRank: null,
       loading: false,
       collectorData: {
         allNominators: [],
@@ -118,24 +119,25 @@ export default {
       .then((resp) => {
         self.rewardData = resp;
       });
+    this.getcollectorRank();
   },
-  computed: {
-    collectorRank() {
-      const collectorListStr = localStorage.getItem(
-        "moonbeamCollectorSortList"
-      );
-      let collectorList;
-      if (collectorListStr) {
-        collectorList = JSON.parse(collectorListStr);
-        const find = collectorList.find((v) => v.id == this.address);
-        if (find) {
-          return find.rankIndex + 1;
-        }
-      }
-      return "--";
-    },
-  },
+  computed: {},
   methods: {
+    getcollectorRank() {
+      this.$localforage
+        .getItem("moonbeamCollectorSortList")
+        .then((str) => {
+          if (!str) {
+            this.collectorRank = "--";
+          } else {
+            const collectorList = JSON.parse(str);
+            const find = collectorList.find((v) => v.id == this.address);
+            if (find) {
+              this.collectorRank = find.rankIndex + 1;
+            }
+          }
+        });
+    },
     getCollectDetailData() {
       this.loading = true;
       moonriverService

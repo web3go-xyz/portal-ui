@@ -1535,7 +1535,7 @@ export default {
               element.rankIndex = index;
             }
             this.tableData = nominatorRes;
-            localStorage.setItem(
+            this.$localforage.setItem(
               "moonriverCollectorSortList",
               JSON.stringify(nominatorRes)
             );
