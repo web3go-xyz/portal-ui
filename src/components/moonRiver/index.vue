@@ -1501,7 +1501,6 @@ export default {
                   roundIndex: i,
                   RPM: result,
                 });
-                console.log(`roundIndex=${i} RPM=${result.toNumber()}`);
               }
               v.historyRPM = arr;
               v.latestRPM = self.getLatestRPM(v.historyRPM);
@@ -1672,6 +1671,7 @@ export default {
         // handle other "switch" errors
       }
       const solveAccounts = (accs) => {
+        console.log('111');
         if (accs.length === 0) {
           console.error("无法获取账号，Metamask 是否正确配置？");
           return;

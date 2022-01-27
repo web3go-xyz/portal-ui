@@ -1,11 +1,5 @@
 export default {
     mounted() {
-
-        if (this.$route && this.$route.query) {
-            console.log('mixin.mounted:', this.$route);
-        } else {
-            console.log('mixin.mounted:');
-        }
         if (this.$route && this.$route.query && this.$route.query.embedId) {
             // 去掉滚动条
             const appEl = document.getElementById("app");
