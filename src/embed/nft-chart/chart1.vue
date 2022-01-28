@@ -69,7 +69,7 @@ export default {
     },
 
     initChart1() {
-      const chart = echarts.init(this.$refs.chart1, this.stylemode);
+      const chart = echarts.init(this.$refs.chart1);
       const option = {
         color: [
           "rgba(58, 118, 240, 1)",

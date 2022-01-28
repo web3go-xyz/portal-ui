@@ -9,6 +9,10 @@ export default {
 };
 </script>
 <style lang="less">
+html,
+body {
+  margin: 0px;
+}
 // echarts 自定义html元素的样式
 .echart-tooltip-formatter-popover {
   .row {
@@ -26,6 +30,15 @@ export default {
     }
   }
 }
+
+.dark {
+  background-color: #1A202C;
+  .chart-item {
+    background-color: #1A202C !important;
+    .title {
+      color: #edeeee !important;
+    }
+  }
+}
 </style>
-<style scoped>
-</style>
+ 

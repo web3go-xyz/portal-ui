@@ -103,7 +103,7 @@ export default {
     },
 
     initChart3() {
-      const chart = echarts.init(this.$refs.chart3, this.stylemode, {
+      const chart = echarts.init(this.$refs.chart3, {
         locale: "EN",
       });
       const option = {
