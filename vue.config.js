@@ -9,8 +9,34 @@ module.exports = {
             }]
         });
 
+        // js output config
+        config.output.filename = "[name].[hash].js";
+        config.output.chunkFilename = "[name].[hash].js";
+
+        config.optimization = {
+            splitChunks: {
+                cacheGroups: {
+                    common: {
+                        //抽取所有入口页面都需要的公共chunk
+                        name: "chunk-common",
+                        chunks: "initial",
+                        minChunks: 2,
+                        maxInitialRequests: 5,
+                        minSize: 0,
+                        priority: 1,
+                        reuseExistingChunk: true,
+                        enforce: true
+                    }
+                }
+            }
+        };
+
+
     },
     chainWebpack: config => {
+        // 删除默认的splitChunk
+        config.optimization.delete("splitChunks");
+
         // 用cdn方式引入
         config.externals({
             'vue': 'Vue',
@@ -36,10 +62,12 @@ module.exports = {
         embed: {
             entry: 'src/embed/embed.main.js',
             template: 'public/embed.html',
+            chunks: ["embed", "chunk-common"]
         },
         index: {
             entry: 'src/main.js',
             template: 'public/index.html',
+            chunks: ["index", "chunk-common"]
         },
     },
 }

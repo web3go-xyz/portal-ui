@@ -1,24 +1,17 @@
 
-import './../style/theme/index.less'
-import './../style/whiteTheme/index.less'
-// element公共组件自定义样式
-import './../style/whiteTheme.less';
 
 import Vue from 'vue';
 import embed from './embed';
 import router from './embed.router';
-import mixin from './../utils/mixin';
 import moment from 'moment';
 
 Vue.prototype.$moment = moment;
-Vue.mixin(mixin)
 
 // register global utility filters
-
-import * as utils from './../utils';
+import * as utils from './lib/utils';
 Vue.prototype.$utils = utils;
 
-import * as filters from './../filters' // global filters
+import * as filters from './lib/filters'
 Object.keys(filters).forEach(key => {
     Vue.filter(key, filters[key])
 })

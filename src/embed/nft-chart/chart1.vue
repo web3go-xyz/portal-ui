@@ -1,0 +1,263 @@
+<template>
+  <div class="layout" :class="stylemode">
+    <div class="chart-wrap">
+      <div class="row">
+        <div id="chart1" class="chart-item" v-loading="chart1Loading">
+          <div class="title">
+            <span> Average Price & Volume </span>
+          </div>
+          <div class="chart chart1" ref="chart1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getAvgPriceVolumeOfCollection } from "./../lib/api";
+export default {
+  data() {
+    return {
+      priceRangeList: [],
+      chart1Loading: false,
+      checked: false,
+      infoData: {},
+      latest7daysStart: "",
+      latest7daysEnd: "",
+      latest7days: [],
+      averagePriceList: [],
+      volumeList: [],
+      priceAvgList: [],
+      priceMaxList: [],
+      priceMinList: [],
+      transaction_countList: [],
+      buyer_countList: [],
+      transactionsList: [],
+      sanDianList: [],
+    };
+  },
+  created() {
+    const arr = [];
+    for (let i = 6; i >= 0; i--) {
+      arr.push(this.$moment().subtract(i, "days").format("YYYY-MM-DD"));
+    }
+    this.latest7days = arr;
+    this.latest7daysStart = arr[0];
+    this.latest7daysEnd = arr[arr.length - 1];
+
+    this.stylemode = this.$route.query.style || "";
+  },
+  mounted() {
+    this.loadData1();
+  },
+  methods: {
+    loadData1() {
+      this.chart1Loading = true;
+      getAvgPriceVolumeOfCollection({
+        collection_id: this.$route.query.id,
+        query_days: this.latest7days,
+      }).then((d) => {
+        this.chart1Loading = false;
+        this.averagePriceList = d.map((v) =>
+          this.$utils.formatTokenNumber(v.avg_price, this.$utils.KSM_RATIO)
+        );
+        this.volumeList = d.map((v) =>
+          this.$utils.formatTokenNumber(v.volume, this.$utils.KSM_RATIO)
+        );
+        this.initChart1();
+      });
+    },
+
+    initChart1() {
+      const chart = echarts.init(this.$refs.chart1, this.stylemode);
+      const option = {
+        color: [
+          "rgba(58, 118, 240, 1)",
+          "rgba(95, 204, 186, 1)",
+          "rgba(255, 125, 0, 1)",
+        ],
+        tooltip: {
+          trigger: "axis",
+        },
+        legend: {
+          data: ["Price(KSM)", "Volume(KSM)"],
+          icon: "circle",
+          left: 0,
+          top: 20,
+          itemWidth: 10,
+          itemHeight: 10,
+          itemGap: 40,
+          itemStyle: {},
+          textStyle: {
+            color: "#7F7E7E",
+            fontSize: 14,
+          },
+        },
+        grid: {
+          containLabel: true,
+          left: 10,
+          top: 70,
+          bottom: 0,
+          right: 10,
+        },
+        xAxis: [
+          {
+            type: "category",
+            data: this.latest7days,
+            axisLine: {
+              show: false,
+            },
+            axisTick: {
+              show: false,
+            },
+            axisLabel: {
+              color: "#A9A9A9",
+              fontSize: 14,
+            },
+          },
+        ],
+        yAxis: [
+          {
+            type: "value",
+            axisLabel: {
+              color: "#A9A9A9",
+              fontSize: 14,
+            },
+            splitLine: {
+              lineStyle: {
+                color: "rgba(232, 232, 232, 1)",
+                type: "dashed",
+              },
+            },
+          },
+          {
+            type: "value",
+            axisLabel: {
+              color: "#A9A9A9",
+              fontSize: 14,
+            },
+            splitLine: {
+              show: false,
+            },
+          },
+        ],
+        series: [
+          {
+            name: "Price(KSM)",
+            type: "line",
+            yAxisIndex: 0,
+            smooth: true,
+            lineStyle: {
+              width: 5,
+            },
+            data: this.averagePriceList,
+          },
+          {
+            name: "Volume(KSM)",
+            type: "bar",
+            yAxisIndex: 1,
+            itemStyle: {
+              color: {
+                type: "linear",
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [
+                  {
+                    offset: 0,
+                    color: "rgba(105, 231, 201, 1)", // 0% 处的颜色
+                  },
+                  {
+                    offset: 1,
+                    color: "rgba(56, 203, 152, 1)", // 100% 处的颜色
+                  },
+                ],
+                global: false, // 缺省为 false
+              },
+              borderRadius: [4, 4, 0, 0],
+            },
+            data: this.volumeList,
+          },
+        ],
+      };
+      chart.setOption(option);
+    },
+  },
+};
+</script>
+<style lang="less">
+.nft-detail-page-popover {
+  font-size: 14px !important;
+}
+</style>
+<style lang="less" scoped>
+.layout {
+  margin: 0 auto;
+}
+
+.chart-wrap {
+  .row {
+    display: flex;
+    .chart-item {
+      text-align: left;
+      padding: 32px;
+      flex: 1;
+      height: 425px;
+      margin-right: 24px;
+      margin-bottom: 24px;
+      background: #ffffff;
+      border-radius: 10px;
+      &:last-child {
+        margin-right: 0;
+      }
+      &:hover {
+        .code-img {
+          display: block !important;
+        }
+      }
+      .title {
+        position: relative;
+        font-size: 20px;
+        color: #292828;
+        span {
+          vertical-align: middle;
+        }
+        .info-icon {
+          vertical-align: middle;
+          width: 16px;
+          height: 16px;
+        }
+        .code-img {
+          opacity: 0.2;
+          display: none;
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: 24px;
+          height: 24px;
+          padding: 3px 5px;
+          border-radius: 4px;
+          cursor: pointer;
+          &:hover {
+            background: #ccc;
+            opacity: 0.4;
+          }
+        }
+        .checkbox-wrap {
+          position: absolute;
+          right: 0;
+          top: 0;
+          /deep/ .el-checkbox__label {
+            color: #7f7e7e;
+          }
+        }
+      }
+      .chart {
+        height: calc(100% - 32px);
+        width: 100%;
+      }
+    }
+  }
+}
+</style>
