@@ -63,11 +63,12 @@
 </template>
 
 <script>
-import Password from "vue-password-strength-meter";
 import { signin, signup, getUserInfo } from "@/api/user";
 
 export default {
-  components: { Password },
+  components: { 
+    
+  },
   data() {
     return {
       loginForm: {

@@ -8,7 +8,6 @@ module.exports = {
                 loader: require.resolve('@open-wc/webpack-import-meta-loader'),
             }]
         });
-
         // js output config
         config.output.filename = "[name].[hash].js";
         config.output.chunkFilename = "[name].[hash].js";
@@ -49,6 +48,12 @@ module.exports = {
             .use(
                 new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en$/)
             );
+        if (process.env.use_analyzer) {
+            config
+                .plugin("webpack-bundle-analyzer").use(
+                    require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+                );
+        }
 
         return config;
     },
