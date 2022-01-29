@@ -12,6 +12,7 @@ export default {
 html,
 body {
   margin: 0px;
+  font-family: "system-ui", "Segoe UI", Helvetica, Arial, sans-serif;
 }
 // echarts 自定义html元素的样式
 .echart-tooltip-formatter-popover {
