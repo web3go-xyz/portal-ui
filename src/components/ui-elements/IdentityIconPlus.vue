@@ -252,14 +252,6 @@ export default {
   methods: {
     updateIdentity() {
       let self = this;
-      if (self.addressInfo.identity) {
-        Object.assign(self.identity, self.addressInfo.identity);
-        return;
-      }
-      if (this.addressInfo.enableDynamicLoading === false) {
-        return;
-      }
-
       self.identity = {
         showMoreInfo: false,
         display: "",
@@ -271,18 +263,29 @@ export default {
         subOf: "",
         judgement: "",
       };
-      if (this.loadAddressIdentityPromise) {
-        let promise = this.loadAddressIdentityPromise(this.addressInfo);
+
+      if (self.addressInfo.identity) {
+        Object.assign(self.identity, self.addressInfo.identity);
+        if (self.identity.display) {
+          return;
+        }
+      }
+      if (self.addressInfo.enableDynamicLoading === false) {
+        return;
+      }
+
+      if (self.loadAddressIdentityPromise) {
+        let promise = self.loadAddressIdentityPromise(self.addressInfo);
         promise.then((info) => {
           Object.assign(self.identity, info.identity);
         });
       } else {
-        let promise = this.loadAddressIdentityAsync(this.addressInfo);
+        let promise = self.loadAddressIdentityAsync(self.addressInfo);
         promise.then((info) => {
           Object.assign(self.identity, info.identity);
         });
       }
-      // console.log(this.identity);
+      // console.log(self.identity);
     },
     loadAddressIdentityAsync(addressInfo) {
       if (this.$utils.loadAddressIdentityAsync) {

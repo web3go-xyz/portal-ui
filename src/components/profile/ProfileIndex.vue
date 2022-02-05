@@ -262,7 +262,7 @@ export default {
     },
     totalAmount() {
       let sum = 0;
-      console.log('111');
+      // console.log('111');
       this.balanceNavData.forEach((v) => {
         sum += v.totalPrice||0;
       });
