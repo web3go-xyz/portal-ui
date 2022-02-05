@@ -35,8 +35,8 @@
       <div class="split"></div>
       <div class="item">
         <div class="title">
-          <i v-if="isNaN(totalAmount)" class="el-icon-loading"></i>
-          <span v-else>$ {{ totalAmount | format2 }}</span>
+          <!-- <i v-if="isNaN(totalAmount)" class="el-icon-loading"></i> -->
+          <span>$ {{ totalAmount | format2 }}</span>
           <img
             style="margin-right: 15px"
             src="@/assets/images/profile/info2.png"
@@ -262,8 +262,9 @@ export default {
     },
     totalAmount() {
       let sum = 0;
+      console.log('111');
       this.balanceNavData.forEach((v) => {
-        sum += v.totalPrice;
+        sum += v.totalPrice||0;
       });
       return sum;
     },
