@@ -8,7 +8,19 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
     <script src="./static/config.js"></script>
     <title>web3go</title>
-
+    <script defer data-domain="web3go.xyz" src="https://plausible.io/js/plausible.js"></script>
+    <script>
+        // console.log(window.location);
+        if (window.location.hostname != 'localhost') {
+            var _hmt = _hmt || [];
+            (function () {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?a3ee85f45e553d5d9068a1bd48a670ea";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+            })();
+        }
+    </script>
 </head>
 
 <body class="white-theme">
