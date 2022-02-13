@@ -307,7 +307,7 @@ export default {
           lable: "ERC20",
           value: "ERC20",
           refers: {
-            schema: "ido-dev",
+            schema: "ido-erc20",
             tables: [
               "chain_type",
               "wallet_address",
@@ -352,7 +352,7 @@ export default {
           lable: "Kusama Crowdloan",
           value: "Kusama Crowdloan",
           refers: {
-            schema: "ido-dev",
+            schema: "ido-kusama-crowdloan",
             tables: [
               "polk_para_chain",
               "polk_para_chain_crowdloan",
@@ -378,7 +378,7 @@ export default {
       ],
       schemaOption: {
         schemaType: "ERC20",
-        schema: "ido-dev",
+        schema: "ido-erc20",
         filterTableNames: [],
       },
       dataTables: [],
