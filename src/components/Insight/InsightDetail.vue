@@ -1,7 +1,7 @@
 <template>
-  <div class="my-analytics-page">
+  <div class="insight-detail-page">
     <div class="layout">
-      <div class="header">
+      <!-- <div class="header">
         <div class="left">
           <img class="icon" src="/static/parachain-icon/moonbeam.png" alt="" />
           <span class="title">Moonbeam Account Overview</span>
@@ -25,7 +25,7 @@
             <i class="icon el-icon-more"></i>
           </div>
         </div>
-      </div>
+      </div> -->
       <div class="content"></div>
     </div>
   </div>
@@ -48,7 +48,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.my-analytics-page {
+.insight-detail-page {
   background: rgb(245, 247, 249);
   .layout {
     padding: 24px 100px;

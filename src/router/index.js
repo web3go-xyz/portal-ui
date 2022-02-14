@@ -3,7 +3,8 @@ import Router from "vue-router";
 
 import HomePage from "@/components/HomePage";
 import ProfileHome from "@/components/profile/ProfileHome";
-import MyAnalytics from "@/components/MyAnalytics";
+import Insight from "@/components/Insight";
+import InsightDetail from "@/components/Insight/InsightDetail";
 
 import ProfileIndex from "@/components/profile/ProfileIndex";
 import Login from "@/components/user/Login";
@@ -71,12 +72,20 @@ export default new Router({
             component: ProfileHome
         },
         {
-            path: "/MyAnalytics",
-            name: "MyAnalytics",
+            path: "/Insight",
+            name: "Insight",
             meta: {
-                parent: 'MyAnalytics'
+                parent: 'Insight'
             },
-            component: MyAnalytics
+            component: Insight
+        },
+        {
+            path: "/InsightDetail",
+            name: "InsightDetail",
+            meta: {
+                parent: 'Insight'
+            },
+            component: InsightDetail
         },
         {
             path: "/ProfileIndex/:nav?",
