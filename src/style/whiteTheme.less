@@ -89,6 +89,14 @@ body.white-theme {
     border-radius: 6px;
     border: 0 !important;
     background-color: white !important;
+
+
+    // 全局滚动条样式影响了select样式
+    .el-scrollbar__wrap {
+      overflow-x: hidden;
+      margin-bottom: 0 !important;
+    }
+
   }
 
   .el-input-number__increase {
@@ -272,7 +280,7 @@ body.white-theme {
 
   .el-message-box__container::before {
     display: block;
-    content: 'Copy this code to your website:'!important;
+    content: 'Copy this code to your website:' !important;
     font-size: 16px;
     margin-bottom: 8px;
   }
@@ -285,7 +293,8 @@ body.white-theme {
     padding: 5px 10px;
 
   }
-  .el-button--primary{
+
+  .el-button--primary {
     font-size: 14px;
   }
 }

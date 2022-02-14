@@ -150,7 +150,7 @@ export default {
         },
         {
           name: "My Analytics",
-          isShowComing: true,
+          route: "MyAnalytics",
         },
       ],
       searchVisible: true,
@@ -168,7 +168,16 @@ export default {
   },
   created() {
     // 菜单高亮
-    const find = this.navLeft.find((v) => v.name == this.$route.meta.parent);
+    const find = this.navLeft.find((v) => {
+      if (
+        v.name == "My Analytics" &&
+        this.$route.meta.parent == "MyAnalytics"
+      ) {
+        return true;
+      } else {
+        return (v.name == this.$route.meta.parent) == "MyAnalytics";
+      }
+    });
     if (find) {
       this.actNav = find;
     }
