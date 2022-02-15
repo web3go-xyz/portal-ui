@@ -102,6 +102,7 @@ export default {
     //   }
     // }
     .content {
+      // overflow: auto;
       box-sizing: border-box;
       height: 100%;
       background: #ffffff;
