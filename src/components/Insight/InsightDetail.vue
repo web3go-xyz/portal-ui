@@ -27,7 +27,13 @@
         </div>
       </div> -->
       <div class="content">
-        <iframe width="100%" height="100%" :src="$route.query.link" frameborder="0"></iframe>
+        <iframe
+          allowTransparency="true"
+          width="100%"
+          height="100%"
+          :src="$route.query.link"
+          frameborder="0"
+        ></iframe>
       </div>
     </div>
   </div>
@@ -54,7 +60,7 @@ export default {
   background: rgb(245, 247, 249);
   height: calc(100vh - 60px);
   .layout {
-      box-sizing: border-box;
+    box-sizing: border-box;
 
     height: 100%;
     padding: 24px 100px;
@@ -105,7 +111,6 @@ export default {
       // overflow: auto;
       box-sizing: border-box;
       height: 100%;
-      background: #ffffff;
       border-radius: 10px;
     }
   }
