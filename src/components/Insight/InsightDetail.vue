@@ -26,7 +26,9 @@
           </div>
         </div>
       </div> -->
-      <div class="content"></div>
+      <div class="content">
+        <iframe width="100%" height="100%" :src="$route.query.link" frameborder="0"></iframe>
+      </div>
     </div>
   </div>
 </template>
@@ -50,56 +52,60 @@ export default {
 <style lang="less" scoped>
 .insight-detail-page {
   background: rgb(245, 247, 249);
+  height: calc(100vh - 60px);
   .layout {
+      box-sizing: border-box;
+
+    height: 100%;
     padding: 24px 100px;
-    .header {
-      background: #ffffff;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      & > .left {
-        display: flex;
-        align-items: center;
-        .icon {
-          width: 56px;
-          height: 56px;
-          margin-right: 8px;
-        }
-        .title {
-          font-size: 24px;
-          font-weight: bold;
-          color: #292828;
-          margin-right: 32px;
-        }
-        .tip {
-          font-size: 16px;
-          color: #a9a9a9;
-        }
-      }
-      & > .right {
-        display: flex;
-        align-items: center;
-        /deep/ input {
-          border: 1px solid #d6d6d6 !important;
-        }
-        .icon-wrap {
-          .icon {
-            margin-left: 16px;
-            cursor: pointer;
-            &:hover {
-              opacity: 0.8;
-            }
-          }
-        }
-      }
-    }
+    // .header {
+    //   background: #ffffff;
+    //   border-radius: 10px;
+    //   display: flex;
+    //   justify-content: space-between;
+    //   align-items: center;
+    //   padding: 16px;
+    //   & > .left {
+    //     display: flex;
+    //     align-items: center;
+    //     .icon {
+    //       width: 56px;
+    //       height: 56px;
+    //       margin-right: 8px;
+    //     }
+    //     .title {
+    //       font-size: 24px;
+    //       font-weight: bold;
+    //       color: #292828;
+    //       margin-right: 32px;
+    //     }
+    //     .tip {
+    //       font-size: 16px;
+    //       color: #a9a9a9;
+    //     }
+    //   }
+    //   & > .right {
+    //     display: flex;
+    //     align-items: center;
+    //     /deep/ input {
+    //       border: 1px solid #d6d6d6 !important;
+    //     }
+    //     .icon-wrap {
+    //       .icon {
+    //         margin-left: 16px;
+    //         cursor: pointer;
+    //         &:hover {
+    //           opacity: 0.8;
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
     .content {
+      box-sizing: border-box;
+      height: 100%;
       background: #ffffff;
       border-radius: 10px;
-      height: 500px;
-      margin-top: 24px;
     }
   }
 }

@@ -15,7 +15,7 @@
             <span>{{ v.created }}</span>
             <div class="right">
               <img src="@/assets/images/home/eye.png" alt="" />
-              <span>234</span>
+              <span>{{ v.viewCount }}</span>
             </div>
           </div>
         </div>
@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import platformApi from "@/api/platform";
+
 import { queryDataBoardList } from "@/api/Insight";
 export default {
   data() {
@@ -37,15 +39,28 @@ export default {
       pageSize: 99999999999,
       pageIndex: 1,
     }).then((d) => {
-      this.cardList = d.list;
+      platformApi.queryDataBoardViewCount().then((resp) => {
+        d.list.forEach((v) => {
+          const find = resp.find((sv) => sv.dataBoardId == v.dashboard_id);
+          if (find) {
+            v.viewCount = find.viewCount;
+          } else {
+            v.viewCount = 0;
+          }
+        });
+        this.cardList = d.list;
+      });
     });
   },
   methods: {
     goDetail(v) {
+      platformApi.reportDataBoardViewCount({
+        dataBoardId: v.dashboard_id,
+      });
       this.$router.push({
         name: "InsightDetail",
         query: {
-          id: v.id,
+          link: v.link,
         },
       });
     },
