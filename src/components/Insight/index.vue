@@ -61,6 +61,7 @@ export default {
         name: "InsightDetail",
         query: {
           link: v.link,
+          name:v.name
         },
       });
     },

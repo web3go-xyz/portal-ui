@@ -26,6 +26,11 @@
           </div>
         </div>
       </div> -->
+      <div class="breadcrumb">
+        <span class="link hover-item" @click="$router.back()"> Insight </span>
+        <i class="el-icon-arrow-right"></i>
+        <span class="text">{{$route.query.name}}</span>
+      </div>
       <div class="content">
         <iframe
           allowTransparency="true"
@@ -110,8 +115,26 @@ export default {
     .content {
       // overflow: auto;
       box-sizing: border-box;
-      height: 100%;
+      height: calc(100% - 41px);
       border-radius: 10px;
+    }
+  }
+  .breadcrumb {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-bottom: 24px;
+    .link {
+      font-size: 14px;
+      color: #a9a9a9;
+    }
+    .el-icon-arrow-right {
+      font-size: 12px;
+      padding: 0 8px;
+    }
+    .text {
+      font-size: 14px;
+      color: #292828;
     }
   }
 }
