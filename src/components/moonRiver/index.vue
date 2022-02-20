@@ -855,7 +855,7 @@ export default {
       isFirstQuery: true,
 
       charts: {},
-      refreshDataInterval: 15000,
+      refreshDataInterval: 60000,
 
       linkAccountSubscribeData: {
         subscribe_address: "",
