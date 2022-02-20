@@ -830,7 +830,7 @@ export default {
       scrollHandler: null,
       chartInstances: [],
       pageIndex: 1,
-      pageSize: 10,
+      pageSize: 100,
       currentSimulate: {},
       freeBalance: null,
       linkLoading: false,
