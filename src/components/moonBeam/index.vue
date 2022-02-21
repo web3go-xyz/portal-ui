@@ -384,6 +384,22 @@
                   <div class="popover-content">
                     <div class="top">
                       <div class="item">
+                        <span class="title"
+                          >Max Collators is {{ maxCollector }}</span
+                        >
+                        <span
+                          class="title"
+                          v-if="
+                            getCollectorRank(scope.row) >=
+                            parseInt(maxCollector * 0.9)
+                          "
+                        >
+                          <br />
+                          Current Rank is below
+                          {{ parseInt(maxCollector * 0.9) }} (last 10%)<br
+                        /></span>
+                      </div>
+                      <div class="item">
                         <span class="title">Total Stake:</span>
                         <span class="number"
                           >{{
