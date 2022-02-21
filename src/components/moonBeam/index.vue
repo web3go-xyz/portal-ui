@@ -1164,10 +1164,10 @@ export default {
     },
     getBoundaryReward(row) {
       const min = BigNumber(this.inputValue || 0).multipliedBy(
-        row.averageRPM.minus(row.standardDeviation)
+        new BigNumber(row.averageRPM).minus(row.standardDeviation)
       );
       const max = BigNumber(this.inputValue || 0).multipliedBy(
-        row.averageRPM.plus(row.standardDeviation)
+        new BigNumber(row.averageRPM).plus(row.standardDeviation)
       );
       return `${min.toFormat(5)} ~ ${max.toFormat(5)}`;
     },
