@@ -218,7 +218,7 @@ export async function loadAddressIdentityAsync(addressInfo) {
     let ls_key = 'identity_address_' + address;
     let valueStr = localStorage.getItem(ls_key);
     if (valueStr) {
-        console.debug('identityData localStorage ', valueStr);
+        // console.debug('identityData localStorage ', valueStr);
         let json = JSON.parse(valueStr);
 
         //check if the cache expire

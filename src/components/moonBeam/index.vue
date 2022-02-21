@@ -207,42 +207,62 @@
               <span>{{ scope.row.totalReward | roundNumber(2) }} GLMR</span>
             </template>
           </el-table-column>
-          <el-table-column label="Latest RPM" prop="latestRPM">
+          <el-table-column label="Min Bond" prop="minBond">
             <template slot="header" slot-scope="scope">
               <div>
-                Latest RPM
+                Min Bond
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
-                    RPM, Rewards Per GLMR. To simplify the calculation, we
-                    define RPM as "rewards per GLMR when nominating to the
-                    specific collator"
+                    Min Bond means the minimum bond amount to join the collator.
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
               </div>
             </template>
             <template slot-scope="scope">
-              <span>{{ scope.row.latestRPM | roundNumber(8) }} GLMR</span>
+              <span>{{ getMinBond(scope.row) | roundNumber(0) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="APR" prop="latestAPR">
+          <el-table-column label="Average RPM" prop="averageRPM">
+            <template slot="header" slot-scope="scope">
+              <div>
+                Average RPM
+                <el-tooltip placement="top" trigger="hover">
+                  <div slot="content" class="tooltip-300px">
+                    Average RPM in past 10 round.
+                    <br /><br />
+                    RPM, Rewards Per GLMR in a round.
+                    <br /><br />
+                    To simplify the calculation, we define RPM as "rewards per
+                    GLMR when nominating to the specific collator"
+                  </div>
+                  <i class="el-icon-warning-outline"></i>
+                </el-tooltip>
+              </div>
+            </template>
+            <template slot-scope="scope">
+              <span>{{ scope.row.averageRPM | roundNumber(8) }} GLMR</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="APR" prop="averageAPR">
             <template slot="header" slot-scope="scope">
               <div>
                 APR
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     APR means the annualized income pledged to the current
-                    collator.<br />Nearly {{ getRoundPerYear() }} rounds per
-                    year.
+                    collator.<br />
+                    <br />Nearly {{ getRoundPerYear() }} rounds per year.
                     <br />
-                    APR = Latest_RPM * Round_Per_Year * 100%
+                    <br />
+                    APR = Average_RPM * Round_Per_Year * 100%
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
               </div>
             </template>
             <template slot-scope="scope">
-              <span>{{ scope.row.latestAPR | roundNumber(2) }}%</span>
+              <span>{{ scope.row.averageAPR | roundNumber(2) }}%</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -826,8 +846,8 @@ export default {
   },
   data() {
     return {
-      auto_notify_at_my_stake_active:1,
-      auto_notify_at_my_stake_inactive:0,
+      auto_notify_at_my_stake_active: 1,
+      auto_notify_at_my_stake_inactive: 0,
       scrollHandler: null,
       chartInstances: [],
       pageIndex: 1,
@@ -991,7 +1011,7 @@ export default {
     updateAutoNotify() {
       let self = this;
 
-      let callback=()=>{
+      let callback = () => {
         moonriverService
           .subscribe({
             subscribe_address: self.linkAccountSubscribeData.subscribe_address,
@@ -1001,7 +1021,6 @@ export default {
               self.linkAccountSubscribeData.auto_notify_at_my_stake,
           })
           .then((resp) => {
-            
             self.$notify({
               message: "Update Success",
               position: "bottom-left",
@@ -1010,10 +1029,10 @@ export default {
               type: "success",
             });
           });
-      }
+      };
       if (!self.linkAccountSubscribeData.subscribe_email) {
-        self.configDialog_subscribe_email(callback); 
-      }else{
+        self.configDialog_subscribe_email(callback);
+      } else {
         callback();
       }
     },
@@ -1108,9 +1127,26 @@ export default {
       }
     },
 
-    getLatestRPM(d) {
+    getMinBond(v) {
+      if (this.maxNominator == 0) {
+        return 50;
+      }
+      let maxNominatorPerCollator = this.maxNominator;
+      if (v.allNominators.length < maxNominatorPerCollator) {
+        return 50;
+      } else {
+        return v.allNominators[maxNominatorPerCollator - 1].amount + 1;
+      }
+    },
+    getAverageRPM(d) {
       if (d && d.length > 0) {
-        return d[d.length - 1].RPM.toNumber();
+        // console.log(d.length);
+        let sum = 0;
+        d.forEach((e) => {
+          sum += e.RPM.toNumber();
+        });
+
+        return sum / d.length;
       }
       return 0;
     },
@@ -1119,7 +1155,7 @@ export default {
       let roundPerYear = Math.ceil((365 * 24 * 3600) / 12 / blockPerRound);
       return roundPerYear;
     },
-    getLatestAPR(rpm) {
+    getAPR(rpm) {
       let roundPerYear = this.getRoundPerYear();
       return roundPerYear * rpm * 100;
     },
@@ -1505,8 +1541,8 @@ export default {
                 });
               }
               v.historyRPM = arr;
-              v.latestRPM = self.getLatestRPM(v.historyRPM);
-              v.latestAPR = self.getLatestAPR(v.latestRPM);
+              v.averageRPM = self.getAverageRPM(v.historyRPM);
+              v.averageAPR = self.getAPR(v.averageRPM);
               v.mimRPM = Math.min.apply(
                 null,
                 arr.map((sv) => sv.RPM.toNumber())
@@ -1515,12 +1551,7 @@ export default {
                 null,
                 arr.map((sv) => sv.RPM.toNumber())
               );
-              // 平均数
-              let allRPM = BigNumber(0);
-              arr.forEach((sv) => {
-                allRPM = allRPM.plus(sv.RPM);
-              });
-              v.averageRPM = allRPM.dividedBy(10);
+
               // 标准差
               let topSum = BigNumber(0);
               v.historyRPM.forEach((sv) => {
@@ -1539,7 +1570,7 @@ export default {
               "moonbeamCollectorSortList",
               JSON.stringify(nominatorRes)
             );
-            
+
             console.log("tableData", nominatorRes);
             this.generateTableChart();
             if (this.searchAccount) {
@@ -1671,7 +1702,7 @@ export default {
         // handle other "switch" errors
       }
       const solveAccounts = (accs) => {
-        console.log('111');
+        console.log("111");
         if (accs.length === 0) {
           console.error("无法获取账号，Metamask 是否正确配置？");
           return;
@@ -1684,7 +1715,8 @@ export default {
           .getMySubscribe({ subscribe_address: this.linkAccount.address })
           .then((resp) => {
             if (resp && resp.id) {
-              self.linkAccountSubscribeData.auto_notify_at_my_stake=resp.auto_notify_at_my_stake;
+              self.linkAccountSubscribeData.auto_notify_at_my_stake =
+                resp.auto_notify_at_my_stake;
               self.linkAccountSubscribeData.subscribe_address =
                 resp.subscribe_address;
               self.linkAccountSubscribeData.subscribe_email =
@@ -1699,7 +1731,8 @@ export default {
               self.linkAccountSubscribeData.subscribe_address =
                 this.linkAccount.address;
               self.linkAccountSubscribeData.subscribe_email = "";
-              self.linkAccountSubscribeData.auto_notify_at_my_stake=self.auto_notify_at_my_stake_inactive;
+              self.linkAccountSubscribeData.auto_notify_at_my_stake =
+                self.auto_notify_at_my_stake_inactive;
               self.linkAccountSubscribeData.watched_address = [];
             }
           });
