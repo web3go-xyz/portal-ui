@@ -148,7 +148,11 @@
         <el-tab-pane label="My Stake" name="2"></el-tab-pane>
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
-        <el-table v-loading="loading" :data="onePageTableData">
+        <el-table
+          v-loading="loading"
+          :data="onePageTableData"
+          @sort-change="sortChange"
+        >
           <el-table-column label="Rank" width="90">
             <template slot-scope="scope">
               <div
@@ -207,7 +211,7 @@
               <span>{{ scope.row.totalReward | roundNumber(2) }} GLMR</span>
             </template>
           </el-table-column>
-          <el-table-column label="Min Bond" prop="minBond">
+          <el-table-column label="Min Bond" prop="minBond" sortable="custom">
             <template slot="header" slot-scope="scope">
               <div>
                 Min Bond
@@ -220,13 +224,13 @@
               </div>
             </template>
             <template slot-scope="scope">
-              <span>{{ getMinBond(scope.row) | roundNumber(0) }}</span>
+              <span>{{ scope.row.minBond | roundNumber(0) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="Average RPM" prop="averageRPM">
             <template slot="header" slot-scope="scope">
               <div>
-                Average RPM
+                Avg RPM
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     Average RPM in past 10 round.
@@ -241,10 +245,10 @@
               </div>
             </template>
             <template slot-scope="scope">
-              <span>{{ scope.row.averageRPM | roundNumber(8) }} GLMR</span>
+              <span>{{ scope.row.averageRPM | roundNumber(8) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="APR" prop="averageAPR">
+          <el-table-column label="APR" prop="apr" sortable="custom">
             <template slot="header" slot-scope="scope">
               <div>
                 APR
@@ -262,13 +266,13 @@
               </div>
             </template>
             <template slot-scope="scope">
-              <span>{{ scope.row.averageAPR | roundNumber(2) }}%</span>
+              <span>{{ scope.row.apr | roundNumber(2) }}%</span>
             </template>
           </el-table-column>
           <el-table-column
             width="270"
             prop="name"
-            label="Reward History ( Latest 10 rounds )"
+            label="Reward History(Latest 10 rounds)"
           >
             <template slot-scope="scope">
               <div :ref="'tableChart' + scope.row.id" class="table-chart"></div>
@@ -317,13 +321,13 @@
         <div class="pagination-wrap">
           <el-pagination
             background
-            layout="prev, pager, next,sizes,jumper"
+            layout="prev, pager, next,sizes"
             :total="tableData.length"
             :current-page.sync="pageIndex"
             @size-change="generateTableChart"
             @current-change="generateTableChart"
             :page-size.sync="pageSize"
-            :page-sizes="[10, 20, 50, 100]"
+            :page-sizes="[100]"
           >
           </el-pagination>
         </div>
@@ -900,6 +904,8 @@ export default {
         subscribe_email: "",
         auto_notify_at_my_stake: 0,
       },
+
+      sort4DisplayConfig: { prop: "", order: "" },
     };
   },
   async created() {
@@ -940,7 +946,7 @@ export default {
     },
     totalCollectorStake() {
       let result = BigNumber(0);
-      // 算出中标的大哥的金额
+
       this.tableData.forEach((v, i) => {
         if (i < this.maxCollector) {
           result = result.plus(this.getTotalStake(v));
@@ -1151,7 +1157,7 @@ export default {
       if (v.allNominators.length < maxNominatorPerCollator) {
         return 50;
       } else {
-        return v.allNominators[maxNominatorPerCollator - 1].amount + 1;
+        return Number(v.allNominators[maxNominatorPerCollator - 1].amount + 1);
       }
     },
     getAverageRPM(d) {
@@ -1253,7 +1259,8 @@ export default {
       return Number(percent.toFixed(2));
     },
     getCollectPercentByRank(rank) {
-      const row = this.tableData[rank - 1];
+      let rankIndex = rank - 1;
+      const row = this.tableData.find((v) => v.rankIndex == rankIndex);
       const top = this.getTotalStake(row);
       const bottom = this.totalCollectorStake;
       const percent = top.dividedBy(bottom).multipliedBy(100);
@@ -1272,8 +1279,8 @@ export default {
       return row.bond;
     },
     getCollectorRank(row) {
-      const findIndex = this.tableData.findIndex((v) => v.id == row.id);
-      return findIndex + 1;
+      const findItem = this.tableData.find((v) => v.id == row.id);
+      return findItem.rankIndex + 1;
     },
     getStakeRank(row) {
       const findIndex = row.allNominators.findIndex(
@@ -1338,12 +1345,15 @@ export default {
       return this.getSelfStake(row).plus(this.getNominatorStake(row));
     },
     getPreviousTotalStake(row) {
-      const index = this.tableData.findIndex((v) => v.id == row.id);
-      let previousIndex = index - 1;
-      if (previousIndex <= 0) {
-        previousIndex = 0;
+      const findItem = this.tableData.find((v) => v.id == row.id);
+
+      let previousRankIndex = findItem.rankIndex - 1;
+      if (previousRankIndex <= 0) {
+        previousRankIndex = 0;
       }
-      const preRow = this.tableData[previousIndex];
+      const preRow = this.tableData.find(
+        (v) => v.rankIndex == previousRankIndex
+      );
       return this.getTotalStake(preRow);
     },
     getTotalStakeByRank(rank) {
@@ -1351,7 +1361,7 @@ export default {
       if (rankIndex <= 0) {
         rankIndex = 0;
       }
-      const row = this.tableData[rankIndex];
+      const row = this.tableData.find((v) => v.rankIndex == rankIndex);
       return this.getTotalStake(row);
     },
     getAllData() {
@@ -1372,36 +1382,36 @@ export default {
       //获取round信息
       moonriverService.getCurrentRoundInfo().then((d) => {
         this.roundInfo = d;
-        // 获取大哥列表
+        // 获取Collator列表
         moonriverService.getRealtimeCollatorCandidatePool().then((c) => {
           let collatorAccounts = [];
           c.forEach((v) => {
             collatorAccounts.push(v.owner);
           });
-          // 一次性获取大哥详情
+          // 一次性获取Collator详情
           const getCollectorDetailPromise =
             moonriverService.getRealtimeCollatorState({
               collators: collatorAccounts,
             });
 
-          //获取大哥totalReward信息
+          //获取CollatortotalReward信息
           const getCollectorTotalRewardPromise =
             moonriverService.getCollatorTotalReward({
               collators: collatorAccounts,
             });
-          // 获取大哥的历史10次reward
+          // 获取Collator的历史10次reward
           const getCollector10RewardPromise =
             moonriverService.getCollatorReward({
               startRoundIndex: this.startRoundIndex,
               endRoundIndex: this.endRoundIndex,
               accounts: collatorAccounts,
             });
-          // 获取小弟的历史10次totalStake
+          // 获取Nominator的历史10次totalStake
           const getNominator10TotalStakePromise = moonriverService.atStake({
             startRoundIndex: this.startRoundIndex,
             endRoundIndex: this.endRoundIndex,
           });
-          // 获取小弟的历史10次totalReward
+          // 获取Nominator的历史10次totalReward
           const getNominator10RewardPromise =
             moonriverService.getNominatorReward({
               startRoundIndex: this.startRoundIndex,
@@ -1418,7 +1428,7 @@ export default {
 
           Promise.all(allPromiseArr).then((d) => {
             this.loading = false;
-            // 整理大哥列表
+            // 整理Collator列表
             let nominatorRes = d[0];
             nominatorRes.forEach((v) => {
               v.bond = BigNumber(v.bond, 16).dividedBy(1e18);
@@ -1429,15 +1439,17 @@ export default {
                 sv.amount = BigNumber(sv.amount, 16).dividedBy(1e18);
               });
               v.allNominators = [...v.topDelegations, ...v.bottomDelegations];
-              //排序小弟
+              //排序Nominator
               v.allNominators.sort((a, b) => {
                 const totalB = b.amount;
                 const totalA = a.amount;
                 const result = totalB.minus(totalA);
                 return result;
               });
+
+              v.minBond = this.getMinBond(v);
             });
-            // 排序大哥
+            // 排序Collator
             nominatorRes.sort((a, b) => {
               const totalB = this.getTotalStake(b);
               const totalA = this.getTotalStake(a);
@@ -1456,7 +1468,7 @@ export default {
                 v.totalReward = BigNumber(0);
               }
             });
-            // 塞入10次大哥reward
+            // 塞入10次Collatorreward
             const getCollector10RewardRes = d[2];
             nominatorRes.forEach((v) => {
               const arr = [];
@@ -1481,7 +1493,7 @@ export default {
               v.historyReward = arr;
             });
             //debugger
-            // 塞入10次小弟totalStake
+            // 塞入10次NominatortotalStake
             const getNominator10TotalStakeRes = d[3];
             nominatorRes.forEach((v) => {
               const arr = [];
@@ -1504,7 +1516,7 @@ export default {
               }
               v.historyNominatorTotalStake = arr;
             });
-            // 塞入10次小弟totalReward (坑点：历史数据返回可能缺失某个roundIndex)
+            // 塞入10次NominatortotalReward (坑点：历史数据返回可能缺失某个roundIndex)
 
             const getNorminator10RewardRes = d[4];
             nominatorRes.forEach((v) => {
@@ -1558,7 +1570,7 @@ export default {
               }
               v.historyRPM = arr;
               v.averageRPM = self.getAverageRPM(v.historyRPM);
-              v.averageAPR = self.getAPR(v.averageRPM);
+              v.apr = self.getAPR(v.averageRPM);
               v.mimRPM = Math.min.apply(
                 null,
                 arr.map((sv) => sv.RPM.toNumber())
@@ -1581,13 +1593,13 @@ export default {
               const element = nominatorRes[index];
               element.rankIndex = index;
             }
-            this.tableData = nominatorRes;
+            this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
               "moonbeamCollectorSortList",
               JSON.stringify(nominatorRes)
             );
 
-            console.log("tableData", nominatorRes);
+            // console.log("tableData", nominatorRes);
             this.generateTableChart();
             if (this.searchAccount) {
               this.getMyStackList();
@@ -1761,7 +1773,6 @@ export default {
           if (this.tableData.length) {
             this.getMyStackList();
           }
-          // 监听账号切换
         });
       };
       this.web3.eth.getAccounts((err, accs) => {
@@ -1846,13 +1857,13 @@ export default {
             0.005,
             0
           );
-          console.log(totalStake_yAxis);
+          // console.log(totalStake_yAxis);
           let totalReward_yAxis = this.getyAxisMinMax(
             row.historyNominatorTotalReward.map((v) => v.reward.toNumber()),
             0.005,
             2
           );
-          console.log(totalReward_yAxis);
+          // console.log(totalReward_yAxis);
           let RPM_yAxis = this.getyAxisMinMax(
             row.historyRPM.map((v) => v.RPM.toNumber()),
             0.1,
@@ -2036,6 +2047,37 @@ export default {
           id: account,
         },
       });
+    },
+
+    sortChange(evt) {
+      console.log("sortChange", evt);
+      this.sort4DisplayConfig = evt;
+      this.loading = true;
+      this.getAllData();
+    },
+    sort4Display(d) {
+      // debugger;
+
+      if (this.sort4DisplayConfig && this.sort4DisplayConfig.order != null) {
+        let key = this.sort4DisplayConfig.prop;
+
+        if (this.sort4DisplayConfig.order == "ascending") {
+          d.sort(function (a, b) {
+            if (a[key] > b[key]) return 1;
+            if (a[key] < b[key]) return -1;
+            return 0;
+          });
+          return d;
+        } else if (this.sort4DisplayConfig.order == "descending") {
+          d.sort(function (a, b) {
+            if (a[key] > b[key]) return -1;
+            if (a[key] < b[key]) return 1;
+            return 0;
+          });
+          return d;
+        }
+      }
+      return d;
     },
   },
 };
