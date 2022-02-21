@@ -1157,7 +1157,7 @@ export default {
       if (v.allNominators.length < maxNominatorPerCollator) {
         return 50;
       } else {
-        return Number(v.allNominators[maxNominatorPerCollator - 1].amount + 1);
+        return Number(v.allNominators[maxNominatorPerCollator - 1].amount) + 1;
       }
     },
     getAverageRPM(d) {
