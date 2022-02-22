@@ -148,7 +148,11 @@
         <el-tab-pane label="My Stake" name="2"></el-tab-pane>
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
-        <el-table v-loading="loading" :data="onePageTableData">
+        <el-table
+          v-loading="loading"
+          :data="onePageTableData"
+          @sort-change="sortChange"
+        >
           <el-table-column label="Rank" width="90">
             <template slot-scope="scope">
               <div
@@ -207,48 +211,68 @@
               <span>{{ scope.row.totalReward | roundNumber(2) }} MOVR</span>
             </template>
           </el-table-column>
-          <el-table-column label="Latest RPM" prop="latestRPM">
+          <el-table-column label="Min Bond" prop="minBond" sortable="custom">
             <template slot="header" slot-scope="scope">
               <div>
-                Latest RPM
+                Min Bond
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
-                    RPM, Rewards Per MOVR. To simplify the calculation, we
-                    define RPM as "rewards per MOVR when nominating to the
-                    specific collator"
+                    Min Bond means the minimum bond amount to join the collator.
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
               </div>
             </template>
             <template slot-scope="scope">
-              <span>{{ scope.row.latestRPM | roundNumber(8) }} MOVR</span>
+              <span>{{ scope.row.minBond | roundNumber(0) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="APR" prop="latestAPR">
+          <el-table-column label="Average RPM" prop="averageRPM">
+            <template slot="header" slot-scope="scope">
+              <div>
+                Avg RPM
+                <el-tooltip placement="top" trigger="hover">
+                  <div slot="content" class="tooltip-300px">
+                    Average RPM in past 10 round.
+                    <br /><br />
+                    RPM, Rewards Per MOVR in a round.
+                    <br /><br />
+                    To simplify the calculation, we define RPM as "rewards per
+                    MOVR when nominating to the specific collator"
+                  </div>
+                  <i class="el-icon-warning-outline"></i>
+                </el-tooltip>
+              </div>
+            </template>
+            <template slot-scope="scope">
+              <span>{{ scope.row.averageRPM | roundNumber(8) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="APR" prop="apr" sortable="custom">
             <template slot="header" slot-scope="scope">
               <div>
                 APR
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     APR means the annualized income pledged to the current
-                    collator.<br />Nearly {{ getRoundPerYear() }} rounds per
-                    year.
+                    collator.<br />
+                    <br />Nearly {{ getRoundPerYear() }} rounds per year.
                     <br />
-                    APR = Latest_RPM * Round_Per_Year * 100%
+                    <br />
+                    APR = Average_RPM * Round_Per_Year * 100%
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
               </div>
             </template>
             <template slot-scope="scope">
-              <span>{{ scope.row.latestAPR | roundNumber(2) }}%</span>
+              <span>{{ scope.row.apr | roundNumber(2) }}%</span>
             </template>
           </el-table-column>
           <el-table-column
             width="270"
             prop="name"
-            label="Reward History ( Latest 10 rounds )"
+            label="Reward History(Latest 10 rounds)"
           >
             <template slot-scope="scope">
               <div :ref="'tableChart' + scope.row.id" class="table-chart"></div>
@@ -297,13 +321,13 @@
         <div class="pagination-wrap">
           <el-pagination
             background
-            layout="prev, pager, next,sizes,jumper"
+            layout="prev, pager, next,sizes"
             :total="tableData.length"
             :current-page.sync="pageIndex"
             @size-change="generateTableChart"
             @current-change="generateTableChart"
             :page-size.sync="pageSize"
-            :page-sizes="[10, 20, 50, 100]"
+            :page-sizes="[100]"
           >
           </el-pagination>
         </div>
@@ -334,13 +358,13 @@
           <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
-                 <identity-icon-plus
+                <identity-icon-plus
                   @click.native="turnActionPage(scope)"
                   :addressInfo="{
                     address: scope.row.id,
                     addressDisplayCompact: true,
                     isEthereum: true,
-                    fontSize:16
+                    fontSize: 16,
                   }"
                 ></identity-icon-plus>
                 <!-- <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
@@ -363,6 +387,22 @@
                 >
                   <div class="popover-content">
                     <div class="top">
+                      <div class="item">
+                        <span class="title"
+                          >Max Collators is {{ maxCollector }}</span
+                        >
+                        <span
+                          class="title"
+                          v-if="
+                            getCollectorRank(scope.row) >=
+                            parseInt(maxCollector * 0.9)
+                          "
+                        >
+                          <br />
+                          Current Rank is below
+                          {{ parseInt(maxCollector * 0.9) }} (last 10%)<br
+                        /></span>
+                      </div>
                       <div class="item">
                         <span class="title">Total Stake:</span>
                         <span class="number"
@@ -813,6 +853,7 @@
 
 <script>
 import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
+
 import { BigNumber } from "bignumber.js";
 
 import moonriverService from "@/api/moonriver";
@@ -825,8 +866,8 @@ export default {
   },
   data() {
     return {
-      auto_notify_at_my_stake_active:1,
-      auto_notify_at_my_stake_inactive:0,
+      auto_notify_at_my_stake_active: 1,
+      auto_notify_at_my_stake_inactive: 0,
       scrollHandler: null,
       chartInstances: [],
       pageIndex: 1,
@@ -863,6 +904,8 @@ export default {
         subscribe_email: "",
         auto_notify_at_my_stake: 0,
       },
+
+      sort4DisplayConfig: { prop: "", order: "" },
     };
   },
   async created() {
@@ -903,7 +946,7 @@ export default {
     },
     totalCollectorStake() {
       let result = BigNumber(0);
-      // 算出中标的大哥的金额
+
       this.tableData.forEach((v, i) => {
         if (i < this.maxCollector) {
           result = result.plus(this.getTotalStake(v));
@@ -990,7 +1033,8 @@ export default {
     },
     updateAutoNotify() {
       let self = this;
-      let callback=()=>{
+
+      let callback = () => {
         moonriverService
           .subscribe({
             subscribe_address: self.linkAccountSubscribeData.subscribe_address,
@@ -1008,10 +1052,10 @@ export default {
               type: "success",
             });
           });
-      }
+      };
       if (!self.linkAccountSubscribeData.subscribe_email) {
-        self.configDialog_subscribe_email(callback); 
-      }else{
+        self.configDialog_subscribe_email(callback);
+      } else {
         callback();
       }
     },
@@ -1106,9 +1150,30 @@ export default {
       }
     },
 
-    getLatestRPM(d) {
+    getMinBond(v) {
+      if (this.maxNominator == 0) {
+        return 5;
+      }
+      let maxNominatorPerCollator = this.maxNominator;
+      if (v.allNominators.length < maxNominatorPerCollator) {
+        return 5;
+      } else {
+        return (
+          BigNumber(v.lowestTopDelegationAmount, 16)
+            .dividedBy(1e18)
+            .toNumber() + 1
+        );
+      }
+    },
+    getAverageRPM(d) {
       if (d && d.length > 0) {
-        return d[d.length - 1].RPM.toNumber();
+        // console.log(d.length);
+        let sum = 0;
+        d.forEach((e) => {
+          sum += e.RPM.toNumber();
+        });
+
+        return sum / d.length;
       }
       return 0;
     },
@@ -1117,7 +1182,7 @@ export default {
       let roundPerYear = Math.ceil((365 * 24 * 3600) / 12 / blockPerRound);
       return roundPerYear;
     },
-    getLatestAPR(rpm) {
+    getAPR(rpm) {
       let roundPerYear = this.getRoundPerYear();
       return roundPerYear * rpm * 100;
     },
@@ -1126,10 +1191,10 @@ export default {
     },
     getBoundaryReward(row) {
       const min = BigNumber(this.inputValue || 0).multipliedBy(
-        row.averageRPM.minus(row.standardDeviation)
+        new BigNumber(row.averageRPM).minus(row.standardDeviation)
       );
       const max = BigNumber(this.inputValue || 0).multipliedBy(
-        row.averageRPM.plus(row.standardDeviation)
+        new BigNumber(row.averageRPM).plus(row.standardDeviation)
       );
       return `${min.toFormat(5)} ~ ${max.toFormat(5)}`;
     },
@@ -1199,7 +1264,8 @@ export default {
       return Number(percent.toFixed(2));
     },
     getCollectPercentByRank(rank) {
-      const row = this.tableData[rank - 1];
+      let rankIndex = rank - 1;
+      const row = this.tableData.find((v) => v.rankIndex == rankIndex);
       const top = this.getTotalStake(row);
       const bottom = this.totalCollectorStake;
       const percent = top.dividedBy(bottom).multipliedBy(100);
@@ -1218,8 +1284,8 @@ export default {
       return row.bond;
     },
     getCollectorRank(row) {
-      const findIndex = this.tableData.findIndex((v) => v.id == row.id);
-      return findIndex + 1;
+      const findItem = this.tableData.find((v) => v.id == row.id);
+      return findItem.rankIndex + 1;
     },
     getStakeRank(row) {
       const findIndex = row.allNominators.findIndex(
@@ -1274,22 +1340,28 @@ export default {
       return Number(percent.toFixed(2));
     },
     getNominatorStake(row) {
-      let result = BigNumber(0);
-      row.topDelegations.forEach((v) => {
-        result = result.plus(v.amount);
-      });
-      return result;
+      return BigNumber(row.totalCounted, 16).dividedBy(1e18).minus(row.bond);
+
+      //let result = BigNumber(0);
+      // row.topDelegations.forEach((v) => {
+      //   result = result.plus(v.amount);
+      // });
+      // return result;
     },
     getTotalStake(row) {
-      return this.getSelfStake(row).plus(this.getNominatorStake(row));
+      return BigNumber(row.totalCounted, 16).dividedBy(1e18);
+      // return this.getSelfStake(row).plus(this.getNominatorStake(row));
     },
     getPreviousTotalStake(row) {
-      const index = this.tableData.findIndex((v) => v.id == row.id);
-      let previousIndex = index - 1;
-      if (previousIndex <= 0) {
-        previousIndex = 0;
+      const findItem = this.tableData.find((v) => v.id == row.id);
+
+      let previousRankIndex = findItem.rankIndex - 1;
+      if (previousRankIndex <= 0) {
+        previousRankIndex = 0;
       }
-      const preRow = this.tableData[previousIndex];
+      const preRow = this.tableData.find(
+        (v) => v.rankIndex == previousRankIndex
+      );
       return this.getTotalStake(preRow);
     },
     getTotalStakeByRank(rank) {
@@ -1297,7 +1369,7 @@ export default {
       if (rankIndex <= 0) {
         rankIndex = 0;
       }
-      const row = this.tableData[rankIndex];
+      const row = this.tableData.find((v) => v.rankIndex == rankIndex);
       return this.getTotalStake(row);
     },
     getAllData() {
@@ -1318,36 +1390,36 @@ export default {
       //获取round信息
       moonriverService.getCurrentRoundInfo().then((d) => {
         this.roundInfo = d;
-        // 获取大哥列表
+        // 获取Collator列表
         moonriverService.getRealtimeCollatorCandidatePool().then((c) => {
           let collatorAccounts = [];
           c.forEach((v) => {
             collatorAccounts.push(v.owner);
           });
-          // 一次性获取大哥详情
+          // 一次性获取Collator详情
           const getCollectorDetailPromise =
             moonriverService.getRealtimeCollatorState({
               collators: collatorAccounts,
             });
 
-          //获取大哥totalReward信息
+          //获取CollatortotalReward信息
           const getCollectorTotalRewardPromise =
             moonriverService.getCollatorTotalReward({
               collators: collatorAccounts,
             });
-          // 获取大哥的历史10次reward
+          // 获取Collator的历史10次reward
           const getCollector10RewardPromise =
             moonriverService.getCollatorReward({
               startRoundIndex: this.startRoundIndex,
               endRoundIndex: this.endRoundIndex,
               accounts: collatorAccounts,
             });
-          // 获取小弟的历史10次totalStake
+          // 获取Nominator的历史10次totalStake
           const getNominator10TotalStakePromise = moonriverService.atStake({
             startRoundIndex: this.startRoundIndex,
             endRoundIndex: this.endRoundIndex,
           });
-          // 获取小弟的历史10次totalReward
+          // 获取Nominator的历史10次totalReward
           const getNominator10RewardPromise =
             moonriverService.getNominatorReward({
               startRoundIndex: this.startRoundIndex,
@@ -1364,7 +1436,7 @@ export default {
 
           Promise.all(allPromiseArr).then((d) => {
             this.loading = false;
-            // 整理大哥列表
+            // 整理Collator列表
             let nominatorRes = d[0];
             nominatorRes.forEach((v) => {
               v.bond = BigNumber(v.bond, 16).dividedBy(1e18);
@@ -1375,15 +1447,17 @@ export default {
                 sv.amount = BigNumber(sv.amount, 16).dividedBy(1e18);
               });
               v.allNominators = [...v.topDelegations, ...v.bottomDelegations];
-              //排序小弟
+              //排序Nominator
               v.allNominators.sort((a, b) => {
                 const totalB = b.amount;
                 const totalA = a.amount;
                 const result = totalB.minus(totalA);
                 return result;
               });
+
+              v.minBond = this.getMinBond(v);
             });
-            // 排序大哥
+            // 排序Collator
             nominatorRes.sort((a, b) => {
               const totalB = this.getTotalStake(b);
               const totalA = this.getTotalStake(a);
@@ -1402,7 +1476,7 @@ export default {
                 v.totalReward = BigNumber(0);
               }
             });
-            // 塞入10次大哥reward
+            // 塞入10次CollatorReward
             const getCollector10RewardRes = d[2];
             nominatorRes.forEach((v) => {
               const arr = [];
@@ -1427,7 +1501,7 @@ export default {
               v.historyReward = arr;
             });
             //debugger
-            // 塞入10次小弟totalStake
+            // 塞入10次NominatorTotalStake
             const getNominator10TotalStakeRes = d[3];
             nominatorRes.forEach((v) => {
               const arr = [];
@@ -1450,7 +1524,7 @@ export default {
               }
               v.historyNominatorTotalStake = arr;
             });
-            // 塞入10次小弟totalReward (坑点：历史数据返回可能缺失某个roundIndex)
+            // 塞入10次NominatortotalReward (坑点：历史数据返回可能缺失某个roundIndex)
 
             const getNorminator10RewardRes = d[4];
             nominatorRes.forEach((v) => {
@@ -1503,9 +1577,8 @@ export default {
                 });
               }
               v.historyRPM = arr;
-              v.latestRPM = self.getLatestRPM(v.historyRPM);
-              v.latestAPR = self.getLatestAPR(v.latestRPM);
-
+              v.averageRPM = self.getAverageRPM(v.historyRPM);
+              v.apr = self.getAPR(v.averageRPM);
               v.mimRPM = Math.min.apply(
                 null,
                 arr.map((sv) => sv.RPM.toNumber())
@@ -1514,12 +1587,7 @@ export default {
                 null,
                 arr.map((sv) => sv.RPM.toNumber())
               );
-              // 平均数
-              let allRPM = BigNumber(0);
-              arr.forEach((sv) => {
-                allRPM = allRPM.plus(sv.RPM);
-              });
-              v.averageRPM = allRPM.dividedBy(10);
+
               // 标准差
               let topSum = BigNumber(0);
               v.historyRPM.forEach((sv) => {
@@ -1533,12 +1601,13 @@ export default {
               const element = nominatorRes[index];
               element.rankIndex = index;
             }
-            this.tableData = nominatorRes;
+            this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
               "moonriverCollectorSortList",
               JSON.stringify(nominatorRes)
             );
-            console.log("tableData", nominatorRes);
+
+            // console.log("tableData", nominatorRes);
             this.generateTableChart();
             if (this.searchAccount) {
               this.getMyStackList();
@@ -1684,7 +1753,8 @@ export default {
           .getMySubscribe({ subscribe_address: this.linkAccount.address })
           .then((resp) => {
             if (resp && resp.id) {
-              self.linkAccountSubscribeData.auto_notify_at_my_stake=resp.auto_notify_at_my_stake;
+              self.linkAccountSubscribeData.auto_notify_at_my_stake =
+                resp.auto_notify_at_my_stake;
               self.linkAccountSubscribeData.subscribe_address =
                 resp.subscribe_address;
               self.linkAccountSubscribeData.subscribe_email =
@@ -1699,7 +1769,8 @@ export default {
               self.linkAccountSubscribeData.subscribe_address =
                 this.linkAccount.address;
               self.linkAccountSubscribeData.subscribe_email = "";
-              self.linkAccountSubscribeData.auto_notify_at_my_stake=self.auto_notify_at_my_stake_inactive;
+              self.linkAccountSubscribeData.auto_notify_at_my_stake =
+                self.auto_notify_at_my_stake_inactive;
               self.linkAccountSubscribeData.watched_address = [];
             }
           });
@@ -1712,7 +1783,6 @@ export default {
           if (this.tableData.length) {
             this.getMyStackList();
           }
-          // 监听账号切换
         });
       };
       this.web3.eth.getAccounts((err, accs) => {
@@ -1797,13 +1867,13 @@ export default {
             0.005,
             0
           );
-          console.log(totalStake_yAxis);
+          // console.log(totalStake_yAxis);
           let totalReward_yAxis = this.getyAxisMinMax(
             row.historyNominatorTotalReward.map((v) => v.reward.toNumber()),
             0.005,
             2
           );
-          console.log(totalReward_yAxis);
+          // console.log(totalReward_yAxis);
           let RPM_yAxis = this.getyAxisMinMax(
             row.historyRPM.map((v) => v.RPM.toNumber()),
             0.1,
@@ -1987,6 +2057,37 @@ export default {
           id: account,
         },
       });
+    },
+
+    sortChange(evt) {
+      console.log("sortChange", evt);
+      this.sort4DisplayConfig = evt;
+      this.loading = true;
+      this.getAllData();
+    },
+    sort4Display(d) {
+      // debugger;
+
+      if (this.sort4DisplayConfig && this.sort4DisplayConfig.order != null) {
+        let key = this.sort4DisplayConfig.prop;
+
+        if (this.sort4DisplayConfig.order == "ascending") {
+          d.sort(function (a, b) {
+            if (a[key] > b[key]) return 1;
+            if (a[key] < b[key]) return -1;
+            return 0;
+          });
+          return d;
+        } else if (this.sort4DisplayConfig.order == "descending") {
+          d.sort(function (a, b) {
+            if (a[key] > b[key]) return -1;
+            if (a[key] < b[key]) return 1;
+            return 0;
+          });
+          return d;
+        }
+      }
+      return d;
     },
   },
 };
