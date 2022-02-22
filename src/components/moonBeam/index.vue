@@ -1157,7 +1157,11 @@ export default {
       if (v.allNominators.length < maxNominatorPerCollator) {
         return 50;
       } else {
-        return Number(v.allNominators[maxNominatorPerCollator - 1].amount) + 1;
+        return (
+          BigNumber(v.lowestTopDelegationAmount, 16)
+            .dividedBy(1e18)
+            .toNumber() + 1
+        );
       }
     },
     getAverageRPM(d) {
@@ -1335,14 +1339,17 @@ export default {
       return Number(percent.toFixed(2));
     },
     getNominatorStake(row) {
-      let result = BigNumber(0);
-      row.topDelegations.forEach((v) => {
-        result = result.plus(v.amount);
-      });
-      return result;
+      return BigNumber(row.totalCounted, 16).dividedBy(1e18).minus(row.bond);
+
+      //let result = BigNumber(0);
+      // row.topDelegations.forEach((v) => {
+      //   result = result.plus(v.amount);
+      // });
+      // return result;
     },
     getTotalStake(row) {
-      return this.getSelfStake(row).plus(this.getNominatorStake(row));
+      return BigNumber(row.totalCounted, 16).dividedBy(1e18);
+      // return this.getSelfStake(row).plus(this.getNominatorStake(row));
     },
     getPreviousTotalStake(row) {
       const findItem = this.tableData.find((v) => v.id == row.id);
@@ -1468,7 +1475,7 @@ export default {
                 v.totalReward = BigNumber(0);
               }
             });
-            // 塞入10次Collatorreward
+            // 塞入10次CollatorReward
             const getCollector10RewardRes = d[2];
             nominatorRes.forEach((v) => {
               const arr = [];
@@ -1493,7 +1500,7 @@ export default {
               v.historyReward = arr;
             });
             //debugger
-            // 塞入10次NominatortotalStake
+            // 塞入10次NominatorTotalStake
             const getNominator10TotalStakeRes = d[3];
             nominatorRes.forEach((v) => {
               const arr = [];
