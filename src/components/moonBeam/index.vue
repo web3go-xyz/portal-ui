@@ -227,7 +227,7 @@
               <span>{{ scope.row.minBond | roundNumber(0) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Average RPM" prop="averageRPM">
+          <!-- <el-table-column label="Average RPM" prop="averageRPM">
             <template slot="header" slot-scope="scope">
               <div>
                 Avg RPM
@@ -247,6 +247,41 @@
             <template slot-scope="scope">
               <span>{{ scope.row.averageRPM | roundNumber(8) }}</span>
             </template>
+          </el-table-column> -->
+          <el-table-column label="Avg Blocks" prop="averageBlocks">
+            <template slot="header" slot-scope="scope">
+              <div>
+                Avg Blocks
+                <el-tooltip placement="top" trigger="hover">
+                  <div slot="content" class="tooltip-300px">
+                    Average Blocks in past 10 round which has been rewarded (
+                    round {{ startRoundIndex }} - {{ endRoundIndex }} ).
+                    <br /><br />
+                  </div>
+                  <i class="el-icon-warning-outline"></i>
+                </el-tooltip>
+              </div>
+            </template>
+            <template slot-scope="scope">
+              <span>{{ scope.row.averageBlocks | roundNumber(1) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="Current Blocks" prop="currentBlocks">
+            <template slot="header" slot-scope="scope">
+              <div>
+                Current Blocks
+                <el-tooltip placement="top" trigger="hover">
+                  <div slot="content" class="tooltip-300px">
+                    Blocks produced in the current round
+                    {{ currentRoundIndex }}. <br /><br />
+                  </div>
+                  <i class="el-icon-warning-outline"></i>
+                </el-tooltip>
+              </div>
+            </template>
+            <template slot-scope="scope">
+              <span>{{ scope.row.currentBlocks }}</span>
+            </template>
           </el-table-column>
           <el-table-column label="APR" prop="apr" sortable="custom">
             <template slot="header" slot-scope="scope">
@@ -259,7 +294,8 @@
                     <br />Nearly {{ getRoundPerYear() }} rounds per year.
                     <br />
                     <br />
-                    APR = Average_RPM * Round_Per_Year * 100%
+                    APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) *
+                    Round_Per_Year * 100%
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
@@ -272,7 +308,7 @@
           <el-table-column
             width="270"
             prop="name"
-            label="Reward History(Latest 10 rounds)"
+            label="Rewards(Last 10 rounds)"
           >
             <template slot-scope="scope">
               <div :ref="'tableChart' + scope.row.id" class="table-chart"></div>
@@ -944,6 +980,9 @@ export default {
     endRoundIndex() {
       return this.roundInfo.current - 2 - 0; //Reward延迟2round发放
     },
+    currentRoundIndex() {
+      return this.roundInfo.current;
+    },
     totalCollectorStake() {
       let result = BigNumber(0);
 
@@ -1181,9 +1220,13 @@ export default {
       let roundPerYear = Math.ceil((365 * 24 * 3600) / 12 / blockPerRound);
       return roundPerYear;
     },
-    getAPR(rpm) {
+    getAPR(v) {
+      // console.log(v.averageBlocks);
       let roundPerYear = this.getRoundPerYear();
-      return roundPerYear * rpm * 100;
+      // APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) * Round_Per_Year * 100%
+      let totalStake = this.getTotalStake(v).toNumber();
+      let avg_Blocks = Number(v.averageBlocks);
+      return 9.35 * (avg_Blocks / totalStake) * roundPerYear * 100;
     },
     resetAccountFilter() {
       this.searchAccount = this.linkAccount ? this.linkAccount.address : "";
@@ -1425,12 +1468,20 @@ export default {
               endRoundIndex: this.endRoundIndex,
             });
 
+          // 获取Collator的历史produced blocks count
+          const getCollector10BlocksPromise =
+            moonriverService.getCollatorProducedBlocks({
+              startRoundIndex: this.startRoundIndex,
+              endRoundIndex: this.currentRoundIndex,
+              accounts: collatorAccounts,
+            });
           const allPromiseArr = [
             getCollectorDetailPromise,
             getCollectorTotalRewardPromise,
             getCollector10RewardPromise,
             getNominator10TotalStakePromise,
             getNominator10RewardPromise,
+            getCollector10BlocksPromise,
           ];
 
           Promise.all(allPromiseArr).then((d) => {
@@ -1577,7 +1628,6 @@ export default {
               }
               v.historyRPM = arr;
               v.averageRPM = self.getAverageRPM(v.historyRPM);
-              v.apr = self.getAPR(v.averageRPM);
               v.mimRPM = Math.min.apply(
                 null,
                 arr.map((sv) => sv.RPM.toNumber())
@@ -1596,10 +1646,62 @@ export default {
               });
               v.standardDeviation = topSum.dividedBy(10).sqrt();
             });
+
+            // 塞入10次Collator的 produced blocks count
+            const getCollector10BlocksRes = d[5];
+            nominatorRes.forEach((v) => {
+              const arr = [];
+              let totalBlocks = 0;
+              let activeRound = 0;
+              for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
+                const find = getCollector10BlocksRes.blocks.find(
+                  (sv) =>
+                    sv.account.toLowerCase() == v.id.toLowerCase() &&
+                    Number(sv.roundIndex) == i
+                );
+                if (find) {
+                  activeRound++;
+                  totalBlocks += Number(find.blocks_count);
+                  arr.push({
+                    roundIndex: i,
+                    blocks_count: Number(find.blocks_count),
+                  });
+                } else {
+                  arr.push({
+                    roundIndex: i,
+                    blocks_count: Number(0),
+                  });
+                }
+              }
+              v.historyBlock = arr;
+
+              //averageBlocks
+              if (activeRound > 0) {
+                // console.log(totalBlocks,'/',activeRound);
+                v.averageBlocks = Number(totalBlocks / activeRound);
+              } else {
+                v.averageBlocks = 0;
+              }
+
+              //current blocks
+              const findCurrent = getCollector10BlocksRes.blocks.find(
+                (sv) =>
+                  sv.account.toLowerCase() == v.id.toLowerCase() &&
+                  Number(sv.roundIndex) == this.currentRoundIndex
+              );
+              if (findCurrent) {
+                v.currentBlocks = Number(findCurrent.blocks_count);
+              } else {
+                v.currentBlocks = 0;
+              }
+            });
+
             for (let index = 0; index < nominatorRes.length; index++) {
               const element = nominatorRes[index];
               element.rankIndex = index;
+              element.apr = self.getAPR(element);
             }
+
             this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
               "moonbeamCollectorSortList",
@@ -1625,14 +1727,20 @@ export default {
           let chartId = `tableChart${v.id}`;
           const charInstance = echarts.init(this.$refs[chartId]);
           charInstance.setOption({
+            tooltip: {
+              appendToBody: true,
+              confine: true,
+              trigger: "axis",
+              //formatter: "{b0}: {c0}",
+            },
             grid: {
               left: 0,
-              top: 0,
+              top: 20,
               bottom: 0,
               right: 0,
             },
             xAxis: {
-              data: v.historyReward.map((v) => "round" + v.roundIndex),
+              data: v.historyReward.map((v) => "round " + v.roundIndex),
               axisLine: {
                 show: false,
               },
@@ -1643,43 +1751,51 @@ export default {
                 show: false,
               },
             },
-            yAxis: {
-              axisLabel: {
+            yAxis: [
+              {
+                type: "value",
+                name: "rewards",
                 show: false,
+                axisLabel: {
+                  show: false,
+                },
+                splitLine: {
+                  show: false,
+                },
               },
-              splitLine: {
+              {
+                type: "value",
+                name: "blocks",
                 show: false,
+                axisLabel: {
+                  show: false,
+                },
+                splitLine: {
+                  show: false,
+                },
               },
-            },
+            ],
             series: [
               {
-                name: "balance",
-                type: "line",
+                name: "rewards",
+                type: "bar",
+                yAxisIndex: 0,
                 data: v.historyReward.map((v) => v.reward.toNumber()),
                 itemStyle: {
                   color: "#17c684",
                 },
                 symbol: "none",
                 silent: true,
-                areaStyle: {
-                  color: {
-                    type: "linear",
-                    x: 0,
-                    y: 0,
-                    x2: 0,
-                    y2: 1,
-                    colorStops: [
-                      {
-                        offset: 0,
-                        color: "rgba(105, 231, 201, 0.35)", // 0% 处的颜色
-                      },
-                      {
-                        offset: 1,
-                        color: "rgba(56, 203, 152, 0)", // 100% 处的颜色
-                      },
-                    ],
-                  },
+              },
+              {
+                name: "blocks",
+                type: "line",
+                yAxisIndex: 1,
+                data: v.historyBlock.map((v) => v.blocks_count),
+                itemStyle: {
+                  color: "#A9DF96",
                 },
+                symbol: "none",
               },
             ],
           });
@@ -2229,7 +2345,7 @@ export default {
       position: relative;
       .table-chart {
         width: 216px;
-        height: 69px;
+        height: 90px;
       }
       .rank-icon {
         display: inline-block;
