@@ -154,13 +154,26 @@
           @sort-change="sortChange"
         >
           <el-table-column label="Rank" width="90">
+            <template slot="header" slot-scope="scope">
+              <div>
+                Rank
+                <el-tooltip placement="top" trigger="hover">
+                  <div slot="content" class="tooltip-300px">
+                    Current Rank by total stake of collator.
+                    <br />
+                    <br />
+                    The green icon means the current collator was choosen and
+                    produce blocks in current round.
+                  </div>
+                  <i class="el-icon-warning-outline"></i>
+                </el-tooltip>
+              </div>
+            </template>
             <template slot-scope="scope">
               <div
                 class="rank-icon"
                 :class="{
-                  first: scope.row.rankIndex + 1 == 1,
-                  second: scope.row.rankIndex + 1 == 2,
-                  third: scope.row.rankIndex + 1 == 3,
+                  'active-block-producer': scope.row.activeBlockProducer,
                 }"
               >
                 {{ scope.row.rankIndex + 1 }}
@@ -897,6 +910,7 @@ import moonriverService from "@/api/moonBeam";
 // import { ApiPromise, WsProvider } from "@polkadot/api";
 // import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 export default {
+  name: "moonbeam-staking-board",
   components: {
     IdentityIconPlus,
   },
@@ -942,6 +956,8 @@ export default {
       },
 
       sort4DisplayConfig: { prop: "", order: "" },
+
+      activeCollators: [],
     };
   },
   async created() {
@@ -1449,6 +1465,7 @@ export default {
             moonriverService.getCollatorTotalReward({
               collators: collatorAccounts,
             });
+
           // 获取Collator的历史10次reward
           const getCollector10RewardPromise =
             moonriverService.getCollatorReward({
@@ -1456,11 +1473,13 @@ export default {
               endRoundIndex: this.endRoundIndex,
               accounts: collatorAccounts,
             });
+
           // 获取Nominator的历史10次totalStake
           const getNominator10TotalStakePromise = moonriverService.atStake({
             startRoundIndex: this.startRoundIndex,
             endRoundIndex: this.endRoundIndex,
           });
+
           // 获取Nominator的历史10次totalReward
           const getNominator10RewardPromise =
             moonriverService.getNominatorReward({
@@ -1475,6 +1494,11 @@ export default {
               endRoundIndex: this.currentRoundIndex,
               accounts: collatorAccounts,
             });
+
+          // 获取在当前round开始运行前，已经选中的若干个collator节点列表
+          const getSelectedCollators4CurrentRoundPromise =
+            moonriverService.getSelectedCollators4CurrentRound({});
+
           const allPromiseArr = [
             getCollectorDetailPromise,
             getCollectorTotalRewardPromise,
@@ -1482,6 +1506,7 @@ export default {
             getNominator10TotalStakePromise,
             getNominator10RewardPromise,
             getCollector10BlocksPromise,
+            getSelectedCollators4CurrentRoundPromise,
           ];
 
           Promise.all(allPromiseArr).then((d) => {
@@ -1696,10 +1721,17 @@ export default {
               }
             });
 
+            //当前round已经选中的若干个collator节点列表,作为Block生产者
+            this.activeCollators = d[6];
+
             for (let index = 0; index < nominatorRes.length; index++) {
               const element = nominatorRes[index];
               element.rankIndex = index;
               element.apr = self.getAPR(element);
+              let findIndex = this.activeCollators.findIndex(
+                (v) => v.toLowerCase() == element.id.toLowerCase()
+              );
+              element.activeBlockProducer = findIndex >= 0;
             }
 
             this.tableData = this.sort4Display(nominatorRes);
@@ -2347,9 +2379,15 @@ export default {
         width: 216px;
         height: 90px;
       }
+      .active-block-producer {
+        background: #19D991 !important;
+      }
       .rank-icon {
-        display: inline-block;
-        padding: 1px 9px;
+        display: inline-block; 
+        text-align: center;  
+        line-height: 30px;     
+        width:30px;
+        height: 30px;
         background: #f5f7f9;
         border-radius: 50%;
         font-size: 14px;
