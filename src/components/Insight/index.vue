@@ -60,7 +60,7 @@ export default {
       this.$router.push({
         name: "InsightDetail",
         query: {
-          link: v.link,
+          link: `${v.link}#${window.BASE_API}/static/parachain-icon/${v.icon}`,
           name:v.name
         },
       });
