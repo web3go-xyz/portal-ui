@@ -958,6 +958,8 @@ export default {
       sort4DisplayConfig: { prop: "", order: "" },
 
       activeCollators: [],
+
+      roundsPickedByDropdown: 10, //默认计算Avg Blocks的round数， 前10个round
     };
   },
   async created() {
@@ -989,6 +991,12 @@ export default {
         (this.pageIndex - 1) * this.pageSize,
         this.pageIndex * this.pageSize
       );
+    },
+    startRoundIndex4AverageBlocksCalculation() {
+      return this.roundInfo.current - 1 - (this.roundsPickedByDropdown || 0);
+    },
+    endRoundIndex4AverageBlocksCalculation() {
+      return this.roundInfo.current - 1;
     },
     startRoundIndex() {
       return this.roundInfo.current - 11 - 0;
@@ -1495,6 +1503,14 @@ export default {
               accounts: collatorAccounts,
             });
 
+          // 根据下拉框获取Collator的历史produced blocks count，用于计算Average Blocks
+          const getCollectorBlocks4AvgBlocksCalculationPromise =
+            moonriverService.getCollatorProducedBlocks({
+              startRoundIndex: this.startRoundIndex4AverageBlocksCalculation,
+              endRoundIndex: this.endRoundIndex4AverageBlocksCalculation,
+              accounts: collatorAccounts,
+            });
+
           // 获取在当前round开始运行前，已经选中的若干个collator节点列表
           const getSelectedCollators4CurrentRoundPromise =
             moonriverService.getSelectedCollators4CurrentRound({});
@@ -1507,6 +1523,7 @@ export default {
             getNominator10RewardPromise,
             getCollector10BlocksPromise,
             getSelectedCollators4CurrentRoundPromise,
+            getCollectorBlocks4AvgBlocksCalculationPromise,
           ];
 
           Promise.all(allPromiseArr).then((d) => {
@@ -1676,8 +1693,6 @@ export default {
             const getCollector10BlocksRes = d[5];
             nominatorRes.forEach((v) => {
               const arr = [];
-              let totalBlocks = 0;
-              let activeRound = 0;
               for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
                 const find = getCollector10BlocksRes.blocks.find(
                   (sv) =>
@@ -1685,8 +1700,6 @@ export default {
                     Number(sv.roundIndex) == i
                 );
                 if (find) {
-                  activeRound++;
-                  totalBlocks += Number(find.blocks_count);
                   arr.push({
                     roundIndex: i,
                     blocks_count: Number(find.blocks_count),
@@ -1699,14 +1712,6 @@ export default {
                 }
               }
               v.historyBlock = arr;
-
-              //averageBlocks
-              if (activeRound > 0) {
-                // console.log(totalBlocks,'/',activeRound);
-                v.averageBlocks = Number(totalBlocks / activeRound);
-              } else {
-                v.averageBlocks = 0;
-              }
 
               //current blocks
               const findCurrent = getCollector10BlocksRes.blocks.find(
@@ -1733,6 +1738,31 @@ export default {
               );
               element.activeBlockProducer = findIndex >= 0;
             }
+
+            // 计算平均出块数量
+            const getCollectorBlocks4AverageBlocksCalculationResult = d[7];
+            nominatorRes.forEach((v) => { 
+              let totalBlocks = 0;
+              let activeRound = 0;   
+                       
+              for (let i = this.startRoundIndex4AverageBlocksCalculation; i <= this.endRoundIndex4AverageBlocksCalculation; i++) {
+                const find = getCollectorBlocks4AverageBlocksCalculationResult.blocks.find(
+                  (sv) =>
+                    sv.account.toLowerCase() == v.id.toLowerCase() &&
+                    Number(sv.roundIndex) == i
+                );
+                if (find) {
+                  activeRound++;
+                  totalBlocks += Number(find.blocks_count);                  
+                }  
+              }
+              //averageBlocks
+              if (activeRound > 0) {
+                v.averageBlocks = Number(totalBlocks / activeRound);
+              } else {
+                v.averageBlocks = 0;
+              }             
+            });
 
             this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
@@ -2380,13 +2410,13 @@ export default {
         height: 90px;
       }
       .active-block-producer {
-        background: #19D991 !important;
+        background: #19d991 !important;
       }
       .rank-icon {
-        display: inline-block; 
-        text-align: center;  
-        line-height: 30px;     
-        width:30px;
+        display: inline-block;
+        text-align: center;
+        line-height: 30px;
+        width: 30px;
         height: 30px;
         background: #f5f7f9;
         border-radius: 50%;
