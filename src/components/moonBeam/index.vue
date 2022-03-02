@@ -148,6 +148,23 @@
         <el-tab-pane label="My Stake" name="2"></el-tab-pane>
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
+        <div class="select-wrap">
+          <span>calculate APR by </span>
+          <el-select
+            @change="changeSelect"
+            v-model="roundSelect"
+            collapse-tags
+          >
+            <el-option
+              v-for="item in 30"
+              :key="item "
+              :label="item "
+              :value="item "
+            >
+            </el-option>
+          </el-select>
+          <span>rounds</span>
+        </div>
         <el-table
           v-loading="loading"
           :data="onePageTableData"
@@ -916,6 +933,8 @@ export default {
   },
   data() {
     return {
+      selectRoundList: [],
+      roundSelect: 10,
       auto_notify_at_my_stake_active: 1,
       auto_notify_at_my_stake_inactive: 0,
       scrollHandler: null,
@@ -1027,6 +1046,7 @@ export default {
     },
   },
   methods: {
+    changeSelect() {},
     clearSubscribe() {
       let self = this;
       moonriverService
@@ -2405,6 +2425,16 @@ export default {
     }
     .tab-content1 {
       position: relative;
+      .select-wrap {
+        align-items: center;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+        /deep/ .el-select{
+          margin:0 10px;
+          width: 68px;
+        }
+      }
       .table-chart {
         width: 216px;
         height: 90px;
