@@ -322,7 +322,7 @@ export default {
           lable: "Karura",
           value: "Karura",
           refers: {
-            schema: "ido-price",
+            schema: "ido-karura-cdp",
             tables: [
               "chain_state",
               "chain_statistic",
@@ -336,7 +336,7 @@ export default {
           lable: "Moonriver",
           value: "Moonriver",
           refers: {
-            schema: "ido-moonriver",
+            schema: "ido-moonriver-staking",
             tables: [
               "round_info",
               "round_collator",
@@ -365,7 +365,7 @@ export default {
           lable: "Polkdot Crowdloan",
           value: "Polkdot Crowdloan",
           refers: {
-            schema: "ido-polkadot",
+            schema: "ido-polkadot-crowdloan",
             tables: [
               "polk_para_chain",
               "polk_para_chain_crowdloan",

@@ -399,7 +399,7 @@ export default {
     let self = this;
 
     let days = this.$moment()
-      .subtract(30 * 6, "days")
+      .subtract(30 * 12, "days")
       .format("YYYY-MM-DD");
     self.kLine_startTime = new Date(days).getTime();
 
