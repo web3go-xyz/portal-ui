@@ -149,10 +149,10 @@
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
         <div class="select-wrap">
-          <span>calculate APR by </span>
+          <span>Calculate Avg Blocks By  </span>
           <el-select
             @change="changeSelect"
-            v-model="roundSelect"
+            v-model="roundsPickedByDropdown"
             collapse-tags
           >
             <el-option
@@ -163,7 +163,7 @@
             >
             </el-option>
           </el-select>
-          <span>rounds</span>
+          <span>Round</span>
         </div>
         <el-table
           v-loading="loading"
@@ -285,7 +285,7 @@
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     Average Blocks in past 10 round which has been rewarded (
-                    round {{ startRoundIndex }} - {{ endRoundIndex }} ).
+                    round {{ startRoundIndex4AverageBlocksCalculation }} - {{ endRoundIndex }} ).
                     <br /><br />
                   </div>
                   <i class="el-icon-warning-outline"></i>
@@ -934,7 +934,6 @@ export default {
   data() {
     return {
       selectRoundList: [],
-      roundSelect: 10,
       auto_notify_at_my_stake_active: 1,
       auto_notify_at_my_stake_inactive: 0,
       scrollHandler: null,
@@ -1046,7 +1045,10 @@ export default {
     },
   },
   methods: {
-    changeSelect() {},
+    changeSelect() {
+      this.loading=true;
+      this.getAllData();
+    },
     clearSubscribe() {
       let self = this;
       moonriverService
@@ -1265,7 +1267,6 @@ export default {
       return roundPerYear;
     },
     getAPR(v) {
-      // console.log(v.averageBlocks);
       let roundPerYear = this.getRoundPerYear();
       // APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) * Round_Per_Year * 100%
       let totalStake = this.getTotalStake(v).toNumber();
@@ -1542,8 +1543,8 @@ export default {
             getNominator10TotalStakePromise,
             getNominator10RewardPromise,
             getCollector10BlocksPromise,
-            getSelectedCollators4CurrentRoundPromise,
             getCollectorBlocks4AvgBlocksCalculationPromise,
+            getSelectedCollators4CurrentRoundPromise,
           ];
 
           Promise.all(allPromiseArr).then((d) => {
@@ -1746,21 +1747,9 @@ export default {
               }
             });
 
-            //当前round已经选中的若干个collator节点列表,作为Block生产者
-            this.activeCollators = d[6];
-
-            for (let index = 0; index < nominatorRes.length; index++) {
-              const element = nominatorRes[index];
-              element.rankIndex = index;
-              element.apr = self.getAPR(element);
-              let findIndex = this.activeCollators.findIndex(
-                (v) => v.toLowerCase() == element.id.toLowerCase()
-              );
-              element.activeBlockProducer = findIndex >= 0;
-            }
 
             // 计算平均出块数量
-            const getCollectorBlocks4AverageBlocksCalculationResult = d[7];
+            const getCollectorBlocks4AverageBlocksCalculationResult = d[6];
             nominatorRes.forEach((v) => { 
               let totalBlocks = 0;
               let activeRound = 0;   
@@ -1783,7 +1772,18 @@ export default {
                 v.averageBlocks = 0;
               }             
             });
+              //当前round已经选中的若干个collator节点列表,作为Block生产者
+            this.activeCollators = d[7];
 
+            for (let index = 0; index < nominatorRes.length; index++) {
+              const element = nominatorRes[index];
+              element.rankIndex = index;
+              element.apr = self.getAPR(element);
+              let findIndex = this.activeCollators.findIndex(
+                (v) => v.toLowerCase() == element.id.toLowerCase()
+              );
+              element.activeBlockProducer = findIndex >= 0;
+            }
             this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
               "moonbeamCollectorSortList",
@@ -1935,7 +1935,6 @@ export default {
         // handle other "switch" errors
       }
       const solveAccounts = (accs) => {
-        console.log("111");
         if (accs.length === 0) {
           console.error("无法获取账号，Metamask 是否正确配置？");
           return;
