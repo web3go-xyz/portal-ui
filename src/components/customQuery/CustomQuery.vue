@@ -333,7 +333,7 @@ export default {
           },
         },
         {
-          lable: "Moonriver",
+          lable: "Moonriver Staking",
           value: "Moonriver",
           refers: {
             schema: "ido-moonriver-staking",
