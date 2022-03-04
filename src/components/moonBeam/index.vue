@@ -148,6 +148,23 @@
         <el-tab-pane label="My Stake" name="2"></el-tab-pane>
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
+        <div class="select-wrap">
+          <span>Calculate Avg Blocks By </span>
+          <el-select
+            @change="changeSelect"
+            v-model="roundsPickedByDropdown"
+            collapse-tags
+          >
+            <el-option
+              v-for="item in roundsDropdown"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
+          <span>Round</span>
+        </div>
         <el-table
           v-loading="loading"
           :data="onePageTableData"
@@ -268,8 +285,8 @@
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     Average Blocks in past 10 round which has been rewarded (
-                    round {{ startRoundIndex }} - {{ endRoundIndex }} ).
-                    <br /><br />
+                    round {{ startRoundIndex4AverageBlocksCalculation }} -
+                    {{ endRoundIndex }} ). <br /><br />
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
@@ -916,6 +933,7 @@ export default {
   },
   data() {
     return {
+      selectRoundList: [],
       auto_notify_at_my_stake_active: 1,
       auto_notify_at_my_stake_inactive: 0,
       scrollHandler: null,
@@ -958,6 +976,9 @@ export default {
       sort4DisplayConfig: { prop: "", order: "" },
 
       activeCollators: [],
+
+      roundsPickedByDropdown: 10, //默认计算Avg Blocks的round数， 前10个round
+      roundsDropdown: [1, 3, 4, 5, 8, 10, 12, 15, 18, 20, 25, 28, 30],
     };
   },
   async created() {
@@ -990,6 +1011,12 @@ export default {
         this.pageIndex * this.pageSize
       );
     },
+    startRoundIndex4AverageBlocksCalculation() {
+      return this.roundInfo.current - 1 - (this.roundsPickedByDropdown || 0);
+    },
+    endRoundIndex4AverageBlocksCalculation() {
+      return this.roundInfo.current - 1;
+    },
     startRoundIndex() {
       return this.roundInfo.current - 11 - 0;
     },
@@ -1019,6 +1046,10 @@ export default {
     },
   },
   methods: {
+    changeSelect() {
+      this.loading = true;
+      this.getAllData(); //TODO
+    },
     clearSubscribe() {
       let self = this;
       moonriverService
@@ -1237,7 +1268,6 @@ export default {
       return roundPerYear;
     },
     getAPR(v) {
-      // console.log(v.averageBlocks);
       let roundPerYear = this.getRoundPerYear();
       // APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) * Round_Per_Year * 100%
       let totalStake = this.getTotalStake(v).toNumber();
@@ -1495,6 +1525,14 @@ export default {
               accounts: collatorAccounts,
             });
 
+          // 根据下拉框获取Collator的历史produced blocks count，用于计算Average Blocks
+          const getCollectorBlocks4AvgBlocksCalculationPromise =
+            moonriverService.getCollatorProducedBlocks({
+              startRoundIndex: this.startRoundIndex4AverageBlocksCalculation,
+              endRoundIndex: this.endRoundIndex4AverageBlocksCalculation,
+              accounts: collatorAccounts,
+            });
+
           // 获取在当前round开始运行前，已经选中的若干个collator节点列表
           const getSelectedCollators4CurrentRoundPromise =
             moonriverService.getSelectedCollators4CurrentRound({});
@@ -1506,6 +1544,7 @@ export default {
             getNominator10TotalStakePromise,
             getNominator10RewardPromise,
             getCollector10BlocksPromise,
+            getCollectorBlocks4AvgBlocksCalculationPromise,
             getSelectedCollators4CurrentRoundPromise,
           ];
 
@@ -1676,8 +1715,6 @@ export default {
             const getCollector10BlocksRes = d[5];
             nominatorRes.forEach((v) => {
               const arr = [];
-              let totalBlocks = 0;
-              let activeRound = 0;
               for (let i = this.startRoundIndex; i <= this.endRoundIndex; i++) {
                 const find = getCollector10BlocksRes.blocks.find(
                   (sv) =>
@@ -1685,8 +1722,6 @@ export default {
                     Number(sv.roundIndex) == i
                 );
                 if (find) {
-                  activeRound++;
-                  totalBlocks += Number(find.blocks_count);
                   arr.push({
                     roundIndex: i,
                     blocks_count: Number(find.blocks_count),
@@ -1699,14 +1734,6 @@ export default {
                 }
               }
               v.historyBlock = arr;
-
-              //averageBlocks
-              if (activeRound > 0) {
-                // console.log(totalBlocks,'/',activeRound);
-                v.averageBlocks = Number(totalBlocks / activeRound);
-              } else {
-                v.averageBlocks = 0;
-              }
 
               //current blocks
               const findCurrent = getCollector10BlocksRes.blocks.find(
@@ -1721,8 +1748,38 @@ export default {
               }
             });
 
+            // 计算平均出块数量
+            const getCollectorBlocks4AverageBlocksCalculationResult = d[6];
+            nominatorRes.forEach((v) => {
+              let totalBlocks = 0;
+              let activeRound = 0;
+
+              for (
+                let i = this.startRoundIndex4AverageBlocksCalculation;
+                i <= this.endRoundIndex4AverageBlocksCalculation;
+                i++
+              ) {
+                const find =
+                  getCollectorBlocks4AverageBlocksCalculationResult.blocks.find(
+                    (sv) =>
+                      sv.account.toLowerCase() == v.id.toLowerCase() &&
+                      Number(sv.roundIndex) == i
+                  );
+                if (find) {
+                  activeRound++;
+                  totalBlocks += Number(find.blocks_count);
+                }
+              }
+              //averageBlocks
+              if (activeRound > 0) {
+                v.averageBlocks = Number(totalBlocks / activeRound);
+              } else {
+                v.averageBlocks = 0;
+              }
+            });
+
             //当前round已经选中的若干个collator节点列表,作为Block生产者
-            this.activeCollators = d[6];
+            this.activeCollators = d[7];
 
             for (let index = 0; index < nominatorRes.length; index++) {
               const element = nominatorRes[index];
@@ -1733,7 +1790,6 @@ export default {
               );
               element.activeBlockProducer = findIndex >= 0;
             }
-
             this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
               "moonbeamCollectorSortList",
@@ -1885,7 +1941,6 @@ export default {
         // handle other "switch" errors
       }
       const solveAccounts = (accs) => {
-        console.log("111");
         if (accs.length === 0) {
           console.error("无法获取账号，Metamask 是否正确配置？");
           return;
@@ -2375,18 +2430,28 @@ export default {
     }
     .tab-content1 {
       position: relative;
+      .select-wrap {
+        align-items: center;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+        /deep/ .el-select {
+          margin: 0 10px;
+          width: 68px;
+        }
+      }
       .table-chart {
         width: 216px;
         height: 90px;
       }
       .active-block-producer {
-        background: #19D991 !important;
+        background: #19d991 !important;
       }
       .rank-icon {
-        display: inline-block; 
-        text-align: center;  
-        line-height: 30px;     
-        width:30px;
+        display: inline-block;
+        text-align: center;
+        line-height: 30px;
+        width: 30px;
         height: 30px;
         background: #f5f7f9;
         border-radius: 50%;
