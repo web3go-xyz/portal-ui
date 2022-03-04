@@ -149,17 +149,17 @@
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
         <div class="select-wrap">
-          <span>Calculate Avg Blocks By  </span>
+          <span>Calculate Avg Blocks By </span>
           <el-select
             @change="changeSelect"
             v-model="roundsPickedByDropdown"
             collapse-tags
           >
             <el-option
-              v-for="item in 30"
-              :key="item "
-              :label="item "
-              :value="item "
+              v-for="item in roundsDropdown"
+              :key="item"
+              :label="item"
+              :value="item"
             >
             </el-option>
           </el-select>
@@ -285,8 +285,8 @@
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     Average Blocks in past 10 round which has been rewarded (
-                    round {{ startRoundIndex4AverageBlocksCalculation }} - {{ endRoundIndex }} ).
-                    <br /><br />
+                    round {{ startRoundIndex4AverageBlocksCalculation }} -
+                    {{ endRoundIndex }} ). <br /><br />
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
@@ -978,6 +978,7 @@ export default {
       activeCollators: [],
 
       roundsPickedByDropdown: 10, //默认计算Avg Blocks的round数， 前10个round
+      roundsDropdown: [1, 3, 4, 5, 8, 10, 12, 15, 18, 20, 25, 28, 30],
     };
   },
   async created() {
@@ -1046,8 +1047,8 @@ export default {
   },
   methods: {
     changeSelect() {
-      this.loading=true;
-      this.getAllData();
+      this.loading = true;
+      this.getAllData(); //TODO
     },
     clearSubscribe() {
       let self = this;
@@ -1747,32 +1748,37 @@ export default {
               }
             });
 
-
             // 计算平均出块数量
             const getCollectorBlocks4AverageBlocksCalculationResult = d[6];
-            nominatorRes.forEach((v) => { 
+            nominatorRes.forEach((v) => {
               let totalBlocks = 0;
-              let activeRound = 0;   
-                       
-              for (let i = this.startRoundIndex4AverageBlocksCalculation; i <= this.endRoundIndex4AverageBlocksCalculation; i++) {
-                const find = getCollectorBlocks4AverageBlocksCalculationResult.blocks.find(
-                  (sv) =>
-                    sv.account.toLowerCase() == v.id.toLowerCase() &&
-                    Number(sv.roundIndex) == i
-                );
+              let activeRound = 0;
+
+              for (
+                let i = this.startRoundIndex4AverageBlocksCalculation;
+                i <= this.endRoundIndex4AverageBlocksCalculation;
+                i++
+              ) {
+                const find =
+                  getCollectorBlocks4AverageBlocksCalculationResult.blocks.find(
+                    (sv) =>
+                      sv.account.toLowerCase() == v.id.toLowerCase() &&
+                      Number(sv.roundIndex) == i
+                  );
                 if (find) {
                   activeRound++;
-                  totalBlocks += Number(find.blocks_count);                  
-                }  
+                  totalBlocks += Number(find.blocks_count);
+                }
               }
               //averageBlocks
               if (activeRound > 0) {
                 v.averageBlocks = Number(totalBlocks / activeRound);
               } else {
                 v.averageBlocks = 0;
-              }             
+              }
             });
-              //当前round已经选中的若干个collator节点列表,作为Block生产者
+
+            //当前round已经选中的若干个collator节点列表,作为Block生产者
             this.activeCollators = d[7];
 
             for (let index = 0; index < nominatorRes.length; index++) {
@@ -2429,8 +2435,8 @@ export default {
         display: flex;
         justify-content: flex-end;
         margin-bottom: 10px;
-        /deep/ .el-select{
-          margin:0 10px;
+        /deep/ .el-select {
+          margin: 0 10px;
           width: 68px;
         }
       }
