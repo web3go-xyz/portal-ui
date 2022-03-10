@@ -321,11 +321,12 @@
                   <div slot="content" class="tooltip-300px">
                     APR means the annualized income pledged to the current
                     collator.<br />
-                    <br />Nearly {{ getRoundPerYear() }} rounds per year.
+                    <!-- <br />Nearly {{ getRoundPerYear() }} rounds per year. -->
                     <br />
                     <br />
-                    APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) *
-                    Round_Per_Year * 100%
+                    <!-- APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) *
+                    Round_Per_Year * 100% -->
+                   APR Formula = 0.00001388888888888889 *  total_supply   *  avg_blocks_per_round  /  collator_counted_stake  * 100%
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
@@ -1026,6 +1027,9 @@ export default {
     currentRoundIndex() {
       return this.roundInfo.current;
     },
+    totalSupply(){
+      return this.roundInfo.totalIssuance;
+    },
     totalCollectorStake() {
       let result = BigNumber(0);
 
@@ -1267,12 +1271,24 @@ export default {
       let roundPerYear = Math.ceil((365 * 24 * 3600) / 12 / blockPerRound);
       return roundPerYear;
     },
-    getAPR(v) {
+    getAPR_Obsolete(v) {
       let roundPerYear = this.getRoundPerYear();
       // APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) * Round_Per_Year * 100%
       let totalStake = this.getTotalStake(v).toNumber();
       let avg_Blocks = Number(v.averageBlocks);
       return 9.35 * (avg_Blocks / totalStake) * roundPerYear * 100;
+    },
+    getAPR(v) {
+      // 0.00001388888888888889 * <total_supply>  * <avg_blocks_per_round> / <collator_counted_stake>
+      let total_supply = this.totalSupply;
+      let collator_counted_stake = this.getTotalStake(v).toNumber();
+      let avg_blocks_per_round = Number(v.averageBlocks);
+      console.log('total_supply:',total_supply,' collator_counted_stake:',collator_counted_stake,' avg_blocks_per_round:',avg_blocks_per_round);
+      return (
+        ((0.00001388888888888889 * total_supply * avg_blocks_per_round) /
+          collator_counted_stake) *
+        100
+      );
     },
     resetAccountFilter() {
       this.searchAccount = this.linkAccount ? this.linkAccount.address : "";
