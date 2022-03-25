@@ -36,6 +36,11 @@ import Moonbeam from "@/components/moonBeam/index";
 import MoonbeamCollectorDetail from "@/components/moonBeam/CollectorDetail";
 import MoonbeamDelegatorDetail from "@/components/moonBeam/DelegatorDetail";
 
+import StakingTemplateA from "@/components/staking/templateA/index";
+import StakingTemplateA_CollectorDetail from "@/components/staking/templateA/CollectorDetail";
+import StakingTemplateA_DelegatorDetail from "@/components/staking/templateA/DelegatorDetail";
+
+
 import MaintenanceDashboard from "@/components/sysConfig/MaintenanceDashboard";
 import AddressTagManage from "@/components/sysConfig/sub/AddressTagManage";
 import ParaChainManage from "@/components/sysConfig/sub/ParaChainManage";
@@ -50,6 +55,8 @@ import NFTMintMaster from "@/components/nft/NFTMintMaster";
 import NFTGraph from "@/components/nft/NFTGraph";
 import NFTTimeMachine from "@/components/nft/NFTTimeMachine";
 
+
+
 Vue.use(Router);
 
 //fix  NavigationDuplicated: Avoided redundant navigation to current location
@@ -59,264 +66,294 @@ Router.prototype.push = function push(location) {
 }
 export default new Router({
     routes: [{
-            path: "/",
-            name: "HomePage",
-            component: HomePage
+        path: "/",
+        name: "HomePage",
+        component: HomePage
+    },
+    {
+        path: "/ProfileHome",
+        name: "ProfileHome",
+        meta: {
+            parent: 'Profile'
         },
-        {
-            path: "/ProfileHome",
-            name: "ProfileHome",
-            meta: {
-                parent: 'Profile'
-            },
-            component: ProfileHome
+        component: ProfileHome
+    },
+    {
+        path: "/Insight",
+        name: "Insight",
+        meta: {
+            parent: 'Insight'
         },
-        {
-            path: "/Insight",
-            name: "Insight",
-            meta: {
-                parent: 'Insight'
-            },
-            component: Insight
+        component: Insight
+    },
+    {
+        path: "/InsightDetail",
+        name: "InsightDetail",
+        meta: {
+            parent: 'Insight'
         },
-        {
-            path: "/InsightDetail",
-            name: "InsightDetail",
-            meta: {
-                parent: 'Insight'
-            },
-            component: InsightDetail
+        component: InsightDetail
+    },
+    {
+        path: "/ProfileIndex/:nav?",
+        name: "ProfileIndex",
+        meta: {
+            parent: 'Profile'
         },
-        {
-            path: "/ProfileIndex/:nav?",
-            name: "ProfileIndex",
-            meta: {
-                parent: 'Profile'
-            },
-            component: ProfileIndex
+        component: ProfileIndex
+    },
+    {
+        path: "/NFTProfiler",
+        name: "NFTProfiler",
+        component: NFTProfiler
+    },
+    {
+        path: "/NftDetail",
+        name: "NftDetail",
+        component: NftDetail
+    },
+    {
+        path: "/NftDetailBeakdown",
+        name: "NftDetailBeakdown",
+        component: NftDetailBeakdown
+    },
+    {
+        path: "/NftItemDetail",
+        name: "NftItemDetail",
+        component: NftItemDetail
+    },
+    {
+        path: "/NFTMintMaster",
+        name: "NFTMintMaster",
+        component: NFTMintMaster
+    },
+    {
+        path: "/NFTGraph",
+        name: "NFTGraph",
+        component: NFTGraph
+    },
+    {
+        path: "/NFTTimeMachine",
+        name: "NFTTimeMachine",
+        component: NFTTimeMachine
+    },
+    {
+        path: "/Login",
+        name: "Login",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/NFTProfiler",
-            name: "NFTProfiler",
-            component: NFTProfiler
+        component: Login
+    },
+    {
+        path: "/Register",
+        name: "Register",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/NftDetail",
-            name: "NftDetail",
-            component: NftDetail
+        component: Register
+    },
+    {
+        path: "/UserInfo",
+        name: "UserInfo",
+        component: UserInfo
+    },
+    {
+        path: "/VerifyEmail",
+        name: "VerifyEmail",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/NftDetailBeakdown",
-            name: "NftDetailBeakdown",
-            component: NftDetailBeakdown
+        component: VerifyEmail
+    },
+    {
+        path: "/VerifyCode",
+        name: "VerifyCode",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/NftItemDetail",
-            name: "NftItemDetail",
-            component: NftItemDetail
+        component: VerifyCode
+    },
+    {
+        path: "/ResetPsd",
+        name: "ResetPsd",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/NFTMintMaster",
-            name: "NFTMintMaster",
-            component: NFTMintMaster
-        },
-        {
-            path: "/NFTGraph",
-            name: "NFTGraph",
-            component: NFTGraph
-        },
-        {
-            path: "/NFTTimeMachine",
-            name: "NFTTimeMachine",
-            component: NFTTimeMachine
-        },
-        {
-            path: "/Login",
-            name: "Login",
-            meta: {
-                noHead: true
-            },
-            component: Login
-        },
-        {
-            path: "/Register",
-            name: "Register",
-            meta: {
-                noHead: true
-            },
-            component: Register
-        },
-        {
-            path: "/UserInfo",
-            name: "UserInfo",
-            component: UserInfo
-        },
-        {
-            path: "/VerifyEmail",
-            name: "VerifyEmail",
-            meta: {
-                noHead: true
-            },
-            component: VerifyEmail
-        },
-        {
-            path: "/VerifyCode",
-            name: "VerifyCode",
-            meta: {
-                noHead: true
-            },
-            component: VerifyCode
-        },
-        {
-            path: "/ResetPsd",
-            name: "ResetPsd",
-            meta: {
-                noHead: true
-            },
-            component: ResetPsd
-        },
-        {
-            path: "/WalletProfiler",
-            name: "WalletProfiler",
-            component: WalletProfiler
-        },
+        component: ResetPsd
+    },
+    {
+        path: "/WalletProfiler",
+        name: "WalletProfiler",
+        component: WalletProfiler
+    },
 
-        {
-            path: "/WalletProfilerDetail",
-            name: "WalletProfilerDetail",
-            meta: {
-                noHead: true
-            },
-            component: WalletProfilerDetail
+    {
+        path: "/WalletProfilerDetail",
+        name: "WalletProfilerDetail",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/WalletLabelSetting",
-            name: "WalletLabelSetting",
-            component: WalletLabelSetting
-        },
+        component: WalletProfilerDetail
+    },
+    {
+        path: "/WalletLabelSetting",
+        name: "WalletLabelSetting",
+        component: WalletLabelSetting
+    },
 
-        {
-            path: "/ParaChainProfiler",
-            name: "ParaChainProfiler",
-            component: ParaChainProfiler4Kusama
-        },
-        {
-            path: "/ParaChainProfiler4Polkadot",
-            name: "ParaChainProfiler4Polkadot",
-            component: ParaChainProfiler4Polkadot
-        },
-        {
-            path: "/ParaChainCrowdloanContributionDetail",
-            name: "ParaChainCrowdloanContributionDetail",
-            component: ParaChainCrowdloanContributionDetail4Kusama
-        },
-        {
-            path: "/ParaChainCrowdloanContributionDetail4Polkadot",
-            name: "ParaChainCrowdloanContributionDetail4Polkadot",
-            component: ParaChainCrowdloanContributionDetail4Polkadot
-        },
-        {
-            path: "/CDPProfiler",
-            name: "CDPProfiler",
-            component: CDPProfiler
-        },
+    {
+        path: "/ParaChainProfiler",
+        name: "ParaChainProfiler",
+        component: ParaChainProfiler4Kusama
+    },
+    {
+        path: "/ParaChainProfiler4Polkadot",
+        name: "ParaChainProfiler4Polkadot",
+        component: ParaChainProfiler4Polkadot
+    },
+    {
+        path: "/ParaChainCrowdloanContributionDetail",
+        name: "ParaChainCrowdloanContributionDetail",
+        component: ParaChainCrowdloanContributionDetail4Kusama
+    },
+    {
+        path: "/ParaChainCrowdloanContributionDetail4Polkadot",
+        name: "ParaChainCrowdloanContributionDetail4Polkadot",
+        component: ParaChainCrowdloanContributionDetail4Polkadot
+    },
+    {
+        path: "/CDPProfiler",
+        name: "CDPProfiler",
+        component: CDPProfiler
+    },
 
-        {
-            path: "/CDPDetail",
-            name: "CDPDetail",
-            meta: {
-                noHead: true
-            },
-            component: CDPDetail
+    {
+        path: "/CDPDetail",
+        name: "CDPDetail",
+        meta: {
+            noHead: true
         },
+        component: CDPDetail
+    },
 
-        {
-            path: "/CustomQuery",
-            name: "CustomQuery",
-            component: CustomQuery
+    {
+        path: "/CustomQuery",
+        name: "CustomQuery",
+        component: CustomQuery
+    },
+    {
+        path: "/Moonriver",
+        name: "Moonriver",
+        component: Moonriver
+    },
+    {
+        path: "/CollectorDetail",
+        name: "CollectorDetail",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/Moonriver",
-            name: "Moonriver",
-            component: Moonriver
+        component: CollectorDetail
+    },
+    {
+        path: "/DelegatorDetail",
+        name: "DelegatorDetail",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/CollectorDetail",
-            name: "CollectorDetail",
-            meta: {
-                noHead: true
-            },
-            component: CollectorDetail
+        component: DelegatorDetail
+    },
+    {
+        path: "/Moonbeam",
+        name: "Moonbeam",
+        component: Moonbeam
+    },
+    {
+        path: "/MoonbeamCollectorDetail",
+        name: "MoonbeamCollectorDetail",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/DelegatorDetail",
-            name: "DelegatorDetail",
-            meta: {
-                noHead: true
-            },
-            component: DelegatorDetail
+        component: MoonbeamCollectorDetail
+    },
+    {
+        path: "/MoonbeamDelegatorDetail",
+        name: "MoonbeamDelegatorDetail",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/Moonbeam",
-            name: "Moonbeam",
-            component: Moonbeam
+        component: MoonbeamDelegatorDetail
+    },
+    {
+        path: "/MaintenanceDashboard",
+        name: "MaintenanceDashboard",
+        meta: {
+            noHead: true
         },
-        {
-            path: "/MoonbeamCollectorDetail",
-            name: "MoonbeamCollectorDetail",
-            meta: {
-                noHead: true
-            },
-            component: MoonbeamCollectorDetail
+        components: {
+            default: MaintenanceDashboard
         },
-        {
-            path: "/MoonbeamDelegatorDetail",
-            name: "MoonbeamDelegatorDetail",
-            meta: {
-                noHead: true
-            },
-            component: MoonbeamDelegatorDetail
-        },
-        {
-            path: "/MaintenanceDashboard",
-            name: "MaintenanceDashboard",
+        children: [{
+            path: "/MaintenanceDashboard/AddressTagManage",
+            name: "MaintenanceDashboard-AddressTagManage",
             meta: {
                 noHead: true
             },
             components: {
-                default: MaintenanceDashboard
+                sub: AddressTagManage
+            }
+        },
+        {
+            path: "/MaintenanceDashboard/ParaChainManage",
+            name: "MaintenanceDashboard-ParaChainManage",
+            meta: {
+                noHead: true
             },
-            children: [{
-                    path: "/MaintenanceDashboard/AddressTagManage",
-                    name: "MaintenanceDashboard-AddressTagManage",
-                    meta: {
-                        noHead: true
-                    },
-                    components: {
-                        sub: AddressTagManage
-                    }
-                },
-                {
-                    path: "/MaintenanceDashboard/ParaChainManage",
-                    name: "MaintenanceDashboard-ParaChainManage",
-                    meta: {
-                        noHead: true
-                    },
-                    components: {
-                        sub: ParaChainManage
-                    }
-                },
-                {
-                    path: "/MaintenanceDashboard/RMRKNFTNameUpdate",
-                    name: "MaintenanceDashboard-RMRKNFTNameUpdate",
-                    meta: {
-                        noHead: true
-                    },
-                    components: {
-                        sub: RMRKNFTNameUpdate
-                    }
-                }
-            ]
+            components: {
+                sub: ParaChainManage
+            }
+        },
+        {
+            path: "/MaintenanceDashboard/RMRKNFTNameUpdate",
+            name: "MaintenanceDashboard-RMRKNFTNameUpdate",
+            meta: {
+                noHead: true
+            },
+            components: {
+                sub: RMRKNFTNameUpdate
+            }
         }
+        ]
+    },
+
+    {
+        path: "/BifrostStaking",
+        name: "BifrostStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'Bifrost',
+                symbol: 'BNC',
+                decimals: 12,
+                minBond: 10
+            }
+        },
+    },
+    {
+        path: "/StakingCollectorDetail",
+        name: "StakingCollectorDetail",
+        meta: {
+            noHead: true
+        },
+        component: StakingTemplateA_CollectorDetail
+    },
+    {
+        path: "/StakingDelegatorDetail",
+        name: "StakingDelegatorDetail",
+        meta: {
+            noHead: true
+        },
+        component: StakingTemplateA_DelegatorDetail
+    },
     ]
 });

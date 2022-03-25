@@ -7,6 +7,9 @@ window.RMRK_API = "https://web3go.xyz/rmrk/";
 
 window.MOONBEAM_API = "https://web3go.xyz/moonbeam/";
 
+
+window.BIFROST_STAKING_API = "http://localhost:20015/";
+
 //window.API = "http://localhost:10000/";
 //window.POLKADOT_API = "http://localhost:20002/";
 //window.KUSAMA_API = "http://localhost:20003/";
@@ -21,3 +24,5 @@ console.log("window.MOONRIVER_API", window.MOONRIVER_API);
 console.log("window.RMRK_API", window.RMRK_API);
 
 console.log("window.MOONBEAM_API", window.MOONBEAM_API);
+
+console.log("window.BIFROST_STAKING_API", window.BIFROST_STAKING_API);
