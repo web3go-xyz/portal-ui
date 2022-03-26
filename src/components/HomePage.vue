@@ -117,7 +117,7 @@
               <div
                 class="card-item"
                 v-for="d in monriverDashboardListFilter"
-                :key="d.id" 
+                :key="d.id"
                 @click="showCardDetail(d.type, d)"
               >
                 <div class="card-item-head">
@@ -353,10 +353,7 @@ export default {
       return this.doTagFilter(this.karuraDashboardList, this.activeTagFilter);
     },
     monriverDashboardListFilter() {
-      return this.doTagFilter(
-        this.moonriverDashboardList,
-        this.activeTagFilter
-      );
+      return this.doTagFilter(this.stakingDashboardList, this.activeTagFilter);
     },
     rmrkDashboardListFilter() {
       return this.doTagFilter(this.rmrkNFTDashboardList, this.activeTagFilter);
@@ -523,12 +520,12 @@ export default {
           tags: ["Featured", "Polkadot", "Kusama", "Karura"],
         },
       ],
-      moonriverDashboardList: [
+      stakingDashboardList: [
         {
           id: "Moonbeam-1",
           type: "Moonbeam",
           name: " Stake Analysis",
-          description: "Moonbeam Analysis to simulate stake",
+          description: "Moonbeam staking analysis and simulate",
           created: "Web3go Offical Team",
           tags: ["Featured", "Polkadot", "Moonbeam"],
           icon: require(`./../assets/images/home/moonbeam.png`),
@@ -537,10 +534,19 @@ export default {
           id: "Moonriver-1",
           type: "Moonriver",
           name: " Stake Analysis",
-          description: "Moonriver Analysis to simulate stake",
+          description: "Moonriver staking analysis and simulate",
           created: "Web3go Offical Team",
           tags: ["Featured", "Kusama", "Moonriver"],
           icon: require(`./../assets/images/home/moonriver.png`),
+        },
+        {
+          id: "Bifrost-1",
+          type: "Bifrost",
+          name: "Stake Analysis",
+          description: "Bifrost staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Bifrost"],
+          icon: require(`./../assets/images/home/bifrost.svg`),
         },
       ],
       rmrkNFTDashboardList: [
@@ -649,6 +655,7 @@ export default {
         Karura: "Karura  CDPs",
         Kusama: "Kusama Parachain Crowdloans",
         Polkadot: "Polkadot Parachain Crowdloans",
+        Bifrost: "Bifrost Staking ( Experimental )",
       };
       return obj[type] || type;
     },
@@ -658,6 +665,9 @@ export default {
       let num = types.indexOf(type) > -1 ? types.indexOf(type) + 2 : 9;
       if (type === "Moonbeam") {
         num = 10;
+      }
+      if (type === "Bifrost") {
+        num = 8;
       }
       return require(`./../assets/images/home/card-line${num}.png`);
     },
@@ -771,6 +781,15 @@ export default {
       if (type == "RMRKNFT") {
         this.$router.push({
           name: "NFTProfiler",
+          params: {
+            data: d,
+          },
+        });
+      }
+
+      if (type == "Bifrost") {
+        this.$router.push({
+          name: "BifrostStaking",
           params: {
             data: d,
           },
