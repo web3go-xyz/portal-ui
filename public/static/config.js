@@ -7,7 +7,7 @@ window.RMRK_API = "https://web3go.xyz/rmrk/";
 
 window.MOONBEAM_API = "https://web3go.xyz/moonbeam/";
 
-window.BIFROST_STAKING_API = "http://web3go.xyz/bifrost-staking/";
+window.BIFROST_STAKING_API = "https://web3go.xyz/bifrost-staking/";
 
 //window.API = "http://localhost:10000/";
 //window.POLKADOT_API = "http://localhost:20002/";
