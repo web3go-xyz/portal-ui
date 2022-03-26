@@ -7,12 +7,16 @@
       <el-table-column prop="blocknumber" label="Block"></el-table-column>
       <el-table-column label="Balance Change">
         <template slot-scope="scope">
-          <span>{{ scope.row.balancechange | roundNumber(2) }} GLMR</span>
+          <span
+            >{{ scope.row.balancechange | roundNumber(2) }} {{ symbol }}</span
+          >
         </template>
       </el-table-column>
       <el-table-column label="Balance Current">
         <template slot-scope="scope">
-          <span>{{ scope.row.balancecurrent | roundNumber(2) }} GLMR</span>
+          <span
+            >{{ scope.row.balancecurrent | roundNumber(2) }} {{ symbol }}</span
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -33,9 +37,14 @@
 </template>
 
 <script>
-import moonriverService from "@/api/moonBeam";
+import stakingService from "@/api/staking/index.js";
 
 export default {
+  props: {
+    query: {
+      type: Object,
+    },
+  },
   data() {
     return {
       pageIndex: 1,
@@ -46,12 +55,21 @@ export default {
     };
   },
   created() {
+    stakingService.base_api = this.query.base_api;
     this.getList();
+  },
+  computed: {
+    symbol() {
+      if (this.query && this.query.symbol) {
+        return this.query.symbol;
+      }
+      return "Symbol";
+    },
   },
   methods: {
     getList() {
       this.loading = true;
-      moonriverService
+      stakingService
         .getCollatorActionHistory({
           collatorAccount: this.$route.query.id,
           pageIndex: this.pageIndex,

@@ -335,8 +335,9 @@ export default new Router({
                 name: 'Bifrost',
                 symbol: 'BNC',
                 decimals: 12,
-                minBond: 10
-            }
+                minBond: 1
+            },
+            base_api: window.BIFROST_STAKING_API
         },
     },
     {

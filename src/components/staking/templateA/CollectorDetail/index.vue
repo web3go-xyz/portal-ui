@@ -1,5 +1,5 @@
 <template>
-  <div class="moonriver-detail-page">
+  <div class="staking-detail-page">
     <div class="common-back-title">
       <i class="el-icon-back" @click="$router.back()"></i>
       <span class="text">{{ address }}</span>
@@ -9,38 +9,38 @@
         <div class="item">
           <div class="title">
             <span>{{ collectorRank }}</span>
-            <img src="@/assets/images/moonriver/icon1.png" alt="" />
+            <img src="@/assets/images/staking/icon1.png" alt="" />
           </div>
           <div class="label">Rank</div>
         </div>
         <div class="item">
           <div class="title">
             <span>{{ collectorData.bond | roundNumber(2) }}</span>
-            <img src="@/assets/images/moonriver/icon2.png" alt="" />
+            <img src="@/assets/images/staking/icon2.png" alt="" />
           </div>
-          <div class="label">Self-Bonded(GLMR)</div>
+          <div class="label">Self-Bonded({{ symbol }})</div>
         </div>
         <div class="item">
           <div class="title">
             <span>{{ collectorData.TotalBonded | roundNumber(2) }}</span>
-            <img src="@/assets/images/moonriver/icon3.png" alt="" />
+            <img src="@/assets/images/staking/icon3.png" alt="" />
           </div>
-          <div class="label">Total Bonded(GLMR)</div>
+          <div class="label">Total Bonded({{ symbol }})</div>
         </div>
 
         <div class="item">
           <div class="title">
             <span>{{ rewardData.latestReward | roundNumber(2) }}</span>
-            <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
+            <img src="@/assets/images/staking/icon-reward.png" alt="" />
           </div>
-          <div class="label">Latest Reward(GLMR)</div>
+          <div class="label">Latest Reward({{ symbol }})</div>
         </div>
         <div class="item">
           <div class="title">
             <span>{{ rewardData.totalReward | roundNumber(2) }}</span>
-            <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
+            <img src="@/assets/images/staking/icon-reward.png" alt="" />
           </div>
-          <div class="label">Total Reward(GLMR)</div>
+          <div class="label">Total Reward({{ symbol }})</div>
         </div>
       </div>
       <div class="nftNav-wrap">
@@ -61,6 +61,7 @@
           :is="currentNav.component"
           :collectorData="collectorData"
           :loading="loading"
+          :query="$route.query"
         />
       </div>
     </div>
@@ -71,7 +72,7 @@
 import Delegator from "./Delegator";
 import Reward from "./Reward";
 import Action from "./Action";
-import moonriverService from "@/api/moonBeam";
+import stakingService from "@/api/staking/index.js";
 import { BigNumber } from "bignumber.js";
 
 export default {
@@ -108,11 +109,13 @@ export default {
     };
   },
   created() {
+    stakingService.base_api = this.$route.query.base_api;
+
     let self = this;
     self.address = self.$route.query.id;
     self.getCollectDetailData();
 
-    moonriverService
+    stakingService
       .getCollatorRewardStatistic({
         collatorAccount: self.address,
       })
@@ -121,11 +124,36 @@ export default {
       });
     this.getcollectorRank();
   },
-  computed: {},
+  computed: {
+    paraChainName() {
+      if (this.$route.query && this.$route.query.name) {
+        return this.$route.query.name;
+      }
+      return "Staking";
+    },
+    symbol() {
+      if (this.$route.query && this.$route.query.symbol) {
+        return this.$route.query.symbol;
+      }
+      return "Symbol";
+    },
+    decimals() {
+      if (this.$route.query && this.$route.query.decimals) {
+        return this.$route.query.decimals;
+      }
+      return 0;
+    },
+    decimalsFormat() {
+      return new BigNumber("1e" + this.decimals);
+    },
+  },
   methods: {
+    formatWithDecimals(value) {
+      return BigNumber(value).dividedBy(this.decimalsFormat);
+    },
     getcollectorRank() {
       this.$localforage
-        .getItem("moonbeamCollectorSortList")
+        .getItem(this.paraChainName + "CollectorSortList")
         .then((str) => {
           if (!str) {
             this.collectorRank = "--";
@@ -140,7 +168,7 @@ export default {
     },
     getCollectDetailData() {
       this.loading = true;
-      moonriverService
+      stakingService
         .getRealtimeCollatorState({
           collators: [this.address],
         })
@@ -148,11 +176,11 @@ export default {
           this.loading = false;
           if (d.length) {
             const data = d[0];
-            data.bond = BigNumber(data.bond, 16).dividedBy(1e18);
+            data.bond = this.formatWithDecimals(data.bond);
             let allAmount = BigNumber(0);
             // 计算Nominator总和
             data.topDelegations.forEach((sv) => {
-              sv.amount = BigNumber(sv.amount, 16).dividedBy(1e18);
+              sv.amount = this.formatWithDecimals(sv.amount);
               allAmount = allAmount.plus(sv.amount);
             });
             data.topDelegations.forEach((sv) => {
@@ -162,7 +190,7 @@ export default {
                 .toFixed(2);
             });
             data.bottomDelegations.forEach((sv) => {
-              sv.amount = BigNumber(sv.amount, 16).dividedBy(1e18);
+              sv.amount = this.formatWithDecimals(sv.amount);
               sv.percent = 0;
             });
             data.allNominators = [
@@ -195,7 +223,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.moonriver-detail-page {
+.staking-detail-page {
   height: 100vh;
   overflow: auto;
   text-align: left;

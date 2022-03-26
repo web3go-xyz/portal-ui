@@ -1,8 +1,8 @@
 import { BigNumber } from "bignumber.js";
 import utils from "@/utils";
-console.log(utils);
-console.log(utils.DOT_RATIO);
-console.log(utils.KSM_RATIO);
+// console.log(utils);
+// console.log(utils.DOT_RATIO);
+// console.log(utils.KSM_RATIO);
 export function formatDate(d) {
     if (d) {
         if (typeof d === 'string') {

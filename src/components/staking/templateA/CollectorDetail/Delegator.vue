@@ -38,7 +38,7 @@
 
       <el-table-column label="Stake">
         <template slot-scope="scope">
-          <span>{{ scope.row.amount }} GLMR</span>
+          <span>{{ scope.row.amount | roundNumber(2) }} {{ symbol }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Percent">
@@ -72,6 +72,23 @@ export default {
     loading: {
       type: Boolean,
     },
+    query: {
+      type: Object,
+    },
+  },
+  computed: {
+    symbol() {
+      if (this.query && this.query.symbol) {
+        return this.query.symbol;
+      }
+      return "Symbol";
+    },
+    paraChainName() {
+      if (this.query && this.query.name) {
+        return this.query.name;
+      }
+      return "Staking";
+    },
   },
   data() {
     return {
@@ -86,8 +103,9 @@ export default {
     },
     turnDelegatorActionPage(row) {
       this.$router.push({
-        name: "MoonbeamDelegatorDetail",
+        name: "StakingDelegatorDetail",
         query: {
+          ...this.query,
           id: row.owner,
         },
       });

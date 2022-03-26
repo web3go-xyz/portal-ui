@@ -33,9 +33,14 @@
 </template>
 
 <script>
-import moonriverService from "@/api/moonBeam";
+import stakingService from "@/api/staking/index.js";
 
 export default {
+  props: {
+    query: {
+      type: Object,
+    },
+  },
   data() {
     return {
       pageIndex: 1,
@@ -46,12 +51,14 @@ export default {
     };
   },
   created() {
+    stakingService.base_api = this.query.base_api;
     this.getList();
   },
+  computed: {},
   methods: {
     getList() {
       this.loading = true;
-      moonriverService
+      stakingService
         .getCollatorRewardHistory({
           collatorAccount: this.$route.query.id,
           pageIndex: this.pageIndex,

@@ -944,7 +944,7 @@
 import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 
 import { BigNumber } from "bignumber.js";
-import stakingService from "@/api/staking/bifrost";
+import stakingService from "@/api/staking/index.js";
 
 export default {
   name: "staking-board",
@@ -979,12 +979,15 @@ export default {
       tableData: [],
       tableData2: [],
       detailChart: null,
-      timer: null,
+
       alReadySelectCollectorIdList: [],
       isFirstQuery: true,
 
       charts: {},
+      timer: null,
       refreshDataInterval: 5 * 60000,
+      timer4header: null,
+      refreshHeaderDataInterval: 30 * 1000,
 
       linkAccountSubscribeData: {
         subscribe_address: "",
@@ -1002,16 +1005,25 @@ export default {
     };
   },
   async created() {
+    stakingService.base_api = this.$route.meta.base_api;
+
     let self = this;
     this.getAllData();
     this.timer = setInterval(() => {
       this.getAllData();
     }, self.refreshDataInterval);
+
+    this.timer4header = setInterval(() => {
+      this.getHeaderData();
+    }, self.refreshHeaderDataInterval);
   },
   beforeDestroy() {
     console.log("staking view destroy");
     if (this.timer) {
       clearInterval(this.timer);
+    }
+    if (this.timer4header) {
+      clearInterval(this.timer4header);
     }
     if (this.charts) {
       for (let key in this.charts) {
@@ -1046,11 +1058,11 @@ export default {
     decimalsFormat() {
       return new BigNumber("1e" + this.decimals);
     },
-    minBond(){
-       if (this.$route.meta && this.$route.meta.parachain) {
+    minBond() {
+      if (this.$route.meta && this.$route.meta.parachain) {
         return this.$route.meta.parachain.minBond;
       }
-      return 50;
+      return 1;
     },
     onePageTableData() {
       return this.tableData.slice(
@@ -1096,6 +1108,9 @@ export default {
     },
   },
   methods: {
+    formatWithDecimals(value) {
+      return BigNumber(value).dividedBy(this.decimalsFormat);
+    },
     changeSelect() {
       this.loading = true;
       this.getAllData(); //TODO
@@ -1294,9 +1309,7 @@ export default {
         return this.minBond;
       } else {
         return (
-          BigNumber(v.lowestTopDelegationAmount, 16)
-            .dividedBy(this.decimalsFormat)
-            .toNumber() + 1
+          this.formatWithDecimals(v.lowestTopDelegationAmount).toNumber() + 1
         );
       }
     },
@@ -1329,14 +1342,14 @@ export default {
       let total_supply = this.totalSupply;
       let collator_counted_stake = this.getTotalStake(v).toNumber();
       let avg_blocks_per_round = Number(v.averageBlocks);
-      console.log(
-        "total_supply:",
-        total_supply,
-        " collator_counted_stake:",
-        collator_counted_stake,
-        " avg_blocks_per_round:",
-        avg_blocks_per_round
-      );
+      // console.log(
+      //   "total_supply:",
+      //   total_supply,
+      //   " collator_counted_stake:",
+      //   collator_counted_stake,
+      //   " avg_blocks_per_round:",
+      //   avg_blocks_per_round
+      // );
       return (
         ((0.00001388888888888889 * total_supply * avg_blocks_per_round) /
           collator_counted_stake) *
@@ -1451,6 +1464,7 @@ export default {
       return findIndex + 1;
     },
     getMyRatio(row) {
+      // debugger;
       const find = row.allNominators.find((v) => v.owner == this.searchAccount);
       const nominatorStake = this.getNominatorStake(row);
       const result = find.amount.dividedBy(nominatorStake);
@@ -1497,9 +1511,7 @@ export default {
       return Number(percent.toFixed(2));
     },
     getNominatorStake(row) {
-      return BigNumber(row.totalCounted, 16)
-        .dividedBy(this.decimalsFormat)
-        .minus(row.bond);
+      return this.formatWithDecimals(row.totalCounted).minus(row.bond);
 
       //let result = BigNumber(0);
       // row.topDelegations.forEach((v) => {
@@ -1508,7 +1520,7 @@ export default {
       // return result;
     },
     getTotalStake(row) {
-      return BigNumber(row.totalCounted, 16).dividedBy(this.decimalsFormat);
+      return this.formatWithDecimals(row.totalCounted);
       // return this.getSelfStake(row).plus(this.getNominatorStake(row));
     },
     getPreviousTotalStake(row) {
@@ -1530,6 +1542,15 @@ export default {
       }
       const row = this.tableData.find((v) => v.rankIndex == rankIndex);
       return this.getTotalStake(row);
+    },
+    getHeaderData() {
+      let self = this;
+      stakingService.getLatestBlockNumber().then((d) => {
+        this.blockNumber = d;
+      });
+      stakingService.getCurrentRoundInfo().then((d) => {
+        this.roundInfo = d;
+      });
     },
     getAllData() {
       let self = this;
@@ -1624,16 +1645,12 @@ export default {
             // 整理Collator列表
             let nominatorRes = d[0];
             nominatorRes.forEach((v) => {
-              v.bond = BigNumber(v.bond, 16).dividedBy(this.decimalsFormat);
+              v.bond = this.formatWithDecimals(v.bond);
               v.topDelegations.forEach((sv) => {
-                sv.amount = BigNumber(sv.amount, 16).dividedBy(
-                  this.decimalsFormat
-                );
+                sv.amount = this.formatWithDecimals(sv.amount);
               });
               v.bottomDelegations.forEach((sv) => {
-                sv.amount = BigNumber(sv.amount, 16).dividedBy(
-                  this.decimalsFormat
-                );
+                sv.amount = this.formatWithDecimals(sv.amount);
               });
               v.allNominators = [...v.topDelegations, ...v.bottomDelegations];
               //排序Nominator
@@ -2052,9 +2069,7 @@ export default {
         this.searchAccount = this.linkAccount.address;
         // 查询token余额
         this.web3.eth.getBalance(this.linkAccount.address).then((d) => {
-          this.freeBalance = BigNumber(d)
-            .dividedBy(this.decimalsFormat)
-            .toString();
+          this.freeBalance = this.formatWithDecimals(d).toString();
           this.inputValue = this.freeBalance;
           this.linkLoading = false;
           if (this.tableData.length) {
@@ -2315,10 +2330,17 @@ export default {
       }, 10);
     },
     turnActionPage({ row, $index }) {
+      let parachainQuery = {
+        name: this.paraChainName,
+        symbol: this.symbol,
+        decimals: this.decimals,
+        base_api: stakingService.base_api,
+      };
       let routeName4CollectorDetail = "StakingCollectorDetail";
       this.$router.push({
         name: routeName4CollectorDetail,
         query: {
+          ...parachainQuery,
           id: row.id,
         },
         meta: this.$route.meta,
@@ -2330,11 +2352,18 @@ export default {
       return str.slice(0, 6) + "..." + str.slice(str.length - 4, str.length);
     },
     turnDelegatorActionPage(account) {
+      let parachainQuery = {
+        name: this.paraChainName,
+        symbol: this.symbol,
+        decimals: this.decimals,
+        base_api: stakingService.base_api,
+      };
       let routeName4DelegatorDetail = "StakingDelegatorDetail";
 
       this.$router.push({
         name: routeName4DelegatorDetail,
         query: {
+          ...parachainQuery,
           id: account,
         },
         meta: this.$route.meta,

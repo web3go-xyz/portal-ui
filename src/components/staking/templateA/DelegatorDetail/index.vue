@@ -1,5 +1,5 @@
 <template>
-  <div class="moonriver-detail-page">
+  <div class="staking-detail-page">
     <div class="common-back-title">
       <i class="el-icon-back" @click="$router.back()"></i>
       <span class="text">{{ address }}</span>
@@ -27,7 +27,7 @@
         <div class="split"></div>
         <div class="item">
           <div class="title">
-            <span>{{ bonded | roundNumber(2) }} GLMR</span>
+            <span>{{ bonded | roundNumber(2) }} {{ symbol }}</span>
             <img src="@/assets/images/moonriver/icon2.png" alt="" />
           </div>
           <div class="label">Total Bonded</div>
@@ -35,7 +35,9 @@
         <div class="split"></div>
         <div class="item">
           <div class="title">
-            <span>{{ rewardData.latestReward | roundNumber(2) }} GLMR</span>
+            <span
+              >{{ rewardData.latestReward | roundNumber(2) }} {{ symbol }}</span
+            >
             <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
           </div>
           <div class="label">Latest Reward</div>
@@ -43,7 +45,9 @@
         <div class="split"></div>
         <div class="item">
           <div class="title">
-            <span>{{ rewardData.totalReward | roundNumber(2) }} GLMR</span>
+            <span
+              >{{ rewardData.totalReward | roundNumber(2) }} {{ symbol }}</span
+            >
             <img src="@/assets/images/moonriver/icon-reward.png" alt="" />
           </div>
           <div class="label">Total Reward</div>
@@ -62,7 +66,11 @@
         </div>
       </div>
       <div class="component-wrap">
-        <component ref="component" :is="currentNav.component" />
+        <component
+          ref="component"
+          :is="currentNav.component"
+          :query="$route.query"
+        />
       </div>
     </div>
   </div>
@@ -72,7 +80,8 @@
 import Action from "./Action";
 import Reward from "./Reward";
 import makeBlockie from "ethereum-blockies-base64";
-import moonriverService from "@/api/moonBeam";
+import stakingService from "@/api/staking/index.js";
+
 export default {
   data() {
     return {
@@ -98,12 +107,26 @@ export default {
       address: "",
     };
   },
-  computed: {},
+  computed: {
+    paraChainName() {
+      if (this.$route.query && this.$route.query.name) {
+        return this.$route.query.name;
+      }
+      return "Staking";
+    },
+    symbol() {
+      if (this.$route.query && this.$route.query.symbol) {
+        return this.$route.query.symbol;
+      }
+      return "Symbol";
+    },
+  },
   created() {
     let self = this;
+    stakingService.base_api = this.$route.query.base_api;
     self.address = self.$route.query.id;
 
-    moonriverService
+    stakingService
       .getDelegatorRewardStatistic({
         delegatorAccount: self.address,
       })
@@ -114,20 +137,22 @@ export default {
   },
   methods: {
     getBonded() {
-      this.$localforage.getItem("moonbeamCollectorSortList").then((str) => {
-        let bondSum = 0;
-        if (str) {
-          const collectorList = JSON.parse(str);
-          for (const c of collectorList) {
-            for (const n of c.allNominators) {
-              if (n.owner === this.address) {
-                bondSum += Number(n.amount);
+      this.$localforage
+        .getItem(this.paraChainName + "CollectorSortList")
+        .then((str) => {
+          let bondSum = 0;
+          if (str) {
+            const collectorList = JSON.parse(str);
+            for (const c of collectorList) {
+              for (const n of c.allNominators) {
+                if (n.owner === this.address) {
+                  bondSum += Number(n.amount);
+                }
               }
             }
           }
-        }
-        this.bonded = bondSum;
-      });
+          this.bonded = bondSum;
+        });
     },
     makeBlockie(address) {
       return makeBlockie(address);
@@ -140,7 +165,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.moonriver-detail-page {
+.staking-detail-page {
   height: 100vh;
   overflow: auto;
   text-align: left;

@@ -18,7 +18,7 @@
 
       <el-table-column label="balance change">
         <template slot-scope="scope">
-          <span>{{ scope.row.balancechange | roundNumber(2) }} GLMR</span>
+          <span>{{ scope.row.balancechange | roundNumber(2) }} {{symbol}}</span>
         </template>
       </el-table-column>
       <el-table-column prop="blocknumber" label="blocknumber"></el-table-column>
@@ -47,10 +47,15 @@
 </template>
 
 <script>
-import moonriverService from "@/api/moonBeam";
+import stakingService from "@/api/staking/index.js";
 import makeBlockie from "ethereum-blockies-base64";
 
 export default {
+  props: {
+    query: {
+      type: Object,
+    },
+  },
   data() {
     return {
       pageIndex: 1,
@@ -61,7 +66,17 @@ export default {
     };
   },
   created() {
+    stakingService.base_api = this.query.base_api;
+
     this.getList();
+  },
+  computed: {
+    symbol() {
+      if (this.query && this.query.symbol) {
+        return this.query.symbol;
+      }
+      return "Symbol";
+    },
   },
   methods: {
     makeBlockie(address) {
@@ -69,15 +84,16 @@ export default {
     },
     turnCollectorActionPage(row) {
       this.$router.push({
-        name: "MoonbeamCollectorDetail",
+        name: "StakingCollectorDetail",
         query: {
+          ...this.query,
           id: row.collator,
         },
       });
     },
     getList() {
       this.loading = true;
-      moonriverService
+      stakingService
         .getDelegatorActionHistory({
           delegatorAccount: this.$route.query.id,
           pageIndex: this.pageIndex,

@@ -56,9 +56,14 @@
 <script>
 import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 
-import moonriverService from "@/api/moonBeam";
+import stakingService from "@/api/staking/index.js";
 
 export default {
+  props: {
+    query: {
+      type: Object,
+    },
+  },
   components: {
     IdentityIconPlus,
   },
@@ -72,20 +77,23 @@ export default {
     };
   },
   created() {
+    stakingService.base_api = this.query.base_api;
+
     this.getList();
   },
   methods: {
     turnCollectorActionPage(row) {
       this.$router.push({
-        name: "MoonbeamCollectorDetail",
+        name: "StakingCollectorDetail",
         query: {
+          ...this.query,
           id: row.collator,
         },
       });
     },
     getList() {
       this.loading = true;
-      moonriverService
+      stakingService
         .getDelegatorRewardHistory({
           delegatorAccount: this.$route.query.id,
           pageIndex: this.pageIndex,
