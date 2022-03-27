@@ -28,9 +28,10 @@ Vue.prototype.$eventBus = new Vue()
 Vue.prototype.$moment = moment;
 Vue.prototype.$utils = utils;
 localforage.config({
-    name: 'db_name'
+    name: 'web3go_db_name'
 });
 Vue.prototype.$localforage = localforage;
+window.localforage = localforage;
 // register global utility filters
 Object.keys(filters).forEach(key => {
     Vue.filter(key, filters[key])

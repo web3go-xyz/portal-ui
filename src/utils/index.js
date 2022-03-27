@@ -214,18 +214,18 @@ const identity_api_path = "https://web3go.xyz/polkadot-identity/polkadot-identit
 export async function loadAddressIdentityAsync(addressInfo) {
     let address = addressInfo.address || '';
 
-    //find localstorage
-    let ls_key = 'identity_address_' + address;
-    let valueStr = localStorage.getItem(ls_key);
+    //find localforage
+    let ls_key = 'identity_' + address;
+    let valueStr = await localforage.getItem(ls_key);
     if (valueStr) {
-        // console.debug('identityData localStorage ', valueStr);
+        // console.debug('identityData localforage ', valueStr);
         let json = JSON.parse(valueStr);
 
         //check if the cache expire
         if (json.expire > (new Date().getTime())) {
             return json;
         } else {
-            localStorage.removeItem(ls_key);
+            localforage.removeItem(ls_key);
         }
     }
 
@@ -274,7 +274,7 @@ export async function loadAddressIdentityAsync(addressInfo) {
     }
 
     let jsonStr = JSON.stringify(identityData);
-    localStorage.setItem(ls_key, jsonStr);
+    localforage.setItem(ls_key, jsonStr);
     return identityData;
 
 
