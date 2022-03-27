@@ -62,7 +62,7 @@
                 </div>
                 <div class="card-item-con">
                   <img
-                    src="./../assets/images/home/card-line-nft.png"
+                    src="./../assets/images/home/rmrk-nft-dashboard.png"
                     alt=""
                     class="polyline"
                     style="width: 95%; margin-top: -30px"
@@ -660,14 +660,21 @@ export default {
       return obj[type] || type;
     },
     getCardLineImg(type) {
-      const types = ["Moonriver", "Karura", "Kusama", "Polkadot", "ERC20"];
+      const types = ["Karura", "Kusama", "Polkadot", "ERC20"];
 
       let num = types.indexOf(type) > -1 ? types.indexOf(type) + 2 : 9;
       if (type === "Moonbeam") {
-        num = 10;
+        return require(`./../assets/images/home/moonbeam-staking-dashboard.png`);
+      }
+
+      if (type === "Moonriver") {
+        return require(`./../assets/images/home/moonriver-staking-dashboard.png`);
       }
       if (type === "Bifrost") {
-        num = 8;
+        return require(`./../assets/images/home/bifrost-dashboard.png`);
+      }
+      if (type === "Karura") {
+        return require(`./../assets/images/home/karura-cdp-dashboard.png`);
       }
       return require(`./../assets/images/home/card-line${num}.png`);
     },
