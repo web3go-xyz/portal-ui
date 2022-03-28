@@ -329,14 +329,7 @@
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     APR means the annualized income pledged to the current
-                    collator.<br />
-                    <!-- <br />Nearly {{ getRoundPerYear() }} rounds per year. -->
-                    <br />
-                    <br />
-                    <!-- APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) *
-                    Round_Per_Year * 100% -->
-                    APR Formula = 0.00001388888888888889 * total_supply *
-                    avg_blocks_per_round / collator_counted_stake * 100%
+                    collator.
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
@@ -945,6 +938,7 @@ import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 
 import { BigNumber } from "bignumber.js";
 import stakingService from "@/api/staking/index.js";
+import aprUtlis from "./aprUtils";
 
 export default {
   name: "staking-board",
@@ -1088,14 +1082,17 @@ export default {
     totalSupply() {
       return this.roundInfo.totalIssuance;
     },
-    totalCollectorStake() {
+    totalCollatorStake() {
       let result = BigNumber(0);
 
-      this.tableData.forEach((v, i) => {
-        if (i < this.maxCollector) {
-          result = result.plus(this.getTotalStake(v));
+      if (this.tableData) {
+        for (const row of this.tableData) {
+          if (row.rankIndex < this.maxCollector) {
+            result = result.plus(this.getTotalStake(row));
+          }
         }
-      });
+      }
+
       return result;
     },
     getInfoPercentage() {
@@ -1325,36 +1322,19 @@ export default {
       }
       return 0;
     },
-    getRoundPerYear() {
-      let blockPerRound = this.roundInfo.length;
-      let roundPerYear = Math.ceil((365 * 24 * 3600) / 12 / blockPerRound);
-      return roundPerYear;
-    },
-    getAPR_Obsolete(v) {
-      let roundPerYear = this.getRoundPerYear();
-      // APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) * Round_Per_Year * 100%
-      let totalStake = this.getTotalStake(v).toNumber();
-      let avg_Blocks = Number(v.averageBlocks);
-      return 9.35 * (avg_Blocks / totalStake) * roundPerYear * 100;
-    },
-    getAPR(v) {
-      // 0.00001388888888888889 * <total_supply>  * <avg_blocks_per_round> / <collator_counted_stake>
-      let total_supply = this.totalSupply;
-      let collator_counted_stake = this.getTotalStake(v).toNumber();
-      let avg_blocks_per_round = Number(v.averageBlocks);
-      // console.log(
-      //   "total_supply:",
-      //   total_supply,
-      //   " collator_counted_stake:",
-      //   collator_counted_stake,
-      //   " avg_blocks_per_round:",
-      //   avg_blocks_per_round
-      // );
-      return (
-        ((0.00001388888888888889 * total_supply * avg_blocks_per_round) /
-          collator_counted_stake) *
-        100
-      );
+    
+    getAPR(currentCollator, totalCollatorStake) {
+      let params = {
+        blockTargetSeconds: 12,
+        blockPerRound: this.roundInfo.length,
+        totalCollatorStake: totalCollatorStake.toNumber(),
+        collatorStake: this.getTotalStake(currentCollator).toNumber(),
+        collatorReward: currentCollator.totalReward.toNumber(),
+        maxCollector: this.maxCollector,
+        averageBlocks: Number(currentCollator.averageBlocks),
+      };
+
+      return aprUtlis.calculate(this.paraChainName, params);
     },
     resetAccountFilter() {
       this.searchAccount = this.linkAccount ? this.linkAccount.address : "";
@@ -1437,7 +1417,7 @@ export default {
       let rankIndex = rank - 1;
       const row = this.tableData.find((v) => v.rankIndex == rankIndex);
       const top = this.getTotalStake(row);
-      const bottom = this.totalCollectorStake;
+      const bottom = this.totalCollatorStake;
       const percent = top.dividedBy(bottom).multipliedBy(100);
       return Number(percent.toFixed(2));
     },
@@ -1523,6 +1503,7 @@ export default {
       return this.formatWithDecimals(row.totalCounted);
       // return this.getSelfStake(row).plus(this.getNominatorStake(row));
     },
+
     getPreviousTotalStake(row) {
       const findItem = this.tableData.find((v) => v.id == row.id);
 
@@ -1873,15 +1854,26 @@ export default {
             //当前round已经选中的若干个collator节点列表,作为Block生产者
             this.activeCollators = d[7];
 
+            let totalCollatorStake = BigNumber(0);
             for (let index = 0; index < nominatorRes.length; index++) {
               const element = nominatorRes[index];
               element.rankIndex = index;
-              element.apr = self.getAPR(element);
               let findIndex = this.activeCollators.findIndex(
                 (v) => v.toLowerCase() == element.id.toLowerCase()
               );
               element.activeBlockProducer = findIndex >= 0;
+
+              if (element.rankIndex < this.maxCollector) {
+                totalCollatorStake = totalCollatorStake.plus(
+                  this.getTotalStake(element)
+                );
+              }
             }
+
+            for (const element of nominatorRes) {
+              element.apr = self.getAPR(element, totalCollatorStake);
+            }
+
             this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
               this.paraChainName + "CollectorSortList",
