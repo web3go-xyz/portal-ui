@@ -149,7 +149,7 @@
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
         <div class="select-wrap">
-          <span>Calculate Avg Blocks By </span>
+          <span>Calculate By </span>
           <el-select
             @change="changeSelect"
             v-model="roundsPickedByDropdown"
@@ -330,6 +330,9 @@
                   <div slot="content" class="tooltip-300px">
                     APR means the annualized income pledged to the current
                     collator.
+                    <br />
+                    APR formula= ( reward / rounds / stake ) * roundPerYear *
+                    100
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
@@ -979,7 +982,7 @@ export default {
 
       charts: {},
       timer: null,
-      refreshDataInterval: 5 * 60000,
+      refreshDataInterval: 5 * 60 * 1000,
       timer4header: null,
       refreshHeaderDataInterval: 30 * 1000,
 
@@ -995,7 +998,7 @@ export default {
       activeCollators: [],
 
       roundsPickedByDropdown: 10, //默认计算Avg Blocks的round数， 前10个round
-      roundsDropdown: [1, 3, 4, 5, 8, 10, 12, 15, 18, 20, 25, 28, 30],
+      roundsDropdown: [1, 3, 4, 5, 8, 10],
     };
   },
   async created() {
@@ -1110,7 +1113,7 @@ export default {
     },
     changeSelect() {
       this.loading = true;
-      this.getAllData(); //TODO
+      this.getAllData();
     },
     clearSubscribe() {
       let self = this;
@@ -1322,19 +1325,45 @@ export default {
       }
       return 0;
     },
-    
-    getAPR(currentCollator, totalCollatorStake) {
+    getRewardInRounds(c, rounds) {
+      let rewardInRounds = 0;
+      let startIndex = c.historyReward.length - rounds;
+      if (startIndex < 0) {
+        startIndex = 0;
+      }
+      for (let index = startIndex; index < c.historyReward.length; index++) {
+        const element = c.historyReward[index];
+        rewardInRounds += element.reward.toNumber();
+      }
+
+      startIndex = c.historyNominatorTotalReward.length - rounds;
+      if (startIndex < 0) {
+        startIndex = 0;
+      }
+      for (
+        let index = startIndex;
+        index < c.historyNominatorTotalReward.length;
+        index++
+      ) {
+        const element = c.historyNominatorTotalReward[index];
+        rewardInRounds += element.reward.toNumber();
+      }
+
+      return rewardInRounds;
+    },
+    async getAPR(currentCollator) {
       let params = {
-        blockTargetSeconds: 12,
         blockPerRound: this.roundInfo.length,
-        totalCollatorStake: totalCollatorStake.toNumber(),
         collatorStake: this.getTotalStake(currentCollator).toNumber(),
-        collatorReward: currentCollator.totalReward.toNumber(),
-        maxCollector: this.maxCollector,
-        averageBlocks: Number(currentCollator.averageBlocks),
+        collatorTotalReward: currentCollator.totalReward.toNumber(),
+        rounds: this.roundsPickedByDropdown,
+        collatorRewardInRounds: this.getRewardInRounds(
+          currentCollator,
+          this.roundsPickedByDropdown
+        ),
       };
 
-      return aprUtlis.calculate(this.paraChainName, params);
+      return await aprUtlis.calculate(this.paraChainName, params);
     },
     resetAccountFilter() {
       this.searchAccount = this.linkAccount ? this.linkAccount.address : "";
@@ -1444,7 +1473,6 @@ export default {
       return findIndex + 1;
     },
     getMyRatio(row) {
-      // debugger;
       const find = row.allNominators.find((v) => v.owner == this.searchAccount);
       const nominatorStake = this.getNominatorStake(row);
       const result = find.amount.dividedBy(nominatorStake);
@@ -1621,7 +1649,7 @@ export default {
             getSelectedCollators4CurrentRoundPromise,
           ];
 
-          Promise.all(allPromiseArr).then((d) => {
+          Promise.all(allPromiseArr).then(async (d) => {
             this.loading = false;
             // 整理Collator列表
             let nominatorRes = d[0];
@@ -1854,7 +1882,6 @@ export default {
             //当前round已经选中的若干个collator节点列表,作为Block生产者
             this.activeCollators = d[7];
 
-            let totalCollatorStake = BigNumber(0);
             for (let index = 0; index < nominatorRes.length; index++) {
               const element = nominatorRes[index];
               element.rankIndex = index;
@@ -1862,16 +1889,10 @@ export default {
                 (v) => v.toLowerCase() == element.id.toLowerCase()
               );
               element.activeBlockProducer = findIndex >= 0;
-
-              if (element.rankIndex < this.maxCollector) {
-                totalCollatorStake = totalCollatorStake.plus(
-                  this.getTotalStake(element)
-                );
-              }
             }
 
             for (const element of nominatorRes) {
-              element.apr = self.getAPR(element, totalCollatorStake);
+              element.apr = await self.getAPR(element);
             }
 
             this.tableData = this.sort4Display(nominatorRes);
