@@ -17,7 +17,7 @@ $ docker build -t portal-ui:v1 .
 
 ## Run the image
 ```bash
-$ docker run -d --name my-portal-ui portal-ui:v1
+$ docker run -d -p 8080:8080 --name my-portal-ui portal-ui:v1
 ```
 
 ## UI
