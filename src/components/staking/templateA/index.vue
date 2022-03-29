@@ -149,7 +149,7 @@
       </el-tabs>
       <div v-show="activeTab == 1" class="tab-content tab-content1">
         <div class="select-wrap">
-          <span>Calculate Avg Blocks By </span>
+          <span>Calculate By </span>
           <el-select
             @change="changeSelect"
             v-model="roundsPickedByDropdown"
@@ -329,14 +329,10 @@
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
                     APR means the annualized income pledged to the current
-                    collator.<br />
-                    <!-- <br />Nearly {{ getRoundPerYear() }} rounds per year. -->
+                    collator.
                     <br />
-                    <br />
-                    <!-- APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) *
-                    Round_Per_Year * 100% -->
-                    APR Formula = 0.00001388888888888889 * total_supply *
-                    avg_blocks_per_round / collator_counted_stake * 100%
+                    APR formula= ( reward / rounds / stake ) * roundPerYear *
+                    100
                   </div>
                   <i class="el-icon-warning-outline"></i>
                 </el-tooltip>
@@ -945,6 +941,7 @@ import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 
 import { BigNumber } from "bignumber.js";
 import stakingService from "@/api/staking/index.js";
+import aprUtlis from "./aprUtils";
 
 export default {
   name: "staking-board",
@@ -985,7 +982,7 @@ export default {
 
       charts: {},
       timer: null,
-      refreshDataInterval: 5 * 60000,
+      refreshDataInterval: 5 * 60 * 1000,
       timer4header: null,
       refreshHeaderDataInterval: 30 * 1000,
 
@@ -1001,7 +998,7 @@ export default {
       activeCollators: [],
 
       roundsPickedByDropdown: 10, //默认计算Avg Blocks的round数， 前10个round
-      roundsDropdown: [1, 3, 4, 5, 8, 10, 12, 15, 18, 20, 25, 28, 30],
+      roundsDropdown: [1, 3, 4, 5, 8, 10],
     };
   },
   async created() {
@@ -1088,14 +1085,17 @@ export default {
     totalSupply() {
       return this.roundInfo.totalIssuance;
     },
-    totalCollectorStake() {
+    totalCollatorStake() {
       let result = BigNumber(0);
 
-      this.tableData.forEach((v, i) => {
-        if (i < this.maxCollector) {
-          result = result.plus(this.getTotalStake(v));
+      if (this.tableData) {
+        for (const row of this.tableData) {
+          if (row.rankIndex < this.maxCollector) {
+            result = result.plus(this.getTotalStake(row));
+          }
         }
-      });
+      }
+
       return result;
     },
     getInfoPercentage() {
@@ -1113,7 +1113,7 @@ export default {
     },
     changeSelect() {
       this.loading = true;
-      this.getAllData(); //TODO
+      this.getAllData();
     },
     clearSubscribe() {
       let self = this;
@@ -1325,36 +1325,45 @@ export default {
       }
       return 0;
     },
-    getRoundPerYear() {
-      let blockPerRound = this.roundInfo.length;
-      let roundPerYear = Math.ceil((365 * 24 * 3600) / 12 / blockPerRound);
-      return roundPerYear;
+    getRewardInRounds(c, rounds) {
+      let rewardInRounds = 0;
+      let startIndex = c.historyReward.length - rounds;
+      if (startIndex < 0) {
+        startIndex = 0;
+      }
+      for (let index = startIndex; index < c.historyReward.length; index++) {
+        const element = c.historyReward[index];
+        rewardInRounds += element.reward.toNumber();
+      }
+
+      startIndex = c.historyNominatorTotalReward.length - rounds;
+      if (startIndex < 0) {
+        startIndex = 0;
+      }
+      for (
+        let index = startIndex;
+        index < c.historyNominatorTotalReward.length;
+        index++
+      ) {
+        const element = c.historyNominatorTotalReward[index];
+        rewardInRounds += element.reward.toNumber();
+      }
+
+      return rewardInRounds;
     },
-    getAPR_Obsolete(v) {
-      let roundPerYear = this.getRoundPerYear();
-      // APR Formula = 9.35 * ( Avg_Blocks / Total_Stake ) * Round_Per_Year * 100%
-      let totalStake = this.getTotalStake(v).toNumber();
-      let avg_Blocks = Number(v.averageBlocks);
-      return 9.35 * (avg_Blocks / totalStake) * roundPerYear * 100;
-    },
-    getAPR(v) {
-      // 0.00001388888888888889 * <total_supply>  * <avg_blocks_per_round> / <collator_counted_stake>
-      let total_supply = this.totalSupply;
-      let collator_counted_stake = this.getTotalStake(v).toNumber();
-      let avg_blocks_per_round = Number(v.averageBlocks);
-      // console.log(
-      //   "total_supply:",
-      //   total_supply,
-      //   " collator_counted_stake:",
-      //   collator_counted_stake,
-      //   " avg_blocks_per_round:",
-      //   avg_blocks_per_round
-      // );
-      return (
-        ((0.00001388888888888889 * total_supply * avg_blocks_per_round) /
-          collator_counted_stake) *
-        100
-      );
+    async getAPR(currentCollator) {
+      let params = {
+        blockPerRound: this.roundInfo.length,
+        collatorStake: this.getTotalStake(currentCollator).toNumber(),
+        collatorTotalReward: currentCollator.totalReward.toNumber(),
+        rounds: this.roundsPickedByDropdown,
+        collatorRewardInRounds: this.getRewardInRounds(
+          currentCollator,
+          this.roundsPickedByDropdown
+        ),
+      };
+
+      return await aprUtlis.calculate(this.paraChainName, params);
     },
     resetAccountFilter() {
       this.searchAccount = this.linkAccount ? this.linkAccount.address : "";
@@ -1437,7 +1446,7 @@ export default {
       let rankIndex = rank - 1;
       const row = this.tableData.find((v) => v.rankIndex == rankIndex);
       const top = this.getTotalStake(row);
-      const bottom = this.totalCollectorStake;
+      const bottom = this.totalCollatorStake;
       const percent = top.dividedBy(bottom).multipliedBy(100);
       return Number(percent.toFixed(2));
     },
@@ -1464,7 +1473,6 @@ export default {
       return findIndex + 1;
     },
     getMyRatio(row) {
-      // debugger;
       const find = row.allNominators.find((v) => v.owner == this.searchAccount);
       const nominatorStake = this.getNominatorStake(row);
       const result = find.amount.dividedBy(nominatorStake);
@@ -1523,6 +1531,7 @@ export default {
       return this.formatWithDecimals(row.totalCounted);
       // return this.getSelfStake(row).plus(this.getNominatorStake(row));
     },
+
     getPreviousTotalStake(row) {
       const findItem = this.tableData.find((v) => v.id == row.id);
 
@@ -1640,7 +1649,7 @@ export default {
             getSelectedCollators4CurrentRoundPromise,
           ];
 
-          Promise.all(allPromiseArr).then((d) => {
+          Promise.all(allPromiseArr).then(async (d) => {
             this.loading = false;
             // 整理Collator列表
             let nominatorRes = d[0];
@@ -1876,12 +1885,16 @@ export default {
             for (let index = 0; index < nominatorRes.length; index++) {
               const element = nominatorRes[index];
               element.rankIndex = index;
-              element.apr = self.getAPR(element);
               let findIndex = this.activeCollators.findIndex(
                 (v) => v.toLowerCase() == element.id.toLowerCase()
               );
               element.activeBlockProducer = findIndex >= 0;
             }
+
+            for (const element of nominatorRes) {
+              element.apr = await self.getAPR(element);
+            }
+
             this.tableData = this.sort4Display(nominatorRes);
             this.$localforage.setItem(
               this.paraChainName + "CollectorSortList",
