@@ -338,13 +338,13 @@ export default new Router({
                 decimals: 12,
                 minBond: 50,
 
-                // walletSupport: 'polkadot.js',
-                walletSupport: 'MetaMask',
-                ss58Format: 6, // polkadot.js
+                walletSupport: 'polkadot.js',
+                // walletSupport: 'MetaMask',
+                ss58Format: 6, // polkadot.js 
+                rpcUrls: ["wss://bifrost-rpc.liebi.com/ws"], //MetaMask,polkadot.js 
 
-                chainId: "0x504", //MetaMask
-                rpcUrls: ["wss://bifrost-rpc.liebi.com/ws"], //MetaMask
-                blockExplorerUrls: ["https://bifrost.subscan.io/"], //MetaMask
+                // chainId: "0x504", //MetaMask
+                // blockExplorerUrls: ["https://bifrost.subscan.io/"], //MetaMask
 
             },
             base_api: window.BIFROST_STAKING_API

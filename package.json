@@ -14,9 +14,10 @@
     },
     "dependencies": {
         "@babel/polyfill": "^7.12.1",
-        "@polkadot/extension-dapp": "^0.42.9",
+        "@polkadot/extension-dapp": "0.42.2",
         "@polkadot/util-crypto": "8.3.1",
-        "@polkadot/vue-identicon": "^0.89.3",
+        "@polkadot/vue-identicon": "0.89.1",
+        "@polkadot/api": "7.1.1",
         "bignumber.js": "^9.0.1",
         "core-js": "^3.6.5",
         "decimal.js": "^10.3.1",

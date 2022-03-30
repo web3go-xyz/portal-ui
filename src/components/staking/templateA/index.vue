@@ -940,6 +940,7 @@ import stakingService from "@/api/staking/index.js";
 import aprUtlis from "./aprUtils";
 
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
 export default {
   name: "staking-board",
@@ -2002,38 +2003,43 @@ export default {
       }
 
       if (this.parachain.walletSupport === "polkadot.js") {
-        this.handleLinkAccount_PolkadotJs(this.parachain.ss58Format);
+        this.handleLinkAccount_PolkadotJs(
+          this.parachain.ss58Format,
+          this.parachain.rpcUrls
+        );
       }
       console.log(
         `wallet [${this.parachain.walletSupport}] not supported yet. current support: [MetaMask,polkadot.js]`
       );
     },
-    async handleLinkAccount_PolkadotJs(ss58Format) {
+    async handleLinkAccount_PolkadotJs(ss58Format, rpcUrls) {
       await web3Enable(`Web3Go ${this.paraChainName} Staking dashboard`);
       const allAccounts = await web3Accounts({ ss58Format: ss58Format });
       for (const account of allAccounts) {
-        console.log(`account:${account}`);
+        console.log(`account:${JSON.stringify(account)}`);
       }
-      const accountInfo = await api.query.system.account(address);
-      let freeBalance = accountInfo.data.free.toString(10);
-      console.log(freeBalance);
+      if (allAccounts && allAccounts.length > 0) {
+        let currentAddress = allAccounts[0].address;
 
-      // //  if (accs.length === 0) {
-      //     console.error(
-      //       "cannot get account, please check if Metamask has been configured？"
-      //     );
-      //     return;
-      //   }
-      //   this.linkAccount = {
-      //     address: accs[0],
-      //   };
-      //   this.searchAccount = this.linkAccount.address;
-      //   if (this.tableData.length) {
-      //     this.getMyStackList();
-      //   }
-      //   this.refreshMySubscribe(this.linkAccount);
+        this.linkAccount = {
+          address: currentAddress,
+        };
+        this.searchAccount = this.linkAccount.address;
+        if (this.tableData.length) {
+          this.getMyStackList();
+        }
+        this.refreshMySubscribe(this.linkAccount);
 
-      //   // 查询token余额
+        const wsProvider = new WsProvider(rpcUrls);
+        const api = await ApiPromise.create({ provider: wsProvider });
+        const accountInfo = await api.query.system.account(address);
+        let freeBalance = accountInfo.data.free.toString(10);
+        console.log(`freeBalance:${freeBalance}`);
+      } else {
+        console.error(
+          "cannot get account, please check if polkadot.js has been configured？"
+        );
+      }
     },
     async handleLinkAccount_MetaMask(
       targetChainId,
