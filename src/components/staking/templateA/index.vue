@@ -2203,17 +2203,17 @@ export default {
                   val[0].seriesName
                 }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[0].value.toFixed(
                   2
-                )} ${this.symbol}</span><br/>
+                )} </span><br/>
               ${val[1].marker} ${
                   val[1].seriesName
                 }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[1].value.toFixed(
                   2
-                )} ${this.symbol}</span><br/>
+                )} </span><br/>
               ${val[2].marker} ${
                   val[2].seriesName
                 }  <span style="font-weight: bold;color: rgba(41, 40, 40, 0.8);">${val[2].value.toFixed(
                   7
-                )} ${this.symbol}</span>
+                )} </span>
               `;
               },
             },
