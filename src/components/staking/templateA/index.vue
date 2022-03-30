@@ -3,11 +3,11 @@
     <div class="common-back-title">
       <i class="el-icon-back" @click="$router.back()"></i>
       <span class="text">{{ paraChainName }}</span>
-      <!-- <div class="link-btn-wrap" v-if="!freeBalance">
+      <div class="link-btn-wrap" v-if="!linkAccount.address">
         <img
           v-if="!linkLoading"
           class="icon"
-          src="@/assets/images/wallet-icon.png"
+          src="@/assets/images/staking/wallet-icon.png"
           alt=""
         />
         <el-button
@@ -18,16 +18,12 @@
         >
       </div>
       <div v-else class="wallet-wrap">
-        <img
-          class="icon"
-          src="@/assets/images/staking/wallet-login-icon-moonbeam.png"
-          alt=""
-        />
+        <img class="icon" :src="paraChainIcon" alt="" />
         <div class="number">
           <el-tooltip :content="linkAccount.address" placement="top">
             <span> {{ shotFilter(linkAccount.address) }}</span>
           </el-tooltip>
-          （{{ freeBalance }} {{ symbol }}）
+          （{{ linkAccount.freeBalance }} {{ symbol }}）
         </div>
 
         <div>
@@ -105,7 +101,7 @@
             <i slot="reference" class="el-icon-bell"></i>
           </el-popover>
         </div>
-      </div> -->
+      </div>
     </div>
     <div class="big-bg">
       <div class="info-wrap">
@@ -943,6 +939,8 @@ import { BigNumber } from "bignumber.js";
 import stakingService from "@/api/staking/index.js";
 import aprUtlis from "./aprUtils";
 
+import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
+
 export default {
   name: "staking-board",
   components: {
@@ -958,10 +956,11 @@ export default {
       pageIndex: 1,
       pageSize: 100,
       currentSimulate: {},
-      freeBalance: null,
       linkLoading: false,
       searchAccount: "",
-      linkAccount: {},
+      linkAccount: {
+        freeBalance: null,
+      },
       blockNumber: null,
       maxCollector: 100,
       maxNominator: 50,
@@ -1034,32 +1033,29 @@ export default {
     }
   },
   computed: {
-    paraChainName() {
+    parachain() {
       if (this.$route.meta && this.$route.meta.parachain) {
-        return this.$route.meta.parachain.name;
+        return this.$route.meta.parachain;
       }
-      return "Staking";
+      return {};
+    },
+    paraChainIcon() {
+      return this.parachain.icon || `${this.paraChainName}.png`;
+    },
+    paraChainName() {
+      return this.parachain.name || "Staking";
     },
     symbol() {
-      if (this.$route.meta && this.$route.meta.parachain) {
-        return this.$route.meta.parachain.symbol;
-      }
-      return "Symbol";
+      return this.parachain.symbol || "Symbol";
     },
     decimals() {
-      if (this.$route.meta && this.$route.meta.parachain) {
-        return this.$route.meta.parachain.decimals;
-      }
-      return 0;
+      return this.parachain.decimals || 0;
     },
     decimalsFormat() {
       return new BigNumber("1e" + this.decimals);
     },
     minBond() {
-      if (this.$route.meta && this.$route.meta.parachain) {
-        return this.$route.meta.parachain.minBond;
-      }
-      return 1;
+      return this.parachain.minBond || 1;
     },
     onePageTableData() {
       return this.tableData.slice(
@@ -1997,10 +1993,56 @@ export default {
       });
     },
     async handleLinkAccount() {
+      if (this.parachain.walletSupport === "MetaMask") {
+        this.handleLinkAccount_MetaMask(
+          this.parachain.chainId,
+          this.parachain.rpcUrls,
+          this.parachain.blockExplorerUrls
+        );
+      }
+
+      if (this.parachain.walletSupport === "polkadot.js") {
+        this.handleLinkAccount_PolkadotJs(this.parachain.ss58Format);
+      }
+      console.log(
+        `wallet [${this.parachain.walletSupport}] not supported yet. current support: [MetaMask,polkadot.js]`
+      );
+    },
+    async handleLinkAccount_PolkadotJs(ss58Format) {
+      await web3Enable(`Web3Go ${this.paraChainName} Staking dashboard`);
+      const allAccounts = await web3Accounts({ ss58Format: ss58Format });
+      for (const account of allAccounts) {
+        console.log(`account:${account}`);
+      }
+      const accountInfo = await api.query.system.account(address);
+      let freeBalance = accountInfo.data.free.toString(10);
+      console.log(freeBalance);
+
+      // //  if (accs.length === 0) {
+      //     console.error(
+      //       "cannot get account, please check if Metamask has been configured？"
+      //     );
+      //     return;
+      //   }
+      //   this.linkAccount = {
+      //     address: accs[0],
+      //   };
+      //   this.searchAccount = this.linkAccount.address;
+      //   if (this.tableData.length) {
+      //     this.getMyStackList();
+      //   }
+      //   this.refreshMySubscribe(this.linkAccount);
+
+      //   // 查询token余额
+    },
+    async handleLinkAccount_MetaMask(
+      targetChainId,
+      rpcUrls,
+      blockExplorerUrls
+    ) {
       // 引入web3
       this.linkLoading = true;
-      const Web3 = require("web3"); //Load Web3 library
-      //Create local Web3 instance - set provider
+      const Web3 = require("web3");
       this.web3 = new Web3(ethereum);
 
       try {
@@ -2013,7 +2055,7 @@ export default {
       try {
         await ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x504" }],
+          params: [{ chainId: targetChainId }],
         });
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
@@ -2023,15 +2065,15 @@ export default {
               method: "wallet_addEthereumChain",
               params: [
                 {
-                  chainId: "0x504",
-                  chainName: "",
-                  rpcUrls: ["https://rpc.api.xx.network"],
+                  chainId: targetChainId,
+                  chainName: this.paraChainName,
+                  rpcUrls: rpcUrls,
                   nativeCurrency: {
                     name: this.symbol,
                     symbol: this.symbol,
                     decimals: this.decimals,
                   },
-                  blockExplorerUrls: ["https://blockscout.xx.network/"],
+                  blockExplorerUrls: blockExplorerUrls,
                 },
               ],
             });
@@ -2047,53 +2089,33 @@ export default {
       }
       const solveAccounts = (accs) => {
         if (accs.length === 0) {
-          console.error("无法获取账号，Metamask 是否正确配置？");
+          console.error(
+            "cannot get account, please check if Metamask has been configured？"
+          );
           return;
         }
         this.linkAccount = {
           address: accs[0],
         };
-        let self = this;
-        stakingService
-          .getMySubscribe({ subscribe_address: this.linkAccount.address })
-          .then((resp) => {
-            if (resp && resp.id) {
-              self.linkAccountSubscribeData.auto_notify_at_my_stake =
-                resp.auto_notify_at_my_stake;
-              self.linkAccountSubscribeData.subscribe_address =
-                resp.subscribe_address;
-              self.linkAccountSubscribeData.subscribe_email =
-                resp.subscribe_email;
-              if (resp.watched_address) {
-                self.linkAccountSubscribeData.watched_address =
-                  resp.watched_address.split(",");
-              } else {
-                self.linkAccountSubscribeData.watched_address = [];
-              }
-            } else {
-              self.linkAccountSubscribeData.subscribe_address =
-                this.linkAccount.address;
-              self.linkAccountSubscribeData.subscribe_email = "";
-              self.linkAccountSubscribeData.auto_notify_at_my_stake =
-                self.auto_notify_at_my_stake_inactive;
-              self.linkAccountSubscribeData.watched_address = [];
-            }
-          });
         this.searchAccount = this.linkAccount.address;
+        if (this.tableData.length) {
+          this.getMyStackList();
+        }
+        this.refreshMySubscribe(this.linkAccount);
+
         // 查询token余额
         this.web3.eth.getBalance(this.linkAccount.address).then((d) => {
-          this.freeBalance = this.formatWithDecimals(d).toString();
-          this.inputValue = this.freeBalance;
+          this.linkAccount.freeBalance = this.formatWithDecimals(d).toString();
+          this.inputValue = this.linkAccount.freeBalance;
           this.linkLoading = false;
-          if (this.tableData.length) {
-            this.getMyStackList();
-          }
         });
       };
       this.web3.eth.getAccounts((err, accs) => {
-        console.log("accs", accs);
+        console.log("web3 accounts:", accs);
         if (err != null) {
-          console.error("无法获取账号， 是否安装了 Metamask");
+          console.error(
+            "cannot get account, please check if the MetaMask has been installed."
+          );
           this.message = "";
           return;
         }
@@ -2104,23 +2126,52 @@ export default {
       });
       ethereum.on("chainChanged", (chainId) => {
         //connect to parachain
-        if (chainId == "0x504") {
+        if (chainId == targetChainId) {
           this.web3.eth.getAccounts((err, accs) => {
-            console.log("accs", accs);
+            console.log("web3 accounts:", accs);
             if (err != null) {
-              console.error("无法获取账号， 是否安装了 Metamask");
+              console.error(
+                "cannot get account, please check if the MetaMask has been installed."
+              );
               this.message = "";
               return;
             }
             solveAccounts(accs);
           });
         } else {
-          this.linkAccount = {};
+          this.linkAccount = { freeBalance: null };
           this.searchAccount = undefined;
-          this.freeBalance = null;
           this.inputValue = 0;
         }
       });
+    },
+    refreshMySubscribe(account) {
+      let self = this;
+      stakingService
+        .getMySubscribe({ subscribe_address: account.address })
+        .then((resp) => {
+          if (resp && resp.id) {
+            self.linkAccountSubscribeData.auto_notify_at_my_stake =
+              resp.auto_notify_at_my_stake;
+            self.linkAccountSubscribeData.subscribe_address =
+              resp.subscribe_address;
+            self.linkAccountSubscribeData.subscribe_email =
+              resp.subscribe_email;
+            if (resp.watched_address) {
+              self.linkAccountSubscribeData.watched_address =
+                resp.watched_address.split(",");
+            } else {
+              self.linkAccountSubscribeData.watched_address = [];
+            }
+          } else {
+            self.linkAccountSubscribeData.subscribe_address =
+              this.linkAccount.address;
+            self.linkAccountSubscribeData.subscribe_email = "";
+            self.linkAccountSubscribeData.auto_notify_at_my_stake =
+              self.auto_notify_at_my_stake_inactive;
+            self.linkAccountSubscribeData.watched_address = [];
+          }
+        });
     },
     getyAxisMinMax(valueArray, scale, fixedNumber) {
       let d = { min: undefined, max: undefined };
