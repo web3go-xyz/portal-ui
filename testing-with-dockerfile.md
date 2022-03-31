@@ -1,26 +1,16 @@
-## Dependencies
-
+## 1. Pull the milestone 1 image from docker hub
 ```bash
-$ npm install
+$ docker pull web3go/release:milestone1
 ```
 
-## Building
 
+## 2. Run the image
 ```bash
-$ npm run build
+$ docker run -d -p 8080:8080 --name my-portal-ui web3go/release:milestone1
 ```
 
-## Create docker image
-```bash
-$ docker build -t portal-ui:v1 .
-```
-
-## Run the image
-```bash
-$ docker run -d --name my-portal-ui portal-ui:v1
-```
-
-## UI
-```bash
-Visit http://localhost:8080 to access the UI
-```
+## 3. Visit UI locally
+ - For main page:  http://localhost:8080
+ - For NFT profiler: http://localhost:8080/#/NFTProfiler
+ - For MOVR staking: http://localhost:8080/#/Moonriver
+ - For GLMR staking: http://localhost:8080/#/Moonbeam

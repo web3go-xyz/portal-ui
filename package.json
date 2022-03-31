@@ -34,14 +34,14 @@
     },
     "devDependencies": {
         "@open-wc/webpack-import-meta-loader": "^0.4.7",
-        "@vue/cli-plugin-babel": "~4.5.0",
-        "@vue/cli-plugin-eslint": "~4.5.0",
-        "@vue/cli-service": "~4.5.0",
+        "@vue/cli-plugin-babel": "^4.5.0",
+        "@vue/cli-plugin-eslint": "^4.5.0",
+        "@vue/cli-service": "^4.5.0",
         "babel-eslint": "^10.1.0",
         "cross-env": "^7.0.3",
         "eslint": "^6.7.2",
         "eslint-plugin-vue": "^6.2.2",
-        "less": "^2.7.3",
+        "less": "^4.1.2",
         "less-loader": "^6.0.0",
         "vue-template-compiler": "^2.6.11",
         "webpack-bundle-analyzer": "^4.5.0"
