@@ -18,13 +18,10 @@
         >
       </div>
       <div v-else class="wallet-wrap">
-        <img class="icon" :src="paraChainIcon" alt="" />
-        <div class="number">
-          <el-tooltip :content="linkAccount.address" placement="top">
-            <span> {{ shotFilter(linkAccount.address) }}</span>
-          </el-tooltip>
-          （{{ linkAccount.freeBalance }} {{ symbol }}）
-        </div>
+        <!-- <img class="icon" :src="paraChainIcon" alt="" /> -->
+        <identity-icon-plus :addressInfo="linkAccount"></identity-icon-plus>
+
+        <div class="number">（{{ linkAccount.freeBalance }} {{ symbol }}）</div>
 
         <div>
           <el-popover placement="bottom" width="400" trigger="click">
@@ -937,7 +934,8 @@ import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 
 import { BigNumber } from "bignumber.js";
 import stakingService from "@/api/staking/index.js";
-import aprUtlis from "./aprUtils";
+import aprUtlis from "./apr.utils";
+import chainUtlis from "@/chain/chain.utils";
 
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -960,6 +958,14 @@ export default {
       linkLoading: false,
       searchAccount: "",
       linkAccount: {
+        address: "",
+        identity: {
+          showMoreInfo: false,
+        },
+        iconSize: 26,
+        fontSize: 14,
+        addressDisplayCompact: true,
+
         freeBalance: null,
       },
       blockNumber: null,
@@ -1775,7 +1781,7 @@ export default {
                   (sv) => Number(sv.roundIndex) == i
                 );
 
-                const result = new BigNumber(0);
+                let result = new BigNumber(0);
                 if (findTop && findBottom) {
                   const top = findTop.reward;
                   const bottom = findBottom.nominatorsStake;
@@ -2004,6 +2010,7 @@ export default {
 
       if (this.parachain.walletSupport === "polkadot.js") {
         this.handleLinkAccount_PolkadotJs(
+          this.paraChainName,
           this.parachain.ss58Format,
           this.parachain.rpcUrls
         );
@@ -2012,8 +2019,8 @@ export default {
         `wallet [${this.parachain.walletSupport}] not supported yet. current support: [MetaMask,polkadot.js]`
       );
     },
-    async handleLinkAccount_PolkadotJs(ss58Format, rpcUrls) {
-      await web3Enable(`Web3Go ${this.paraChainName} Staking dashboard`);
+    async handleLinkAccount_PolkadotJs(chain, ss58Format, rpcUrls) {
+      await web3Enable(`Web3Go ${chain} Staking dashboard`);
       const allAccounts = await web3Accounts({ ss58Format: ss58Format });
       for (const account of allAccounts) {
         console.log(`account:${JSON.stringify(account)}`);
@@ -2021,9 +2028,7 @@ export default {
       if (allAccounts && allAccounts.length > 0) {
         let currentAddress = allAccounts[0].address;
 
-        this.linkAccount = {
-          address: currentAddress,
-        };
+        this.linkAccount.address = currentAddress;
         this.searchAccount = this.linkAccount.address;
         if (this.tableData.length) {
           this.getMyStackList();
@@ -2031,10 +2036,20 @@ export default {
         this.refreshMySubscribe(this.linkAccount);
 
         const wsProvider = new WsProvider(rpcUrls);
-        const api = await ApiPromise.create({ provider: wsProvider });
-        const accountInfo = await api.query.system.account(address);
+        let types = chainUtlis.getTypes(chain);
+        console.log("types:", types);
+        const api = await ApiPromise.create({
+          provider: wsProvider,
+        });
+
+        // const blockHash = await api.rpc.chain.getBlockHash(100);
+        // const header = await api.derive.chain.getHeader(blockHash);
+        // console.log(`#${header.number}-${blockHash}: ${header.author}`);
+        const accountInfo = await api.query.system.account(currentAddress);
+        console.log(`accountInfo:${accountInfo}`);
         let freeBalance = accountInfo.data.free.toString(10);
         console.log(`freeBalance:${freeBalance}`);
+        this.linkAccount.freeBalance=this.formatWithDecimals(freeBalance).toFixed();
       } else {
         console.error(
           "cannot get account, please check if polkadot.js has been configured？"
@@ -2100,9 +2115,7 @@ export default {
           );
           return;
         }
-        this.linkAccount = {
-          address: accs[0],
-        };
+        this.linkAccount.address = accs[0];
         this.searchAccount = this.linkAccount.address;
         if (this.tableData.length) {
           this.getMyStackList();
@@ -2145,7 +2158,8 @@ export default {
             solveAccounts(accs);
           });
         } else {
-          this.linkAccount = { freeBalance: null };
+          this.linkAccount.address = "";
+          this.linkAccount.freeBalance = null;
           this.searchAccount = undefined;
           this.inputValue = 0;
         }
@@ -2552,6 +2566,8 @@ export default {
     margin-right: 35px;
     display: flex;
     align-items: center;
+    line-height: initial;
+    height: 60px;
     .icon {
       width: 24px;
       height: 24px;

@@ -8,6 +8,14 @@ module.exports = {
                 loader: require.resolve('@open-wc/webpack-import-meta-loader'),
             }]
         });
+        config.module.rules.push({
+            test: /\.js$/,
+            use: [{
+                loader: require.resolve('babel-loader'),
+            }]
+        });
+        console.log(config.module.rules);
+       
         // js output config
         config.output.filename = "[name].[hash].js";
         config.output.chunkFilename = "[name].[hash].js";
