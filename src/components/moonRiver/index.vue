@@ -1563,7 +1563,7 @@ export default {
                   (sv) => Number(sv.roundIndex) == i
                 );
 
-                const result = new BigNumber(0);
+                let result = new BigNumber(0);
                 if (findTop && findBottom) {
                   const top = findTop.reward;
                   const bottom = findBottom.nominatorsStake;
