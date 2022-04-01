@@ -34,7 +34,7 @@ export function getPrice(data) {
 }
 export function getAccountDetail(data) {
     return request({
-        url: `${window.BASE_API}/polkadot-balance/polkadot-balance-analysis/getAccountDetail`,
+        url: `${window.BASE_API}/${data.network}-balance/balance-analysis/getAccountDetail`,
         method: 'post',
         data
     })

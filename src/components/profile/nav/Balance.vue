@@ -90,7 +90,7 @@
                 class="el-icon-loading"
               ></i>
               <span v-else class="view hover-item" @click="rowClick(scope.row)"
-                >view</span
+                ><div v-if="supportBalance(scope.row)">view</div></span
               >
             </template>
           </el-table-column>
@@ -222,8 +222,7 @@
 </template>
 
 <script>
-import BigNumber from "bignumber.js";
-import { getAccountDetail } from "@/api/profile/Balance";
+import { getAccountDetail } from "@/api/profile/parachain.balance";
 export default {
   name: "Profile-Balance",
   props: {
@@ -275,6 +274,11 @@ export default {
     },
   },
   methods: {
+    supportBalance(d) {
+      let s = ["polkadot", "litmus"];
+      // console.log(d);
+      return s.indexOf(d.network) >= 0;
+    },
     getDecimal() {
       if (
         this.currentRow &&
@@ -340,6 +344,7 @@ export default {
       this.detailLoading = true;
       this.detailData = [];
       getAccountDetail({
+        network: row.network,
         account_id: row.value,
         time_start: "1970-01-01T00:00:00.000Z",
         time_end: new Date().toISOString(),
@@ -367,10 +372,10 @@ export default {
         });
         console.log("detailData", detailData);
         this.detailData = detailData;
-        if(this.detailData.length){
+        if (this.detailData.length) {
           this.visbile = true;
-        }else{
-          this.$message.warning('The wallet has no data');
+        } else {
+          this.$message.warning("The wallet has no data");
         }
       });
     },

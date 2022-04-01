@@ -122,7 +122,7 @@ import {
   ss58transform,
   getBalance,
   getPrice,
-} from "@/api/profile/Balance";
+} from "@/api/profile/parachain.balance";
 import Balance from "./nav/Balance";
 import Crowdloan from "./nav/Crowdloan";
 import Defi from "./nav/Defi";
