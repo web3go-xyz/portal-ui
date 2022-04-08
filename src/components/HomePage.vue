@@ -655,7 +655,7 @@ export default {
         Karura: "Karura  CDPs",
         Kusama: "Kusama Parachain Crowdloans",
         Polkadot: "Polkadot Parachain Crowdloans",
-        Bifrost: "Bifrost Staking ( Experimental )",
+        Bifrost: "Bifrost Staking",
       };
       return obj[type] || type;
     },
