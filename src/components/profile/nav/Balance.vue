@@ -111,7 +111,7 @@
     </div>
     <el-dialog
       center
-      :title="currentRow && shorterAddress(currentRow.value)"
+      :title="currentRow && (currentRow.value)"
       :visible.sync="visbile"
       width="600"
     >

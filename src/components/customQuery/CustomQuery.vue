@@ -349,6 +349,14 @@ export default {
           },
         },
         {
+          lable: "Moonbeam Balance",
+          value: "Moonbeam Balance",
+          refers: {
+            schema: "prod-moonbeam-balance",
+            tables: [],
+          },
+        },
+        {
           lable: "Kusama Crowdloan",
           value: "Kusama Crowdloan",
           refers: {
