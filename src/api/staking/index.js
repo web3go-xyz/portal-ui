@@ -66,14 +66,7 @@ let stakingApi = {
             data
         })
     },
-    // get the scheduled exit of collators/nominators;获取这是计划要离开的collator节点和nominator，离开不是立刻生效的， 需要等待指定的roundIndex，可以根据该列表在预测下一个round的排位时， 注意检查如果roundIndex匹配， 需要排除掉对应的数据。
-    getScheduledExitQueue: function (params) {
-        return request({
-            url: this.formatUrl('​/staking-analysis​/getScheduledExitQueue'),
-            method: 'get',
-            params
-        })
-    },
+    
     // get max collators count per round;获取每个round最多的collator数量
     getMaxCollatorsPerRound: function (params) {
         return request({
