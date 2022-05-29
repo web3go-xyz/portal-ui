@@ -47,9 +47,8 @@ export function roundNumber(value, flag) {
     if (value !== undefined) {
         let bn = new BigNumber(value);
         return bn.toFormat(precision);
-    } else {
-        return value
     }
+    return value || 0
 
 }
 

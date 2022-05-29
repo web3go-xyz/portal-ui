@@ -351,6 +351,27 @@ export default new Router({
         },
     },
     {
+        path: "/OAKStaking",
+        name: "OAKStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'OAK',
+                icon: 'static/parachain-icon/oak-logo.png',
+                symbol: 'TUR',
+                decimals: 10,
+                minBond: 50,
+
+                walletSupport: 'polkadot.js', 
+                ss58Format: 51, // polkadot.js 
+                rpcUrls: ["wss://rpc.turing-staging.oak.tech"], //MetaMask,polkadot.js 
+ 
+
+            },
+            base_api: window.OAK_STAKING_API
+        },
+    },
+    {
         path: "/StakingCollectorDetail",
         name: "StakingCollectorDetail",
         meta: {

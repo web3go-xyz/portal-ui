@@ -21,7 +21,9 @@
         <!-- <img class="icon" :src="paraChainIcon" alt="" /> -->
         <identity-icon-plus :addressInfo="linkAccount"></identity-icon-plus>
 
-        <div class="number">（{{ linkAccount.freeBalance }} {{ symbol }}）</div>
+        <div class="number">
+          （{{ linkAccount.freeBalance | roundNumber(2) }} {{ symbol }}）
+        </div>
 
         <div>
           <el-popover placement="bottom" width="400" trigger="click">
@@ -2049,7 +2051,8 @@ export default {
         console.log(`accountInfo:${accountInfo}`);
         let freeBalance = accountInfo.data.free.toString(10);
         console.log(`freeBalance:${freeBalance}`);
-        this.linkAccount.freeBalance=this.formatWithDecimals(freeBalance).toFixed();
+        this.linkAccount.freeBalance =
+          this.formatWithDecimals(freeBalance).toFixed();
       } else {
         console.error(
           "cannot get account, please check if polkadot.js has been configured？"
