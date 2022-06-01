@@ -346,7 +346,7 @@
               <div :ref="'tableChart' + scope.row.id" class="table-chart"></div>
             </template>
           </el-table-column>
-          <el-table-column :width="parachain.canDelegate?'200':'130'">
+          <el-table-column :width="parachain.canDelegate ? '200' : '130'">
             <template slot-scope="scope">
               <div class="div-operation">
                 <span
@@ -387,9 +387,17 @@
                   v-if="ifShowDelegate(scope.row) && parachain.canDelegate"
                   @click="handleDelegate(scope.row)"
                   class="table-btn"
-                  style="margin-left:8px;"
+                  style="margin-left: 8px"
                 >
                   Delegate
+                </div>
+                <div
+                  v-if="ifAlreadyDelegate(scope.row) && parachain.canDelegate"
+                  @click="goToMyStake"
+                  class="table-btn"
+                  style="margin-left: 8px; background: rgb(95, 106, 249)"
+                >
+                  MyStake
                 </div>
               </div>
             </template>
@@ -1153,6 +1161,9 @@ export default {
     },
   },
   methods: {
+    goToMyStake() {
+      this.activeTab = '2';
+    },
     async delegateSuccess() {
       this.loading = true;
       this.getAllData();
@@ -1171,6 +1182,15 @@ export default {
         return false;
       }
       return true;
+    },
+    ifAlreadyDelegate(row) {
+      const find = row.allNominators.find(
+        (sv) => sv.owner == this.linkAccount.address
+      );
+      if (find && this.currentWalletAccount) {
+        return true;
+      }
+      return false;
     },
     handleDelegateMore(row) {
       this.$refs.delegateModal.init(row.id, true);
