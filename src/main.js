@@ -14,7 +14,6 @@ import './style/whiteTheme/index.less'
 // element公共组件自定义样式
 import './style/whiteTheme.less';
 
-
 import App from './App'
 import router from './router'
 import store from './store'
@@ -46,6 +45,8 @@ if (!tokenExpireTime || moment().valueOf() > moment(tokenExpireTime).valueOf()) 
     localStorage.removeItem("userInfo");
 }
 /* eslint-disable no-new */
+
+
 new Vue({
     el: '#app',
     router,

@@ -21,10 +21,10 @@
         <!-- <img class="icon" :src="paraChainIcon" alt="" /> -->
         <identity-icon-plus :addressInfo="linkAccount"></identity-icon-plus>
 
-        <div class="number">
+        <div class="number" v-if="linkAccount.freeBalance">
           （{{ linkAccount.freeBalance | roundNumber(2) }} {{ symbol }}）
         </div>
-
+        <div v-else><i class="el-icon-loading"></i></div>
         <div>
           <el-popover placement="bottom" width="400" trigger="click">
             <div class="popover-subscribe">
@@ -338,7 +338,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            width="270"
+            width="280"
             prop="name"
             label="Rewards(Last 10 rounds)"
           >
@@ -346,7 +346,7 @@
               <div :ref="'tableChart' + scope.row.id" class="table-chart"></div>
             </template>
           </el-table-column>
-          <el-table-column>
+          <el-table-column :width="parachain.canDelegate?'200':'130'">
             <template slot-scope="scope">
               <div class="div-operation">
                 <span
@@ -355,6 +355,7 @@
                   class="table-operation-span"
                   ><i class="el-icon-data-line"></i>Simulate</span
                 >
+
                 <el-tooltip effect="light" placement="bottom">
                   <div slot="content">
                     Add current collator into watch list with specified
@@ -382,6 +383,14 @@
                     <i class="el-icon-remove-outline"></i>
                   </div>
                 </el-tooltip>
+                <div
+                  v-if="ifShowDelegate(scope.row) && parachain.canDelegate"
+                  @click="handleDelegate(scope.row)"
+                  class="table-btn"
+                  style="margin-left:8px;"
+                >
+                  Delegate
+                </div>
               </div>
             </template>
           </el-table-column>
@@ -489,7 +498,10 @@
                       </div>
                     </div>
                     <div class="bottom">
-                      <div class="item">
+                      <div
+                        class="item"
+                        v-if="tableData.length > parseInt(maxCollector * 0.9)"
+                      >
                         <div class="item-left">
                           <span class="title"
                             >Rank
@@ -515,7 +527,10 @@
                           ></el-progress>
                         </div>
                       </div>
-                      <div class="item">
+                      <div
+                        class="item"
+                        v-if="tableData.length > parseInt(maxCollector * 0.6)"
+                      >
                         <div class="item-left">
                           <span class="title"
                             >Rank
@@ -735,6 +750,17 @@
               ></el-progress>
             </template>
           </el-table-column>
+          <el-table-column v-if="parachain.canDelegate" width="140">
+            <template slot-scope="scope">
+              <div
+                v-if="currentWalletAccount"
+                class="table-btn"
+                @click="handleDelegateMore(scope.row)"
+              >
+                DelegateMore
+              </div>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
     </div>
@@ -928,27 +954,41 @@
         >
       </el-popover>
     </div>
+    <DelegateModal
+      ref="delegateModal"
+      :api="apiPromise"
+      :symbol="symbol"
+      :linkAccount="linkAccount"
+      :currentWalletAccount="currentWalletAccount"
+      @success="delegateSuccess"
+    ></DelegateModal>
   </div>
 </template>
 
 <script>
 import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
-
 import { BigNumber } from "bignumber.js";
 import stakingService from "@/api/staking/index.js";
 import aprUtlis from "./apr.utils";
 import chainUtlis from "@/chain/chain.utils";
-
-import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
+import DelegateModal from "./DelegateModal";
+import {
+  web3Accounts,
+  web3Enable,
+  web3AccountsSubscribe,
+} from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
 export default {
   name: "staking-board",
   components: {
     IdentityIconPlus,
+    DelegateModal,
   },
   data() {
     return {
+      apiPromise: null,
+      currentWalletAccount: null,
       selectRoundList: [],
       auto_notify_at_my_stake_active: 1,
       auto_notify_at_my_stake_inactive: 0,
@@ -1113,6 +1153,31 @@ export default {
     },
   },
   methods: {
+    async delegateSuccess() {
+      this.loading = true;
+      this.getAllData();
+      const accountInfo = await this.apiPromise.query.system.account(
+        this.linkAccount.address
+      );
+      let freeBalance = accountInfo.data.free.toString(10);
+      this.linkAccount.freeBalance =
+        this.formatWithDecimals(freeBalance).toFixed();
+    },
+    ifShowDelegate(row) {
+      const find = row.allNominators.find(
+        (sv) => sv.owner == this.linkAccount.address
+      );
+      if (find || !this.currentWalletAccount) {
+        return false;
+      }
+      return true;
+    },
+    handleDelegateMore(row) {
+      this.$refs.delegateModal.init(row.id, true);
+    },
+    handleDelegate(row) {
+      this.$refs.delegateModal.init(row.id);
+    },
     formatWithDecimals(value) {
       return BigNumber(value).dividedBy(this.decimalsFormat);
     },
@@ -1463,6 +1528,7 @@ export default {
         return result;
       });
       this.tableData2 = arr;
+      console.log("222", arr);
     },
     getSelfStake(row) {
       return row.bond;
@@ -2043,7 +2109,7 @@ export default {
         const api = await ApiPromise.create({
           provider: wsProvider,
         });
-
+        this.apiPromise = api;
         // const blockHash = await api.rpc.chain.getBlockHash(100);
         // const header = await api.derive.chain.getHeader(blockHash);
         // console.log(`#${header.number}-${blockHash}: ${header.author}`);
@@ -2053,6 +2119,7 @@ export default {
         console.log(`freeBalance:${freeBalance}`);
         this.linkAccount.freeBalance =
           this.formatWithDecimals(freeBalance).toFixed();
+        this.currentWalletAccount = allAccounts[0];
       } else {
         console.error(
           "cannot get account, please check if polkadot.js has been configured？"
@@ -2501,6 +2568,21 @@ export default {
     opacity: 0;
     position: fixed;
   }
+  .table-btn {
+    display: inline-block;
+    text-align: center;
+    padding: 0 8px;
+    height: 40px;
+    line-height: 40px;
+    background: #38cb98;
+    border-radius: 6px;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.7;
+    }
+  }
   .pagination-wrap {
     margin-top: 10px;
   }
@@ -2914,6 +2996,7 @@ export default {
 <style lang="less" scoped>
 .div-operation {
   display: flex;
+  align-items: center;
   .subscribe {
     margin-left: 10px;
     font-size: 20px;
