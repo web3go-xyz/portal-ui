@@ -201,7 +201,7 @@
                   :addressInfo="{
                     address: scope.row.id,
                     addressDisplayCompact: true,
-                    isEthereum: true,
+                    isEthereum: isEthereum,
                     fontSize: 16,
                   }"
                 ></identity-icon-plus>
@@ -214,40 +214,49 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Self Stake">
+          <el-table-column label="Stake">
             <template slot-scope="scope">
-              <span
-                >{{ getSelfStake(scope.row) | roundNumber(2) }}
-                {{ symbol }}</span
-              >
+              <div>
+                <div>
+                  Self:<span
+                    >{{ getSelfStake(scope.row) | roundNumber(2) }}
+                    {{ symbol }}</span
+                  >
+                </div>
+                <div>
+                  Delegators:
+                  <span
+                    >{{ getNominatorStake(scope.row) | roundNumber(2) }}
+                    {{ symbol }}</span
+                  >
+                </div>
+                <div>
+                  Total:
+                  <span
+                    >{{ getTotalStake(scope.row) | roundNumber(2) }}
+                    {{ symbol }}</span
+                  >
+                </div>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column width="150" label="Delegator Stake">
-            <template slot-scope="scope">
-              <span
-                >{{ getNominatorStake(scope.row) | roundNumber(2) }}
-                {{ symbol }}</span
-              >
-            </template>
-          </el-table-column>
-          <el-table-column label="Total Stake">
-            <template slot-scope="scope">
-              <span
-                >{{ getTotalStake(scope.row) | roundNumber(2) }}
-                {{ symbol }}</span
-              >
-            </template>
-          </el-table-column>
-          <el-table-column label="Total Reward">
+
+          <el-table-column label="Total Reward" width="150">
             <template slot-scope="scope">
               <span
                 >{{ scope.row.totalReward | roundNumber(2) }} {{ symbol }}</span
               >
             </template>
           </el-table-column>
-          <el-table-column label="Min Bond" prop="minBond" sortable="custom">
+          <el-table-column
+            label="Min Bond"
+            width="120"
+            prop="minBond"
+            sortable="custom"
+            align="center"
+          >
             <template slot="header" slot-scope="scope">
-              <div>
+              <div style="display: inline-flex; align-items: center">
                 Min Bond
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
@@ -261,28 +270,13 @@
               <span>{{ scope.row.minBond | roundNumber(0) }}</span>
             </template>
           </el-table-column>
-          <!-- <el-table-column label="Average RPM" prop="averageRPM">
-            <template slot="header" slot-scope="scope">
-              <div>
-                Avg RPM
-                <el-tooltip placement="top" trigger="hover">
-                  <div slot="content" class="tooltip-300px">
-                    Average RPM in past 10 round.
-                    <br /><br />
-                    RPM, Rewards Per {{symbol}} in a round.
-                    <br /><br />
-                    To simplify the calculation, we define RPM as "rewards per
-                    {{symbol}} when nominating to the specific collator"
-                  </div>
-                  <i class="el-icon-warning-outline"></i>
-                </el-tooltip>
-              </div>
-            </template>
-            <template slot-scope="scope">
-              <span>{{ scope.row.averageRPM | roundNumber(8) }}</span>
-            </template>
-          </el-table-column> -->
-          <el-table-column label="Avg Blocks" prop="averageBlocks">
+
+          <el-table-column
+            label="Avg Blocks"
+            width="120"
+            prop="averageBlocks"
+            align="center"
+          >
             <template slot="header" slot-scope="scope">
               <div>
                 Avg Blocks
@@ -300,7 +294,12 @@
               <span>{{ scope.row.averageBlocks | roundNumber(1) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Current Blocks" prop="currentBlocks">
+          <el-table-column
+            label="Current Blocks"
+            width="140"
+            prop="currentBlocks"
+            align="center"
+          >
             <template slot="header" slot-scope="scope">
               <div>
                 Current Blocks
@@ -317,9 +316,15 @@
               <span>{{ scope.row.currentBlocks }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="APR" prop="apr" sortable="custom">
+          <el-table-column
+            label="APR"
+            prop="apr"
+            width="120"
+            sortable="custom"
+            align="right"
+          >
             <template slot="header" slot-scope="scope">
-              <div>
+              <div style="display: inline-flex; align-items: center">
                 APR
                 <el-tooltip placement="top" trigger="hover">
                   <div slot="content" class="tooltip-300px">
@@ -448,7 +453,7 @@
                   :addressInfo="{
                     address: scope.row.id,
                     addressDisplayCompact: true,
-                    isEthereum: true,
+                    isEthereum: isEthereum,
                     fontSize: 16,
                   }"
                 ></identity-icon-plus>
@@ -1090,6 +1095,12 @@ export default {
     }
   },
   computed: {
+    isEthereum() {
+      if (this.parachain.walletSupport) {
+        return this.parachain.walletSupport.indexOf("MetaMask") > -1;
+      }
+      return false;
+    },
     parachain() {
       if (this.$route.meta && this.$route.meta.parachain) {
         return this.$route.meta.parachain;
@@ -1162,7 +1173,7 @@ export default {
   },
   methods: {
     goToMyStake() {
-      this.activeTab = '2';
+      this.activeTab = "2";
     },
     async delegateSuccess() {
       this.loading = true;

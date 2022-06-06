@@ -548,6 +548,15 @@ export default {
           tags: ["Featured", "Kusama", "Bifrost"],
           icon: require(`./../assets/images/home/bifrost.svg`),
         },
+        {
+          id: "Turing-1",
+          type: "Turing",
+          name: "Stake Analysis",
+          description: "Turing staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Turing"],
+          icon: require(`./../assets/images/home/oak-turing.png`),
+        },
       ],
       rmrkNFTDashboardList: [
         {
@@ -656,6 +665,7 @@ export default {
         Kusama: "Kusama Parachain Crowdloans",
         Polkadot: "Polkadot Parachain Crowdloans",
         Bifrost: "Bifrost Staking",
+        Turing: "Turing Staking",
       };
       return obj[type] || type;
     },
@@ -672,6 +682,9 @@ export default {
       }
       if (type === "Bifrost") {
         return require(`./../assets/images/home/bifrost-dashboard.png`);
+      }
+      if (type === "Turing") {
+        return require(`./../assets/images/home/oak-turing-dashboard.png`);
       }
       if (type === "Karura") {
         return require(`./../assets/images/home/karura-cdp-dashboard.png`);
@@ -797,6 +810,14 @@ export default {
       if (type == "Bifrost") {
         this.$router.push({
           name: "BifrostStaking",
+          params: {
+            data: d,
+          },
+        });
+      }
+      if (type == "Turing") {
+        this.$router.push({
+          name: "OAKStaking",
           params: {
             data: d,
           },
