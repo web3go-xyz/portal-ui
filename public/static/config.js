@@ -17,7 +17,7 @@ window.OAK_STAKING_API = "https://web3go.xyz/oak-staking/"; //Prefix for all oak
 //window.RMRK_API = "http://localhost:20005/";
 //window.MOONBEAM_API = "http://localhost:20014/";
 // window.BIFROST_STAKING_API = "http://localhost:20015/";
-window.OAK_STAKING_API = "http://16.163.5.216:20017/";
+//window.OAK_STAKING_API = "http://16.163.5.216:20017/";
 
 console.log("window.API：", window.API);
 console.log("window.POLKADOT_API", window.POLKADOT_API);
