@@ -973,6 +973,7 @@
       :symbol="symbol"
       :linkAccount="linkAccount"
       :currentWalletAccount="currentWalletAccount"
+      :minBond="minBond"
       @success="delegateSuccess"
     ></DelegateModal>
   </div>

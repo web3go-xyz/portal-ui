@@ -1,6 +1,10 @@
 <template>
   <div>
-    <el-dialog :title="isDelegateMore?'DelegateMore':'Delegate'" :visible.sync="visible" width="30%">
+    <el-dialog
+      :title="isDelegateMore ? 'DelegateMore' : 'Delegate'"
+      :visible.sync="visible"
+      width="30%"
+    >
       <div class="wallet-wrap">
         <!-- <img class="icon" :src="paraChainIcon" alt="" /> -->
         <identity-icon-plus :addressInfo="receiverAccount"></identity-icon-plus>
@@ -12,14 +16,18 @@
       <div class="input-wrap">
         <el-input-number
           v-model="num"
-          :min="0"
+          :min="minBond"
           :max="Number(linkAccount.freeBalance)"
           label="Input Num"
         ></el-input-number>
         <span class="symbol">{{ symbol }}</span>
       </div>
       <div class="btn-wrap">
-        <el-button :loading="btnLoading" @click="confirm" type="primary"
+        <el-button
+          :loading="btnLoading"
+          @click="confirm"
+          type="primary"
+          :disabled="canNotConfirm"
           >Confirm</el-button
         >
       </div>
@@ -32,7 +40,7 @@ import { BigNumber } from "bignumber.js";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import IdentityIconPlus from "@/components/ui-elements/IdentityIconPlus.vue";
 export default {
-  props: ["api", "symbol", "linkAccount", "currentWalletAccount"],
+  props: ["api", "symbol", "linkAccount", "currentWalletAccount", "minBond"],
   components: {
     IdentityIconPlus,
   },
@@ -47,6 +55,9 @@ export default {
     };
   },
   computed: {
+    canNotConfirm() {
+      return this.linkAccount.freeBalance <= this.minBond;
+    },
     parachain() {
       if (this.$route.meta && this.$route.meta.parachain) {
         return this.$route.meta.parachain;
