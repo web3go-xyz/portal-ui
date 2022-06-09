@@ -29,3 +29,6 @@ console.log("window.MOONRIVER_API", window.MOONRIVER_API);
 
 console.log("window.BIFROST_STAKING_API", window.BIFROST_STAKING_API);
 console.log("window.OAK_STAKING_API", window.OAK_STAKING_API);
+
+//window.BIFROST_WSS = "wss://bifrost-rpc.liebi.com/ws";
+//window.OAK_TURING_WSS = 'wss://rpc.turing-staging.oak.tech';
