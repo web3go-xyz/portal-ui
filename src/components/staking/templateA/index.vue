@@ -987,10 +987,12 @@
         <div
           class="wallet-item"
           v-for="ac in allAccounts"
-          :key="ac.address"
+          :key="ac.key"
           @click="accountChoosen(ac)"
         >
-          <div class="wallet-item-meta">{{ ac.meta.name }}</div>
+          <div class="wallet-item-meta">
+            {{ ac.meta.name }}&nbsp;(&nbsp;{{ ac.meta.source }}&nbsp;)
+          </div>
           <div class="wallet-item-address">{{ ac.address }}</div>
         </div>
       </div>
@@ -2158,6 +2160,11 @@ export default {
         ss58Format: ss58Format,
         accountType: ["ed25519", "sr25519", "ecdsa"],
       });
+      if (allAccounts && allAccounts.length > 0) {
+        for (const ac of allAccounts) {
+          ac.key = ac.address + (ac.meta.name || "") + (ac.meta.source || "");
+        }
+      }
       return allAccounts || [];
     },
     async accountChoosen(account) {
