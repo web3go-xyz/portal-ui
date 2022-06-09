@@ -18,7 +18,7 @@
         >
       </div>
       <div v-else class="wallet-wrap">
-        <!-- <img class="icon" :src="paraChainIcon" alt="" /> -->
+        <i class="el-icon-wallet switch-icon" @click="handleLinkAccount"></i>
         <identity-icon-plus :addressInfo="linkAccount"></identity-icon-plus>
 
         <div class="number" v-if="linkAccount.freeBalance">
@@ -976,6 +976,30 @@
       :minBond="minBond"
       @success="delegateSuccess"
     ></DelegateModal>
+
+    <el-dialog
+      title="Choose Wallet Account"
+      :visible.sync="showAccountChooseDialog"
+      width="30%"
+      center
+    >
+      <div class="wallet-list">
+        <div
+          class="wallet-item"
+          v-for="ac in allAccounts"
+          :key="ac.address"
+          @click="accountChoosen(ac)"
+        >
+          <div class="wallet-item-meta">{{ ac.meta.name }}</div>
+          <div class="wallet-item-address">{{ ac.address }}</div>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="warning" @click="showAccountChooseDialog = false"
+          >Cancel</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -1061,6 +1085,9 @@ export default {
 
       roundsPickedByDropdown: 10, //默认计算Avg Blocks的round数， 前10个round
       roundsDropdown: [1, 3, 4, 5, 8, 10],
+
+      allAccounts: [], //account choose list shown on dialog
+      showAccountChooseDialog: false,
     };
   },
   async created() {
@@ -2100,6 +2127,8 @@ export default {
       });
     },
     async handleLinkAccount() {
+      this.allAccounts = [];
+
       if (this.parachain.walletSupport === "MetaMask") {
         this.handleLinkAccount_MetaMask(
           this.parachain.chainId,
@@ -2109,24 +2138,55 @@ export default {
       }
 
       if (this.parachain.walletSupport === "polkadot.js") {
-        this.handleLinkAccount_PolkadotJs(
+        let allAccounts = await this.getAccountList_PolkadotJs(
           this.paraChainName,
-          this.parachain.ss58Format,
-          this.parachain.rpcUrls
+          this.parachain.ss58Format
         );
+        console.log("allAccounts from polkadot.js:", allAccounts);
+
+        this.allAccounts = allAccounts;
+        this.showAccountChooseDialog = true;
       }
       console.log(
         `wallet [${this.parachain.walletSupport}] not supported yet. current support: [MetaMask,polkadot.js]`
       );
     },
-    async handleLinkAccount_PolkadotJs(chain, ss58Format, rpcUrls) {
+
+    async getAccountList_PolkadotJs(chain, ss58Format) {
       await web3Enable(`Web3Go ${chain} Staking dashboard`);
-      const allAccounts = await web3Accounts({ ss58Format: ss58Format });
-      for (const account of allAccounts) {
-        console.log(`account:${JSON.stringify(account)}`);
-      }
+      const allAccounts = await web3Accounts({
+        ss58Format: ss58Format,
+        accountType: ["ed25519", "sr25519", "ecdsa"],
+      });
+      return allAccounts || [];
+    },
+    async accountChoosen(account) {
+      this.showAccountChooseDialog = false;
+      let pickedAccountIndex = this.allAccounts.findIndex(
+        (t) => t.address == account.address
+      );
+      console.log(
+        `accountChoosen:`,
+        account,
+        `,pickedAccountIndex:`,
+        pickedAccountIndex
+      );
+      await this.handleLinkAccount_PolkadotJs(
+        this.paraChainName,
+        this.parachain.ss58Format,
+        this.parachain.rpcUrls,
+        pickedAccountIndex
+      );
+    },
+    async handleLinkAccount_PolkadotJs(
+      chain,
+      ss58Format,
+      rpcUrls,
+      pickedAccountIndex
+    ) {
+      let allAccounts = await this.getAccountList_PolkadotJs(chain, ss58Format);
       if (allAccounts && allAccounts.length > 0) {
-        let currentAddress = allAccounts[0].address;
+        let currentAddress = allAccounts[pickedAccountIndex || 0].address;
 
         this.linkAccount.address = currentAddress;
         this.searchAccount = this.linkAccount.address;
@@ -2698,8 +2758,34 @@ export default {
       font-size: 16px;
       color: rgba(41, 40, 40, 0.6);
     }
+
+    .switch-icon {
+      margin: 0px 15px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      &:hover {
+        color: #36f1a6;
+      }
+    }
   }
 
+  .wallet-list {
+    .wallet-item {
+      padding: 15px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      .wallet-item-address {
+      }
+      .wallet-item-meta {
+        font-size: 1rem;
+        font-weight: bold;
+      }
+
+      &:hover {
+        background: #ddd;
+      }
+    }
+  }
   .big-bg {
     padding: 25px 100px;
     .info-wrap {
