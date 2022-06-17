@@ -341,7 +341,7 @@ export default new Router({
                 walletSupport: 'polkadot.js',
                 // walletSupport: 'MetaMask',
                 ss58Format: 6, // polkadot.js 
-                rpcUrls: ["wss://bifrost-rpc.liebi.com/ws"], //MetaMask,polkadot.js 
+                rpcUrls: [window.BIFROST_WSS || "wss://bifrost-rpc.liebi.com/ws"], //MetaMask,polkadot.js 
 
                 // chainId: "0x504", //MetaMask
                 // blockExplorerUrls: ["https://bifrost.subscan.io/"], //MetaMask
@@ -364,11 +364,11 @@ export default new Router({
                 canDelegate: true,
                 walletSupport: 'polkadot.js',
                 ss58Format: 51, // polkadot.js 
-                rpcUrls: ["wss://rpc.turing.oak.tech"], //MetaMask,polkadot.js 
+                rpcUrls: [window.OAK_TURING_WSS || "wss://rpc.turing.oak.tech"], //MetaMask,polkadot.js 
             },
             base_api: window.OAK_STAKING_API
         },
-    },    
+    },
     {
         path: "/StakingCollectorDetail",
         name: "StakingCollectorDetail",
