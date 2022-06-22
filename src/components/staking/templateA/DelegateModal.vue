@@ -16,7 +16,7 @@
       <div class="input-wrap">
         <el-input-number
           v-model="num"
-          :min="minBond"
+          :min="minBondRequired"
           :max="Number(linkAccount.freeBalance)"
           label="Input Num"
         ></el-input-number>
@@ -55,8 +55,14 @@ export default {
     };
   },
   computed: {
+    minBondRequired() {
+      if (this.isDelegateMore === "DelegateMore") {
+        return 1;
+      }
+      return this.minBond;
+    },
     canNotConfirm() {
-      return this.linkAccount.freeBalance <= this.minBond;
+      return this.linkAccount.freeBalance <= this.minBondRequired;
     },
     parachain() {
       if (this.$route.meta && this.$route.meta.parachain) {
