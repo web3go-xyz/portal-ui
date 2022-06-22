@@ -56,10 +56,7 @@ export default {
   },
   computed: {
     minBondRequired() {
-      if (this.isDelegateMore === "DelegateMore") {
-        return 1;
-      }
-      return this.minBond;
+      return this.num;
     },
     canNotConfirm() {
       return this.linkAccount.freeBalance <= this.minBondRequired;
@@ -86,8 +83,8 @@ export default {
         this.$message.error("Please enter a number greater than 0");
         return;
       }
-      if (!this.isDelegateMore && this.num < 50) {
-        this.$message.error("The minimum delegate is 50");
+      if (!this.isDelegateMore && this.num < this.minBond) {
+        this.$message.error("The minimum delegate is " + this.minBond);
         return;
       }
       this.btnLoading = true;
@@ -179,7 +176,7 @@ export default {
       if (isMore) {
         this.num = 1;
       } else {
-        this.num = 50;
+        this.num = this.minBond;
       }
       this.isDelegateMore = isMore;
       this.receiverAccount = { ...this.linkAccount, address };
