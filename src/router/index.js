@@ -242,27 +242,27 @@ export default new Router({
         name: "CustomQuery",
         component: CustomQuery
     },
-    {
-        path: "/Moonriver",
-        name: "Moonriver",
-        component: Moonriver
-    },
-    {
-        path: "/CollectorDetail",
-        name: "CollectorDetail",
-        meta: {
-            noHead: true
-        },
-        component: CollectorDetail
-    },
-    {
-        path: "/DelegatorDetail",
-        name: "DelegatorDetail",
-        meta: {
-            noHead: true
-        },
-        component: DelegatorDetail
-    },
+    // {
+    //     path: "/Moonriver",
+    //     name: "Moonriver",
+    //     component: Moonriver
+    // },
+    // {
+    //     path: "/CollectorDetail",
+    //     name: "CollectorDetail",
+    //     meta: {
+    //         noHead: true
+    //     },
+    //     component: CollectorDetail
+    // },
+    // {
+    //     path: "/DelegatorDetail",
+    //     name: "DelegatorDetail",
+    //     meta: {
+    //         noHead: true
+    //     },
+    //     component: DelegatorDetail
+    // },
     {
         path: "/Moonbeam",
         name: "Moonbeam",
@@ -369,6 +369,26 @@ export default new Router({
             base_api: window.OAK_STAKING_API
         },
     },
+    {
+        path: "/Moonriver",
+        name: "Moonriver",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'Moonriver',
+                icon: 'static/parachain-icon/moonriver.png',
+                symbol: 'MOVR',
+                decimals: 18,
+                minBond: 5,
+                canDelegate: false,
+                walletSupport: 'MetaMask',
+                chainId: "0x505", //MetaMask Moonriver
+                blockExplorerUrls: ["https://moonriver.subscan.io/"], //MetaMask 
+            },
+            base_api: window.MOONRIVER_API
+        },
+    },
+
     {
         path: "/StakingCollectorDetail",
         name: "StakingCollectorDetail",

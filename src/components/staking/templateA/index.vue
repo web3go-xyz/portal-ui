@@ -1492,6 +1492,8 @@ export default {
           currentCollator,
           this.roundsPickedByDropdown
         ),
+        totalSupply: this.totalSupply,
+        averageBlocks: currentCollator.averageBlocks,
       };
 
       return await aprUtlis.calculate(this.paraChainName, params);
