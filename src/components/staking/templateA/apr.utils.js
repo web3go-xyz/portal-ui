@@ -19,6 +19,21 @@ let aprUtlis = {
                 100
             );
         }
+        if (paraChainName.toLowerCase() === 'moonriver'
+            || paraChainName.toLowerCase() === 'moonbeam') {
+
+            // 0.00001388888888888889 * <total_supply>  * <avg_blocks_per_round> / <collator_counted_stake>
+            let total_supply = Number(params.totalSupply);
+            let collator_counted_stake = Number(params.collatorStake);
+            let avg_blocks_per_round = Number(params.averageBlocks);
+            console.log('total_supply:', total_supply, ' collator_counted_stake:', collator_counted_stake, ' avg_blocks_per_round:', avg_blocks_per_round);
+            return (
+                ((0.00001388888888888889 * total_supply * avg_blocks_per_round) /
+                    collator_counted_stake) *
+                100
+            );
+
+        }
 
         return -1;
     },
