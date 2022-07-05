@@ -4,8 +4,8 @@ let aprUtlis = {
 
     async calculate(paraChainName, params) {
         console.log(paraChainName, '\taprUtlis.calculate:', JSON.stringify(params));
-        if (paraChainName.toLowerCase() === 'bifrost'
-            || paraChainName.toLowerCase() === 'oak') {
+        if (paraChainName.toLowerCase() === 'bifrost'.toLowerCase()
+            || paraChainName.toLowerCase() === 'Turing Network'.toLowerCase()) {
             let blockTargetSeconds = await this.getBlockTargetSeconds(paraChainName);
             console.log('blockTargetSeconds:', blockTargetSeconds);
 
