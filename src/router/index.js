@@ -351,12 +351,12 @@ export default new Router({
         },
     },
     {
-        path: "/OAKStaking",
-        name: "OAKStaking",
+        path: "/TuringStaking",
+        name: "TuringStaking",
         component: StakingTemplateA,
         meta: {
             parachain: {
-                name: 'OAK',
+                name: 'Turing Network',
                 icon: 'static/parachain-icon/oak-logo.png',
                 symbol: 'TUR',
                 decimals: 10,

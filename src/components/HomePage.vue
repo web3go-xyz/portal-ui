@@ -817,7 +817,7 @@ export default {
       }
       if (type == "Turing") {
         this.$router.push({
-          name: "OAKStaking",
+          name: "TuringStaking",
           params: {
             data: d,
           },
