@@ -24,7 +24,7 @@
         </div>
         <div class="item">
           <span class="label">Owner</span>
-          <span class="text">{{ infoData.currentOwner }}</span>
+          <span class="text">{{ infoData.currentOwnerAccount }}</span>
         </div>
         <div class="item">
           <span class="label">Metadata</span>
