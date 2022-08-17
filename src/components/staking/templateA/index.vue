@@ -793,9 +793,10 @@
             <span>RPM Statistic</span>
             <el-tooltip placement="top" trigger="hover">
               <div slot="content" class="tooltip-300px">
-                RPM, Rewards Per {{ symbol }}. To simplify the calculation, we
-                define RPM as "rewards per {{ symbol }} when nominating to the
-                specific collator"
+                RPM, rewards per {{ symbol }} for next single round. Simply like
+                how much rewards you will get in the next round if tokens
+                staked. This indicator is for delegators to find the max
+                estimated rewards under the fixed token quantity.
               </div>
               <i class="el-icon-warning-outline"></i>
             </el-tooltip>
@@ -1202,6 +1203,20 @@ export default {
     },
   },
   methods: {
+    getFreeBalance(accountInfo) {
+      if (accountInfo && accountInfo.data) {
+        console.log(`getFreeBalance:`, accountInfo);
+        // {"free":488672920111,"reserved":0,"miscFrozen":0,"feeFrozen":0}}
+        let free = accountInfo.data.free.toString(10);
+        if (accountInfo.data.miscFrozen) {
+          let miscFrozen = accountInfo.data.miscFrozen.toString(10);
+          let final = free - miscFrozen;
+          if (final < 0) final = 0;
+          return final;
+        }
+      }
+      return 0;
+    },
     goToMyStake() {
       this.activeTab = "2";
     },
@@ -1211,7 +1226,7 @@ export default {
       const accountInfo = await this.apiPromise.query.system.account(
         this.linkAccount.address
       );
-      let freeBalance = accountInfo.data.free.toString(10);
+      let freeBalance = this.getFreeBalance(accountInfo);
       this.linkAccount.freeBalance =
         this.formatWithDecimals(freeBalance).toFixed();
     },
@@ -2216,7 +2231,7 @@ export default {
         // console.log(`#${header.number}-${blockHash}: ${header.author}`);
         const accountInfo = await api.query.system.account(currentAddress);
         console.log(`accountInfo:${accountInfo}`);
-        let freeBalance = accountInfo.data.free.toString(10);
+        let freeBalance = this.getFreeBalance(accountInfo);
         console.log(`freeBalance:${freeBalance}`);
         this.linkAccount.freeBalance =
           this.formatWithDecimals(freeBalance).toFixed();
