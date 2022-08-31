@@ -19,7 +19,7 @@ window.OAK_STAKING_API = "https://web3go.xyz/oak-staking/"; //Prefix for all oak
 // window.BIFROST_STAKING_API = "http://localhost:20015/";
 //window.OAK_STAKING_API = "http://16.163.5.216:20017/";
 
-console.log("window.API：", window.API);
+console.log("window.API:", window.API);
 console.log("window.POLKADOT_API", window.POLKADOT_API);
 console.log("window.KUSAMA_API", window.KUSAMA_API);
 console.log("window.RMRK_API", window.RMRK_API);

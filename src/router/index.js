@@ -383,6 +383,7 @@ export default new Router({
                 canDelegate: false,
                 walletSupport: 'MetaMask',
                 chainId: "0x505", //MetaMask Moonriver
+                rpcUrls: ["https://rpc.moonriver.moonbeam.network"], //MetaMask,polkadot.js 
                 blockExplorerUrls: ["https://moonriver.subscan.io/"], //MetaMask 
             },
             base_api: window.MOONRIVER_API

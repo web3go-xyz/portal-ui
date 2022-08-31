@@ -1094,6 +1094,19 @@ export default {
     };
   },
   async created() {
+    if (this.parachain.walletSupport === "MetaMask") {
+      const alreadyLinkMetaMask = localStorage.getItem("alreadyLinkMetaMask");
+      if (alreadyLinkMetaMask) {
+        this.handleLinkAccount();
+      }
+    } else {
+      const savedAccountStr = localStorage.getItem("currentAccount");
+      if (savedAccountStr) {
+        setTimeout(() => {
+          this.accountChoosen(JSON.parse(savedAccountStr));
+        }, 100);
+      }
+    }
     stakingService.base_api = this.$route.meta.base_api;
 
     let self = this;
@@ -2185,62 +2198,45 @@ export default {
       return allAccounts || [];
     },
     async accountChoosen(account) {
+      await web3Enable(`Web3Go ${this.paraChainName} Staking dashboard`);
+      localStorage.setItem("currentAccount", JSON.stringify(account));
       this.showAccountChooseDialog = false;
-      let pickedAccountIndex = this.allAccounts.findIndex(
-        (t) => t.address == account.address
-      );
-      console.log(
-        `accountChoosen:`,
-        account,
-        `,pickedAccountIndex:`,
-        pickedAccountIndex
-      );
+
+      console.log(`accountChoosen:`, account, `,account:`, account);
       await this.handleLinkAccount_PolkadotJs(
         this.paraChainName,
         this.parachain.ss58Format,
         this.parachain.rpcUrls,
-        pickedAccountIndex
+        account
       );
     },
-    async handleLinkAccount_PolkadotJs(
-      chain,
-      ss58Format,
-      rpcUrls,
-      pickedAccountIndex
-    ) {
-      let allAccounts = await this.getAccountList_PolkadotJs(chain, ss58Format);
-      if (allAccounts && allAccounts.length > 0) {
-        let currentAddress = allAccounts[pickedAccountIndex || 0].address;
+    async handleLinkAccount_PolkadotJs(chain, ss58Format, rpcUrls, account) {
+      let currentAddress = account.address;
 
-        this.linkAccount.address = currentAddress;
-        this.searchAccount = this.linkAccount.address;
-        if (this.tableData.length) {
-          this.getMyStackList();
-        }
-        this.refreshMySubscribe(this.linkAccount);
-
-        const wsProvider = new WsProvider(rpcUrls);
-        let types = chainUtlis.getTypes(chain);
-        console.log("types:", types);
-        const api = await ApiPromise.create({
-          provider: wsProvider,
-        });
-        this.apiPromise = api;
-        // const blockHash = await api.rpc.chain.getBlockHash(100);
-        // const header = await api.derive.chain.getHeader(blockHash);
-        // console.log(`#${header.number}-${blockHash}: ${header.author}`);
-        const accountInfo = await api.query.system.account(currentAddress);
-        console.log(`accountInfo:${accountInfo}`);
-        let freeBalance = this.getFreeBalance(accountInfo);
-        console.log(`freeBalance:${freeBalance}`);
-        this.linkAccount.freeBalance =
-          this.formatWithDecimals(freeBalance).toFixed();
-        this.currentWalletAccount = allAccounts[0];
-      } else {
-        console.error(
-          "cannot get account, please check if polkadot.js has been configured？"
-        );
+      this.linkAccount.address = currentAddress;
+      this.searchAccount = this.linkAccount.address;
+      if (this.tableData.length) {
+        this.getMyStackList();
       }
+      this.refreshMySubscribe(this.linkAccount);
+
+      const wsProvider = new WsProvider(rpcUrls);
+      let types = chainUtlis.getTypes(chain);
+      console.log("types:", types);
+      const api = await ApiPromise.create({
+        provider: wsProvider,
+      });
+      this.apiPromise = api;
+      // const blockHash = await api.rpc.chain.getBlockHash(100);
+      // const header = await api.derive.chain.getHeader(blockHash);
+      // console.log(`#${header.number}-${blockHash}: ${header.author}`);
+      const accountInfo = await api.query.system.account(currentAddress);
+      console.log(`accountInfo:${accountInfo}`);
+      let freeBalance = this.getFreeBalance(accountInfo);
+      console.log(`freeBalance:${freeBalance}`);
+      this.linkAccount.freeBalance =
+        this.formatWithDecimals(freeBalance).toFixed();
+      this.currentWalletAccount = account;
     },
     async handleLinkAccount_MetaMask(
       targetChainId,
@@ -2302,6 +2298,8 @@ export default {
           return;
         }
         this.linkAccount.address = accs[0];
+        localStorage.setItem("alreadyLinkMetaMask", true);
+
         this.searchAccount = this.linkAccount.address;
         if (this.tableData.length) {
           this.getMyStackList();
