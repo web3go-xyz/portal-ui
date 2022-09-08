@@ -13,7 +13,7 @@
         }}</el-menu-item>
       </el-menu>
     </div>
-    <div v-show="showSub">
+    <div v-if="showSub">
       <router-view name="sub" />
     </div>
   </div>
@@ -43,6 +43,11 @@ export default {
           index: "RMRKNFTNameUpdate",
           name: "RMRK NFT NameUpdate",
           routeName: "MaintenanceDashboard-RMRKNFTNameUpdate",
+        },
+        {
+          index: "InsightManage",
+          name: "Insight Manage",
+          routeName: "MaintenanceDashboard-InsightManage",
         },
       ],
     };

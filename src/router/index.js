@@ -45,6 +45,7 @@ import MaintenanceDashboard from "@/components/sysConfig/MaintenanceDashboard";
 import AddressTagManage from "@/components/sysConfig/sub/AddressTagManage";
 import ParaChainManage from "@/components/sysConfig/sub/ParaChainManage";
 import RMRKNFTNameUpdate from "@/components/sysConfig/sub/RMRKNFTNameUpdate";
+import InsightManage from "@/components/sysConfig/sub/InsightManage";
 
 
 import NFTProfiler from "@/components/nft/NftProfiler";
@@ -322,7 +323,16 @@ export default new Router({
             components: {
                 sub: RMRKNFTNameUpdate
             }
-        }
+        }, {
+            path: "/MaintenanceDashboard/InsightManage",
+            name: "MaintenanceDashboard-InsightManage",
+            meta: {
+                noHead: true
+            },
+            components: {
+                sub: InsightManage
+            }
+        },
         ]
     },
 

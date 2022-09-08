@@ -40,6 +40,7 @@ function getAddressTagList(data) {
     data
   });
 }
+
 export default {
   getWalletLabelConfig,
   updateWalletLabelConfig,

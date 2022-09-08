@@ -1,19 +1,23 @@
 <template>
   <div class="content address-tag-manage">
     <div class="top-operation">
-      <el-button type="primary" @click="handleNew()">New address tag</el-button>
+      <el-button type="primary" @click="handleNew()">New insight</el-button>
     </div>
     <div class="">
-      <el-table :data="addressTagList" style="width: 100%">
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column label="icon" width="70">
+          <template slot-scope="scope">
+            <img
+              class="icon"
+              :src="'static/parachain-icon/' + scope.row.icon"
+              alt=""
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="name"></el-table-column>
         <el-table-column
-          prop="address"
-          label="address"
-          width="400"
-        ></el-table-column>
-        <el-table-column
-          prop="addressTag"
-          label="address tag"
-          width="180"
+          prop="dashboard_id"
+          label="dashboard_id"
         ></el-table-column>
         <el-table-column
           prop="description"
@@ -37,34 +41,56 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="30%">
       <div>
         <div class="form-row">
-          <div class="desc">address</div>
+          <div class="desc">name</div>
+          <div class="value">
+            <el-input v-model="currentRow.name"></el-input>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="desc">dashboard_id</div>
           <div class="value">
             <el-input
-              :disabled="dialogTitle == 'Edit'"
-              v-model="currentRow.address"
+              v-model="currentRow.dashboard_id"
             ></el-input>
           </div>
         </div>
         <div class="form-row">
-          <div class="desc">address tag</div>
+          <div class="desc">type</div>
           <div class="value">
             <el-input
-              v-model="currentRow.addressTag"
-              placeholder="if you have multiple tags, please use comma between them"
+              v-model="currentRow.type"
+              placeholder="type of dashboard, sample as : Moonbeam, Polkadot"
             ></el-input>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="desc">show tag instead of address</div>
-          <div class="value">
-            <el-switch v-model="currentRow.showTagInsteadOfAddress">
-            </el-switch>
           </div>
         </div>
         <div class="form-row">
           <div class="desc">description</div>
           <div class="value">
-            <el-input v-model="currentRow.simpleDescription"></el-input>
+            <el-input v-model="currentRow.description"></el-input>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="desc">tags</div>
+          <div class="value">
+            <el-input v-model="currentRow.tags"></el-input>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="desc">icon</div>
+          <div class="value">
+            <el-input v-model="currentRow.icon"></el-input>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="desc">snapshot</div>
+          <div class="value">
+            <el-input v-model="currentRow.snapshot"></el-input>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="desc">link</div>
+          <div class="value">
+            <el-input v-model="currentRow.link"></el-input>
           </div>
         </div>
       </div>
@@ -77,13 +103,18 @@
 </template>
 
 <script>
-import service from "@/api/config-manage";
+import {
+  queryDataBoardList,
+  publishDashboard,
+  removeDashboard,
+  snapshotUpload,
+} from "@/api/Insight";
 export default {
   name: "AddressTagManage",
   data() {
     return {
       name: "AddressTagManage",
-      addressTagList: [],
+      tableData: [],
       dialogVisible: false,
       dialogTitle: "",
       currentRow: {
@@ -98,81 +129,67 @@ export default {
   },
   computed: {},
   mounted() {
-    this.getAddressTagList();
+    this.getData();
   },
   methods: {
-    getAddressTagList() {
+    getData() {
       var self = this;
-      return service.getAddressTagList().then((resp) => {
+      return queryDataBoardList().then((resp) => {
         if (resp && resp) {
-          self.addressTagList = resp.list;
+          self.tableData = resp.list;
         }
       });
     },
     handleNew() {
-      let self = this;
-      self.currentRow.id = 0;
-      self.currentRow.address = "";
-      self.currentRow.addressTag = "";
-      self.currentRow.description = "";
-      self.currentRow.showTagInsteadOfAddress = false;
-      self.currentRow.simpleDescription = "";
-
-      self.dialogVisible = true;
-      self.dialogTitle = "New";
+      this.currentRow = {
+        id: 0,
+        name: "",
+        type: "",
+        description: "",
+        tags: "",
+        icon: "",
+        snapshot: "",
+        link: "",
+      };
+      this.dialogVisible = true;
+      this.dialogTitle = "New";
     },
     handleEdit(index, row) {
-      let self = this;
-      self.currentRow.id = row.id;
-      self.currentRow.address = row.address;
-      self.currentRow.addressTag = row.addressTag;
-      self.currentRow.description = row.description;
-
-      if (self.currentRow.description) {
-        let desc = JSON.parse(self.currentRow.description);
-        self.currentRow.showTagInsteadOfAddress =
-          desc.showTagInsteadOfAddress || false;
-        self.currentRow.simpleDescription = desc.simpleDescription || "";
-      }
-      self.dialogVisible = true;
-      self.dialogTitle = "Edit";
+      this.currentRow = row;
+      this.dialogVisible = true;
+      this.dialogTitle = "Edit";
     },
     handleDelete(index, row) {
       let self = this;
       self.currentRow = row;
 
-      this.$confirm("Remove current address tag, continue?", "Confirm", {
+      this.$confirm("Remove current insight, continue?", "Confirm", {
         confirmButtonText: "Confirm",
         cancelButtonText: "Cancel",
         type: "warning",
       })
         .then(() => {
-          service.removeAddressTag(self.currentRow).then((resp) => {
+          removeDashboard(self.currentRow).then((resp) => {
             self.$notify({
               type: "success",
               message: "Remove success!",
               position: "bottom-left",
             });
             self.dialogVisible = false;
-            self.getAddressTagList();
+            self.getData();
           });
         })
         .catch(() => {});
     },
     onSave() {
       let self = this;
-      let desc = {
-        showTagInsteadOfAddress: self.currentRow.showTagInsteadOfAddress,
-        simpleDescription: self.currentRow.simpleDescription,
-      };
-      self.currentRow.description = JSON.stringify(desc);
-      service.updateAddressTag(self.currentRow).then((resp) => {
+      publishDashboard(self.currentRow).then((resp) => {
         self.$notify({
           type: "success",
           message: "Update success!",
           position: "bottom-left",
         });
-        self.getAddressTagList();
+        self.getData();
         self.dialogVisible = false;
       });
     },
@@ -190,7 +207,10 @@ export default {
   text-align: left;
   padding: 10px 0px;
 }
-
+.icon {
+  width: 24px;
+  height: 24px;
+}
 .form-row {
   .desc {
     font-size: 16px;
