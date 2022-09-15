@@ -61,6 +61,7 @@
 import ERC20 from "@/components/BAS/ERC20";
 import ERC721 from "@/components/BAS/ERC721";
 import Overview from "@/components/BAS/Overview";
+import basApi from "@/api/bas";
 export default {
   components: {
     ERC20,
@@ -79,6 +80,11 @@ export default {
         },
       });
     }
+    basApi
+      .basOverview({
+        apikey: 123456,
+      })
+      .then((d) => {});
   },
   methods: {
     clickTab(tabIndex) {
