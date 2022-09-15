@@ -5,6 +5,7 @@ import HomePage from "@/components/HomePage";
 import ProfileHome from "@/components/profile/ProfileHome";
 import Insight from "@/components/Insight";
 import InsightDetail from "@/components/Insight/InsightDetail";
+import BAS from "@/components/BAS";
 
 import ProfileIndex from "@/components/profile/ProfileIndex";
 import Login from "@/components/user/Login";
@@ -86,6 +87,14 @@ export default new Router({
             parent: 'Insight'
         },
         component: Insight
+    },
+    {
+        path: "/BAS",
+        name: "BAS",
+        meta: {
+            parent: 'BAS'
+        },
+        component: BAS
     },
     {
         path: "/InsightDetail",
@@ -399,7 +408,6 @@ export default new Router({
             base_api: window.MOONRIVER_API
         },
     },
-
     {
         path: "/StakingCollectorDetail",
         name: "StakingCollectorDetail",

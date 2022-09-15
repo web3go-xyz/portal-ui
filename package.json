@@ -13,9 +13,9 @@
         "analyzer": "cross-env use_analyzer=true npm run build"
     },
     "dependencies": {
+        "@polkadot/api": "^7.14.1",
         "@polkadot/extension-dapp": "0.42.9",
         "@polkadot/vue-identicon": "1.4.1",
-        "@polkadot/api": "^7.14.1",
         "bignumber.js": "^9.0.2",
         "core-js": "^3.21.1",
         "decimal.js": "^10.3.1",
@@ -25,6 +25,7 @@
         "material-design-icons-iconfont": "^6.5.0",
         "moment": "^2.29.1",
         "vue": "^2.6.11",
+        "vue-count-to": "^1.0.13",
         "vue-cropper": "^0.5.8",
         "vue-i18n": "^8.24.5",
         "vue-router": "^3.5.2",
