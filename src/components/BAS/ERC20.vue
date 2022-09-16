@@ -4,19 +4,38 @@
       <div class="info">
         <div class="item">
           <div class="num">
-            <countTo :startVal="0" :endVal="3407568" :duration="3000"></countTo>
+            <countTo
+              v-if="numData.total_transfer_tokens"
+              :decimals="2"
+              :startVal="0"
+              :endVal="numData.total_transfer_tokens"
+              :duration="3000"
+            ></countTo>
+            <span v-else>--</span>
           </div>
           <span class="label">Total Transfers</span>
         </div>
         <div class="item">
           <div class="num">
-            <countTo :startVal="0" :endVal="3407568" :duration="3000"></countTo>
+            <countTo
+              v-if="numData.total_transfer_transactions"
+              :startVal="0"
+              :endVal="numData.total_transfer_transactions"
+              :duration="3000"
+            ></countTo>
+            <span v-else>--</span>
           </div>
           <span class="label">Tansfer Volume</span>
         </div>
         <div class="item">
           <div class="num">
-            <countTo :startVal="0" :endVal="3407568" :duration="3000"></countTo>
+            <countTo
+              v-if="numData.total_addresses"
+              :startVal="0"
+              :endVal="numData.total_addresses"
+              :duration="3000"
+            ></countTo>
+            <span v-else>--</span>
           </div>
           <span class="label">Total Addresses</span>
         </div>
@@ -72,10 +91,27 @@
 
 <script>
 import countTo from "vue-count-to";
+import basApi from "@/api/bas";
+
 export default {
   components: { countTo },
   data() {
-    return {};
+    return {
+      numData: {},
+    };
+  },
+  created() {
+    basApi
+      .basErc20Overview({
+        apikey: 123456,
+      })
+      .then((d) => {
+        d.total_transfer_tokens = this.$utils.formatTokenNumber(
+          d.total_transfer_tokens,
+          Math.pow(10, d.token_decimals)
+        );
+        this.numData = d;
+      });
   },
   mounted() {},
 };

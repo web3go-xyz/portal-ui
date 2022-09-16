@@ -33,7 +33,7 @@ let basApi = {
     formatUrl: function (url) {
         return utils.formatUrl(this.base_api || '/', url);
     },
-    base_api: '/'
+    base_api: window.BASE_API
 }
 
 export default basApi;

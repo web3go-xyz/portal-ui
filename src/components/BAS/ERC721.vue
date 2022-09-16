@@ -3,18 +3,13 @@
     <div class="small-tab-wrap">
       <div class="small-tab">
         <div
+          v-for="(v, i) in tabList"
+          :key="i"
           class="item"
-          @click="clickSmallTab(1)"
-          :class="{ active: smallTabIndex == 1 }"
+          @click="clickSmallTab(v)"
+          :class="{ active: smallTab.name == v.name }"
         >
-          MetaApes Fighter
-        </div>
-        <div
-          class="item"
-          @click="clickSmallTab(2)"
-          :class="{ active: smallTabIndex == 2 }"
-        >
-          Meta Apes Relic
+          {{ v.name }}
         </div>
       </div>
     </div>
@@ -22,21 +17,13 @@
       <div class="col">
         <div class="label">Contract Address</div>
         <div class="value">
-          {{
-            smallTabIndex == 1
-              ? "0xa72b7321517a763dd879019564406fb5fc39cfd0"
-              : "0xc805c32b3d9a29e54f6c01d4d0a322697be23c64"
-          }}
+          {{ smallTab.contract_address }}
         </div>
       </div>
       <div class="col">
         <div class="label">Creator Address</div>
         <div class="value">
-          {{
-            smallTabIndex == 1
-              ? "0x43F970Fb4256763b3C03bED26Df01eBDA6F488A5"
-              : "0xD699576B6b97f57Bd7513F70beF38Cd63556edF7"
-          }}
+          {{ smallTab.creator }}
         </div>
       </div>
     </div>
@@ -48,7 +35,7 @@
             <div class="num">
               <countTo
                 :startVal="0"
-                :endVal="3407568"
+                :endVal="numData.total_minted"
                 :duration="3000"
               ></countTo>
             </div>
@@ -57,7 +44,11 @@
         </div>
         <div class="l-chart">
           <iframe
-            src="https://mb.web3go.xyz/public/question/57bb86d9-b2a5-49bc-84dc-3cc1417aa7c7"
+            :src="
+              addQuery(
+                'https://mb.web3go.xyz/public/question/57bb86d9-b2a5-49bc-84dc-3cc1417aa7c7'
+              )
+            "
             frameborder="0"
             width="100%"
             height="369"
@@ -68,7 +59,11 @@
       <div class="right">
         <div class="r-chart">
           <iframe
-            src="https://mb.web3go.xyz/public/question/e7879479-cafa-4633-b571-aa813149e0d1"
+            :src="
+              addQuery(
+                'https://mb.web3go.xyz/public/question/e7879479-cafa-4633-b571-aa813149e0d1'
+              )
+            "
             frameborder="0"
             width="100%"
             height="595"
@@ -85,7 +80,7 @@
             <div class="num">
               <countTo
                 :startVal="0"
-                :endVal="3407568"
+                :endVal="numData.total_burnt"
                 :duration="3000"
               ></countTo>
             </div>
@@ -94,7 +89,11 @@
         </div>
         <div class="l-chart">
           <iframe
-            src="https://mb.web3go.xyz/public/question/8facdb90-2269-408b-b757-3d73ac6fa422"
+            :src="
+              addQuery(
+                'https://mb.web3go.xyz/public/question/8facdb90-2269-408b-b757-3d73ac6fa422'
+              )
+            "
             frameborder="0"
             width="100%"
             height="369"
@@ -105,7 +104,11 @@
       <div class="right">
         <div class="r-chart">
           <iframe
-            src="https://mb.web3go.xyz/public/question/39429d2a-b97d-4eb6-b374-542a2209bd9d"
+            :src="
+              addQuery(
+                'https://mb.web3go.xyz/public/question/39429d2a-b97d-4eb6-b374-542a2209bd9d'
+              )
+            "
             frameborder="0"
             width="100%"
             height="595"
@@ -116,7 +119,11 @@
     </div>
     <div class="chart">
       <iframe
-        src="https://mb.web3go.xyz/public/question/72fc65e3-187e-4a76-9b74-bb07bf45308b"
+        :src="
+          addQuery(
+            'https://mb.web3go.xyz/public/question/72fc65e3-187e-4a76-9b74-bb07bf45308b'
+          )
+        "
         frameborder="0"
         width="100%"
         height="588"
@@ -126,7 +133,11 @@
     <div class="half-row">
       <div class="h-chart">
         <iframe
-          src="https://mb.web3go.xyz/public/question/62862451-0177-4a3b-9fd7-6f2e362fa687"
+          :src="
+            addQuery(
+              'https://mb.web3go.xyz/public/question/62862451-0177-4a3b-9fd7-6f2e362fa687'
+            )
+          "
           frameborder="0"
           width="100%"
           height="588"
@@ -135,7 +146,11 @@
       </div>
       <div class="h-chart">
         <iframe
-          src="https://mb.web3go.xyz/public/question/99fc7114-3671-47ee-9d42-3b95b05fb674"
+          :src="
+            addQuery(
+              'https://mb.web3go.xyz/public/question/99fc7114-3671-47ee-9d42-3b95b05fb674'
+            )
+          "
           frameborder="0"
           width="100%"
           height="588"
@@ -146,7 +161,11 @@
     <div class="half-row">
       <div class="h-chart">
         <iframe
-          src="https://mb.web3go.xyz/public/question/89aba2bd-ba35-4639-bba9-c6d340e3d18a"
+          :src="
+            addQuery(
+              'https://mb.web3go.xyz/public/question/89aba2bd-ba35-4639-bba9-c6d340e3d18a'
+            )
+          "
           frameborder="0"
           width="100%"
           height="588"
@@ -155,7 +174,11 @@
       </div>
       <div class="h-chart">
         <iframe
-          src="https://mb.web3go.xyz/public/question/2f339a7c-2bb7-4140-a0a3-c95ac5cf4a53"
+          :src="
+            addQuery(
+              'https://mb.web3go.xyz/public/question/2f339a7c-2bb7-4140-a0a3-c95ac5cf4a53'
+            )
+          "
           frameborder="0"
           width="100%"
           height="588"
@@ -168,17 +191,47 @@
 
 <script>
 import countTo from "vue-count-to";
+import basApi from "@/api/bas";
 export default {
   components: { countTo },
   data() {
     return {
-      smallTabIndex: 1,
+      tabList: [],
+      smallTab: {},
+      numData: {},
     };
+  },
+  created() {
+    basApi
+      .basContracts({
+        apikey: 123456,
+      })
+      .then((d) => {
+        this.tabList = d;
+        if (d.length) {
+          this.smallTab = d[0];
+          this.getNumData();
+        }
+      });
   },
   mounted() {},
   methods: {
-    clickSmallTab(index) {
-      this.smallTabIndex = index;
+    addQuery(str) {
+      return str + "?contract_address=" + this.smallTab.contract_address;
+    },
+    getNumData() {
+      basApi
+        .basContractsOverview({
+          apikey: 123456,
+          contract_address: this.smallTab.contract_address,
+        })
+        .then((d) => {
+          this.numData = d;
+        });
+    },
+    clickSmallTab(v) {
+      this.smallTab = v;
+      this.getNumData();
     },
   },
 };
