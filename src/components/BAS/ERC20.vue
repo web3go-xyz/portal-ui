@@ -25,7 +25,7 @@
             ></countTo>
             <span v-else>--</span>
           </div>
-          <span class="label">Tansfer Volume</span>
+          <span class="label">Total Transfer Amount</span>
         </div>
         <div class="item">
           <div class="num">
