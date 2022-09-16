@@ -15,12 +15,9 @@
           >
         </div>
         <div class="text">
-          Meta Apes is a free-to-play, play-and-earn MMO strategy game designed
-          for mobile. It is set in a post-apocalyptic world, in which humanity
-          has ended and a new era ruled by Apes has begun. Web3go provides a
-          general data overview of Meta Apes. Through the dashboard, users can
-          check out the latest key data and understant the time trend of those
-          data
+          Web3go provides abundant data analysis for Meta Apes. Through the
+          dashboard, users can check out the latest key data and go though
+          historical data by protocal type and other different perspectives.
         </div>
       </div>
       <div class="tab-wrap">
@@ -103,7 +100,7 @@ export default {
 }
 @media screen and (max-width: 1400px) {
   .page {
-    width: 1200px!important;
+    width: 1200px !important;
   }
 }
 .page {
