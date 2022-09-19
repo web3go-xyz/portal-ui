@@ -5,6 +5,7 @@ import HomePage from "@/components/HomePage";
 import ProfileHome from "@/components/profile/ProfileHome";
 import Insight from "@/components/Insight";
 import InsightDetail from "@/components/Insight/InsightDetail";
+import BAS from "@/components/BAS";
 
 import ProfileIndex from "@/components/profile/ProfileIndex";
 import Login from "@/components/user/Login";
@@ -45,6 +46,7 @@ import MaintenanceDashboard from "@/components/sysConfig/MaintenanceDashboard";
 import AddressTagManage from "@/components/sysConfig/sub/AddressTagManage";
 import ParaChainManage from "@/components/sysConfig/sub/ParaChainManage";
 import RMRKNFTNameUpdate from "@/components/sysConfig/sub/RMRKNFTNameUpdate";
+import InsightManage from "@/components/sysConfig/sub/InsightManage";
 
 
 import NFTProfiler from "@/components/nft/NftProfiler";
@@ -85,6 +87,14 @@ export default new Router({
             parent: 'Insight'
         },
         component: Insight
+    },
+    {
+        path: "/BAS",
+        name: "BAS",
+        meta: {
+            parent: 'BAS'
+        },
+        component: BAS
     },
     {
         path: "/InsightDetail",
@@ -322,7 +332,16 @@ export default new Router({
             components: {
                 sub: RMRKNFTNameUpdate
             }
-        }
+        }, {
+            path: "/MaintenanceDashboard/InsightManage",
+            name: "MaintenanceDashboard-InsightManage",
+            meta: {
+                noHead: true
+            },
+            components: {
+                sub: InsightManage
+            }
+        },
         ]
     },
 
@@ -383,12 +402,12 @@ export default new Router({
                 canDelegate: false,
                 walletSupport: 'MetaMask',
                 chainId: "0x505", //MetaMask Moonriver
+                rpcUrls: ["https://rpc.moonriver.moonbeam.network"], //MetaMask,polkadot.js 
                 blockExplorerUrls: ["https://moonriver.subscan.io/"], //MetaMask 
             },
             base_api: window.MOONRIVER_API
         },
     },
-
     {
         path: "/StakingCollectorDetail",
         name: "StakingCollectorDetail",

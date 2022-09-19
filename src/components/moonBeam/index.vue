@@ -983,6 +983,7 @@ export default {
     };
   },
   async created() {
+    this.handleLinkAccount();
     let self = this;
     this.getAllData();
     this.timer = setInterval(() => {

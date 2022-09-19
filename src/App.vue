@@ -152,6 +152,10 @@ export default {
           name: "Insight",
           route: "Insight",
         },
+        {
+          name: "BAS",
+          route: "BAS",
+        },
       ],
       searchVisible: true,
       navRight: [
