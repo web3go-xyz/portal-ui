@@ -1,11 +1,11 @@
 <template>
   <div class="component-wrap">
-    <div class="info-wrap">
+    <!-- <div class="info-wrap">
       <div class="info">
         <div class="item">
           <div class="num">
             <countTo
-              v-if="numData.total_transfer_tokens"
+              v-if="numData.total_transfer_tokens!==undefined"
               :decimals="2"
               :startVal="0"
               :endVal="numData.total_transfer_tokens"
@@ -18,7 +18,7 @@
         <div class="item">
           <div class="num">
             <countTo
-              v-if="numData.total_transfer_transactions"
+              v-if="numData.total_transfer_transactions!==undefined"
               :startVal="0"
               :endVal="numData.total_transfer_transactions"
               :duration="3000"
@@ -30,7 +30,7 @@
         <div class="item">
           <div class="num">
             <countTo
-              v-if="numData.total_addresses"
+              v-if="numData.total_addresses!==undefined"
               :startVal="0"
               :endVal="numData.total_addresses"
               :duration="3000"
@@ -40,7 +40,7 @@
           <span class="label">Total Addresses</span>
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="chart">
       <iframe
         src="https://mb.web3go.xyz/public/question/35331a65-524e-48f7-9c8a-32d448342ff4"
@@ -59,7 +59,7 @@
         allowtransparency
       ></iframe>
     </div>
-    <div class="chart">
+    <!-- <div class="chart">
       <iframe
         src="https://mb.web3go.xyz/public/question/292cff20-dce2-4a53-98e2-a6298326580e"
         frameborder="0"
@@ -67,7 +67,7 @@
         height="588"
         allowtransparency
       ></iframe>
-    </div>
+    </div> -->
     <div class="chart">
       <iframe
         src="https://mb.web3go.xyz/public/question/379c21c5-55d8-49c0-8d10-cc02482536b8"
@@ -101,17 +101,17 @@ export default {
     };
   },
   created() {
-    basApi
-      .basErc20Overview({
-        apikey: 123456,
-      })
-      .then((d) => {
-        d.total_transfer_tokens = this.$utils.formatTokenNumber(
-          d.total_transfer_tokens,
-          Math.pow(10, d.token_decimals)
-        );
-        this.numData = d;
-      });
+    // basApi
+    //   .basErc20Overview({
+    //     apikey: 123456,
+    //   })
+    //   .then((d) => {
+    //     d.total_transfer_tokens = this.$utils.formatTokenNumber(
+    //       d.total_transfer_tokens,
+    //       Math.pow(10, d.token_decimals)
+    //     );
+    //     this.numData = d;
+    //   });
   },
   mounted() {},
 };

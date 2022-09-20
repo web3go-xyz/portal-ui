@@ -5,7 +5,7 @@
         <div class="item">
           <div class="num">
             <countTo
-              v-if="numData.block_number"
+              v-if="numData.block_number!==undefined"
               :startVal="0"
               :endVal="numData.block_number"
               :duration="3000"
@@ -17,7 +17,7 @@
         <div class="item">
           <div class="num">
             <countTo
-              v-if="numData.total_transactions"
+              v-if="numData.total_transactions!==undefined"
               :startVal="0"
               :endVal="numData.total_transactions"
               :duration="3000"
@@ -29,7 +29,7 @@
         <div class="item">
           <div class="num">
             <countTo
-              v-if="numData.total_addresses"
+              v-if="numData.total_addresses!==undefined"
               :startVal="0"
               :endVal="numData.total_addresses"
               :duration="3000"
@@ -41,7 +41,7 @@
         <div class="item">
           <div class="num">
             <countTo
-              v-if="numData.total_gas"
+              v-if="numData.total_gas!==undefined"
               :decimals="2"
               :startVal="0"
               :endVal="numData.total_gas"

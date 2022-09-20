@@ -34,10 +34,12 @@
           <div class="right">
             <div class="num">
               <countTo
+                v-if="numData.total_minted !== undefined"
                 :startVal="0"
                 :endVal="numData.total_minted"
                 :duration="3000"
               ></countTo>
+              <span v-else>--</span>
             </div>
             <div class="label">Total Minted</div>
           </div>
@@ -79,10 +81,12 @@
           <div class="right">
             <div class="num">
               <countTo
+                v-if="numData.total_burnt !== undefined"
                 :startVal="0"
                 :endVal="numData.total_burnt"
                 :duration="3000"
               ></countTo>
+              <span v-else>--</span>
             </div>
             <div class="label">Total Burnt</div>
           </div>
@@ -231,6 +235,7 @@ export default {
     },
     clickSmallTab(v) {
       this.smallTab = v;
+      this.numData = {};
       this.getNumData();
     },
   },
