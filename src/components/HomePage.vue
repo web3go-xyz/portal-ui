@@ -450,7 +450,7 @@ export default {
         },
         {
           name: "Telegram",
-          url: "http://t.me/web3go",
+          url: "https://t.me/Web3GoCommunity",
           icon: "telegram",
         },
         {
