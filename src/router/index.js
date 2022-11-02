@@ -389,6 +389,25 @@ export default new Router({
         },
     },
     {
+        path: "/LitentryStaking",
+        name: "LitentryStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'Litentry Network',
+                icon: 'static/parachain-icon/litentry.png',
+                symbol: 'LIT',
+                decimals: 12,
+                minBond: 50,
+                canDelegate: true,
+                walletSupport: 'polkadot.js',
+                ss58Format: 31, // polkadot.js 
+                rpcUrls: ["wss://rpc.rococo-parachain-sg.litentry.io"], //MetaMask,polkadot.js
+            },
+            base_api: window.LITENTRY_STAKING_API
+        },
+    },
+    {
         path: "/Moonriver",
         name: "Moonriver",
         component: StakingTemplateA,

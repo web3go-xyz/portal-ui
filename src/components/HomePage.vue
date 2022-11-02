@@ -557,6 +557,15 @@ export default {
           tags: ["Featured", "Kusama", "Turing"],
           icon: require(`./../assets/images/home/oak-turing.png`),
         },
+        {
+          id: "Litentry-1",
+          type: "Litentry",
+          name: "Stake Analysis",
+          description: "Litentry staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Litentry"],
+          icon: require(`./../assets/images/home/litentry.png`),
+        },
       ],
       rmrkNFTDashboardList: [
         {
@@ -818,6 +827,14 @@ export default {
       if (type == "Turing") {
         this.$router.push({
           name: "TuringStaking",
+          params: {
+            data: d,
+          },
+        });
+      }
+      if (type == "Litentry") {
+        this.$router.push({
+          name: "LitentryStaking",
           params: {
             data: d,
           },

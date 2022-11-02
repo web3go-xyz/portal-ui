@@ -9,6 +9,8 @@ window.MOONBEAM_API = "https://web3go.xyz/moonbeam/"; //Prefix for all moonbeam 
 window.MOONRIVER_API = "https://web3go.xyz/moonriver/"; //Prefix for all moonriver staking api
 window.BIFROST_STAKING_API = "https://web3go.xyz/bifrost-staking/"; //Prefix for all bifrost staking api
 window.OAK_STAKING_API = "https://web3go.xyz/oak-staking/"; //Prefix for all oak staking api
+// window.LITENTRY_STAKING_API = "https://web3go.xyz/litentry-staking/"; //Prefix for all litentry staking api
+
 
 //window.API = "http://localhost:10000/";
 //window.POLKADOT_API = "http://localhost:20002/";
@@ -18,6 +20,7 @@ window.OAK_STAKING_API = "https://web3go.xyz/oak-staking/"; //Prefix for all oak
 //window.MOONBEAM_API = "http://localhost:20014/";
 // window.BIFROST_STAKING_API = "http://localhost:20015/";
 //window.OAK_STAKING_API = "http://16.163.5.216:20017/";
+window.LITENTRY_STAKING_API = "http://localhost:20015/";
 
 console.log("window.API:", window.API);
 console.log("window.POLKADOT_API", window.POLKADOT_API);
@@ -29,6 +32,8 @@ console.log("window.MOONRIVER_API", window.MOONRIVER_API);
 
 console.log("window.BIFROST_STAKING_API", window.BIFROST_STAKING_API);
 console.log("window.OAK_STAKING_API", window.OAK_STAKING_API);
+console.log("window.LITENTRY_STAKING_API", window.LITENTRY_STAKING_API);
+
 
 //window.BIFROST_WSS = "wss://bifrost-rpc.liebi.com/ws";
 //window.OAK_TURING_WSS = 'wss://rpc.turing-staging.oak.tech';
