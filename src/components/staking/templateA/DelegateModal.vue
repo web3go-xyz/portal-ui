@@ -67,6 +67,15 @@ export default {
       }
       return {};
     },
+    delegateParameterCount() {
+      if (
+        this.$route.meta &&
+        this.$route.meta.parachain.delegateParameterCount
+      ) {
+        return parseInt(this.$route.meta.parachain.delegateParameterCount);
+      }
+      return 4;
+    },
     decimals() {
       return this.parachain.decimals || 0;
     },
@@ -141,13 +150,23 @@ export default {
           delegationCount,
           myDelegationCount
         );
-        await this.api.tx.parachainStaking
-          .delegate(
+        console.log(`delegateParameterCount:${this.delegateParameterCount}`);
+        let delegateTx = null;
+        if (this.delegateParameterCount < 4) {
+          delegateTx = await this.api.tx.parachainStaking.delegate(
+            this.receiverAccount.address,
+            this.formatWithDecimals(this.num)
+          );
+        } else {
+          delegateTx = await this.api.tx.parachainStaking.delegate(
             this.receiverAccount.address,
             this.formatWithDecimals(this.num),
             delegationCount,
             myDelegationCount
-          )
+          );
+        }
+
+        delegateTx
           .signAndSend(
             this.linkAccount.address,
             { signer: injector.signer },

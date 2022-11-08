@@ -400,6 +400,7 @@ export default new Router({
                 decimals: 12,
                 minBond: 50,
                 canDelegate: true,
+                delegateParameterCount: 2,
                 walletSupport: 'polkadot.js',
                 ss58Format: 131, // polkadot.js 
                 rpcUrls: ["wss://rpc.rococo-parachain-sg.litentry.io"], //MetaMask,polkadot.js
