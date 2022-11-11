@@ -558,10 +558,19 @@ export default {
           icon: require(`./../assets/images/home/oak-turing.png`),
         },
         {
-          id: "Litentry-1",
-          type: "Litentry",
-          name: "Stake Analysis",
-          description: "Litentry staking analysis and simulate",
+          id: "Litentry-Testnet-1",
+          type: "LitentryTestnetStaking",
+          name: "Litentry Testnet Staking Analysis",
+          description: "Litentry Testnet staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Litentry"],
+          icon: require(`./../assets/images/home/litentry.png`),
+        },
+        {
+          id: "Litentry-Mainnet-1",
+          type: "LitentryMainnetStaking",
+          name: "Litentry Mainnet Staking Analysis",
+          description: "Litentry Mainnet staking analysis and simulate",
           created: "Web3go Offical Team",
           tags: ["Featured", "Kusama", "Litentry"],
           icon: require(`./../assets/images/home/litentry.png`),
@@ -675,6 +684,8 @@ export default {
         Polkadot: "Polkadot Parachain Crowdloans",
         Bifrost: "Bifrost Staking",
         Turing: "Turing Staking",
+        LitentryTestnetStaking: "Litentry Rococo Staking",
+        LitentryMainnetStaking: "Litentry Staking",
       };
       return obj[type] || type;
     },
@@ -832,9 +843,9 @@ export default {
           },
         });
       }
-      if (type == "Litentry") {
+      if (String(type).startsWith("Litentry")) {
         this.$router.push({
-          name: "LitentryStaking",
+          name: type,
           params: {
             data: d,
           },
