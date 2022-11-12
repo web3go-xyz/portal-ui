@@ -575,6 +575,15 @@ export default {
           tags: ["Featured", "Kusama", "Litentry"],
           icon: require(`./../assets/images/home/litentry.png`),
         },
+        {
+          id: "CalamariStaking-Mainnet-1",
+          type: "CalamariStaking",
+          name: "Calamari Mainnet Staking Analysis",
+          description: "Calamari Mainnet staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Calamari"],
+          icon: require(`./../assets/images/home/calamari.png`),
+        },
       ],
       rmrkNFTDashboardList: [
         {
@@ -686,6 +695,7 @@ export default {
         Turing: "Turing Staking",
         LitentryTestnetStaking: "Litentry Rococo Staking",
         LitentryMainnetStaking: "Litentry Staking",
+        CalamariStaking: "Calamari Staking",
       };
       return obj[type] || type;
     },
@@ -843,7 +853,7 @@ export default {
           },
         });
       }
-      if (String(type).startsWith("Litentry")) {
+      if (String(type).startsWith("Litentry")||String(type).startsWith("Calamari")) {
         this.$router.push({
           name: type,
           params: {

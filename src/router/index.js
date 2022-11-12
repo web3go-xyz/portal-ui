@@ -429,6 +429,26 @@ export default new Router({
         },
     },
     {
+        path: "/CalamariStaking",
+        name: "CalamariStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'Calamari Network',
+                icon: 'static/parachain-icon/calamari.png',
+                symbol: 'KMA',
+                decimals: 12,
+                minBond: 50,
+                canDelegate: true,
+                delegateParameterCount: 4,
+                walletSupport: 'polkadot.js',
+                ss58Format: 78, // polkadot.js 
+                rpcUrls: ["wss://ws.calamari.systems/"], //MetaMask,polkadot.js
+            },
+            base_api: window.CALAMARI_STAKING_MAINNET_API
+        },
+    },
+    {
         path: "/Moonriver",
         name: "Moonriver",
         component: StakingTemplateA,

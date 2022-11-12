@@ -3,10 +3,9 @@ import request from "@/utils/request";
 let aprUtlis = {
 
     async calculate(paraChainName, params) {
-        console.log(paraChainName, '\taprUtlis.calculate:', JSON.stringify(params));
-        if (paraChainName.toLowerCase() === 'bifrost'.toLowerCase()
-            || paraChainName.toLowerCase() === 'Turing Network'.toLowerCase()
-            || paraChainName.toLowerCase() === 'Litentry Rococo Network'.toLowerCase()) {
+        let formula = this.getFormula(paraChainName);
+        console.log(paraChainName, '\taprUtlis.calculate:', JSON.stringify(params), `formula:`, formula);
+        if (formula === 'common') {
             let blockTargetSeconds = await this.getBlockTargetSeconds(paraChainName);
             console.log('blockTargetSeconds:', blockTargetSeconds);
 
@@ -20,8 +19,7 @@ let aprUtlis = {
                 100
             );
         }
-        if (paraChainName.toLowerCase() === 'moonriver'
-            || paraChainName.toLowerCase() === 'moonbeam') {
+        if (formula === 'moonbeam') {
 
             // 0.00001388888888888889 * <total_supply>  * <avg_blocks_per_round> / <collator_counted_stake>
             let total_supply = Number(params.totalSupply);
@@ -43,6 +41,13 @@ let aprUtlis = {
             (365 * 24 * 3600) / (blockTargetSeconds * blockPerRound)
         );
         return roundPerYear;
+    },
+    getFormula(paraChainName) {
+        if (paraChainName.toLowerCase() === 'moonriver'
+            || paraChainName.toLowerCase() === 'moonbeam') {
+            return 'moonbeam';
+        }
+        return 'common';
     },
 
     async getBlockTargetSeconds(paraChainName) {
