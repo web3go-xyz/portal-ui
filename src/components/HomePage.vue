@@ -99,7 +99,7 @@
                   <img :src="getCardLineImg(d.type)" alt="" class="polyline" />
                 </div>
                 <div class="card-item-foot">
-                  <span class="name">{{ d.type }}{{ d.name }}</span>
+                  <span class="name"> {{ d.name }}</span>
                   <p class="clickNum" v-if="d.viewCount">
                     <i
                       v-show="userInfo"
@@ -128,7 +128,7 @@
                   <img :src="getCardLineImg(d.type)" alt="" class="polyline" />
                 </div>
                 <div class="card-item-foot">
-                  <span class="name">{{ d.type }}{{ d.name }}</span>
+                  <span class="name"> {{ d.name }}</span>
                   <p class="clickNum" v-if="d.viewCount">
                     <i
                       v-show="userInfo"
@@ -161,7 +161,7 @@
                   <img :src="getCardLineImg(d.type)" alt="" class="polyline" />
                 </div>
                 <div class="card-item-foot">
-                  <span class="name">{{ d.type }}{{ d.name }}</span>
+                  <span class="name"> {{ d.name }}</span>
                   <p class="clickNum" v-if="d.viewCount">
                     <i
                       v-show="userInfo"
@@ -197,7 +197,7 @@
                   <img :src="getCardLineImg(d.type)" alt="" class="polyline" />
                 </div>
                 <div class="card-item-foot">
-                  <span class="name">{{ d.type }}{{ d.name }}</span>
+                  <span class="name"> {{ d.name }}</span>
                   <p class="clickNum" v-if="d.viewCount">
                     <i
                       v-show="userInfo"
@@ -270,7 +270,7 @@
                   <img :src="getCardLineImg(d.type)" alt="" class="polyline" />
                 </div>
                 <div class="card-item-foot">
-                  <span class="name">{{ d.type }}{{ d.name }}</span>
+                  <span class="name"> {{ d.name }}</span>
                   <p class="clickNum" v-if="d.viewCount">
                     <i
                       v-show="userInfo"
@@ -557,19 +557,19 @@ export default {
           tags: ["Featured", "Kusama", "Turing"],
           icon: require(`./../assets/images/home/oak-turing.png`),
         },
-        {
-          id: "Litentry-Testnet-1",
-          type: "LitentryTestnetStaking",
-          name: "Litentry Testnet Staking Analysis",
-          description: "Litentry Testnet staking analysis and simulate",
-          created: "Web3go Offical Team",
-          tags: ["Featured", "Kusama", "Litentry"],
-          icon: require(`./../assets/images/home/litentry.png`),
-        },
+        // {
+        //   id: "Litentry-Testnet-1",
+        //   type: "LitentryTestnetStaking",
+        //   name: "Staking Analysis",
+        //   description: "Litentry Testnet staking analysis and simulate",
+        //   created: "Web3go Offical Team",
+        //   tags: ["Featured", "Kusama", "Litentry"],
+        //   icon: require(`./../assets/images/home/litentry.png`),
+        // },
         {
           id: "Litentry-Mainnet-1",
           type: "LitentryMainnetStaking",
-          name: "Litentry Mainnet Staking Analysis",
+          name: "Staking Analysis",
           description: "Litentry Mainnet staking analysis and simulate",
           created: "Web3go Offical Team",
           tags: ["Featured", "Kusama", "Litentry"],
@@ -578,7 +578,7 @@ export default {
         {
           id: "CalamariStaking-Mainnet-1",
           type: "CalamariStaking",
-          name: "Calamari Mainnet Staking Analysis",
+          name: "Staking Analysis",
           description: "Calamari Mainnet staking analysis and simulate",
           created: "Web3go Offical Team",
           tags: ["Featured", "Kusama", "Calamari"],
@@ -718,6 +718,12 @@ export default {
       }
       if (type === "Karura") {
         return require(`./../assets/images/home/karura-cdp-dashboard.png`);
+      }
+      if (type === "LitentryMainnetStaking") {
+        return require(`./../assets/images/home/litentry-staking-dashboard.png`);
+      }
+       if (type === "CalamariStaking") {
+        return require(`./../assets/images/home/calamari-staking-dashboard.png`);
       }
       return require(`./../assets/images/home/card-line${num}.png`);
     },
