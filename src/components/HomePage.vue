@@ -48,6 +48,39 @@
 
         <div class="case-wrapper clearfix">
           <div class="card" v-show="featuredCardVisible">
+            <h2 class="card-title">Staking</h2>
+            <div class="card-content">
+              <div
+                class="card-item"
+                v-for="d in monriverDashboardListFilter"
+                :key="d.id"
+                @click="showCardDetail(d.type, d)"
+              >
+                <div class="card-item-head">
+                  <img :src="d.icon" alt="" class="logo" />
+                  <span class="type">{{ mapCardType(d.type) }}</span>
+                </div>
+                <div class="card-item-con">
+                  <img :src="getCardLineImg(d.type)" alt="" class="polyline" />
+                </div>
+                <div class="card-item-foot">
+                  <span class="name"> {{ d.name }}</span>
+                  <p class="clickNum" v-if="d.viewCount">
+                    <i
+                      v-show="userInfo"
+                      :class="{
+                        'el-icon-star-on': ifAlreadyCollect(d),
+                        'el-icon-star-off': !ifAlreadyCollect(d),
+                      }"
+                      @click.stop="collect(d)"
+                    ></i>
+                    <img src="./../assets/images/home/eye.png" alt="" />
+                    <span>{{ d.viewCount }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <h2 class="card-title">Featured</h2>
             <div class="card-content">
               <div
@@ -90,35 +123,6 @@
                 v-for="d in parachainCrowdloanDashboardListFilter"
                 :key="d.id"
                 @click="showCardDetail('crowdloan', d)"
-              >
-                <div class="card-item-head">
-                  <img :src="d.icon" alt="" class="logo" />
-                  <span class="type">{{ mapCardType(d.type) }}</span>
-                </div>
-                <div class="card-item-con">
-                  <img :src="getCardLineImg(d.type)" alt="" class="polyline" />
-                </div>
-                <div class="card-item-foot">
-                  <span class="name"> {{ d.name }}</span>
-                  <p class="clickNum" v-if="d.viewCount">
-                    <i
-                      v-show="userInfo"
-                      :class="{
-                        'el-icon-star-on': ifAlreadyCollect(d),
-                        'el-icon-star-off': !ifAlreadyCollect(d),
-                      }"
-                      @click.stop="collect(d)"
-                    ></i>
-                    <img src="./../assets/images/home/eye.png" alt="" />
-                    <span>{{ d.viewCount }}</span>
-                  </p>
-                </div>
-              </div>
-              <div
-                class="card-item"
-                v-for="d in monriverDashboardListFilter"
-                :key="d.id"
-                @click="showCardDetail(d.type, d)"
               >
                 <div class="card-item-head">
                   <img :src="d.icon" alt="" class="logo" />
@@ -465,28 +469,28 @@ export default {
       msg: "Welcome to Data Analysis",
 
       erc20DashboardList: [
-        {
-          id: "ERC20-1",
-          type: "ERC20",
-          name: " LIT Analysis",
-          description: "Sample Analysis For LIT To View The Details And Trends",
-          created: "Web3go Offical Team",
-          data: {
-            contractAddress: "0xb59490ab09a0f526cc7305822ac65f2ab12f9723",
-          },
-          tags: ["Featured", "ERC20", "Ethereum"],
-        },
-        {
-          id: "ERC20-2",
-          type: "ERC20",
-          name: " ATA Analysis",
-          description: "Sample Analysis For ATA To View The Details And Trends",
-          created: "Web3go Offical Team",
-          data: {
-            contractAddress: "0xa2120b9e674d3fc3875f415a7df52e382f141225",
-          },
-          tags: ["Featured", "ERC20", "Ethereum"],
-        },
+        // {
+        //   id: "ERC20-1",
+        //   type: "ERC20",
+        //   name: " LIT Analysis",
+        //   description: "Sample Analysis For LIT To View The Details And Trends",
+        //   created: "Web3go Offical Team",
+        //   data: {
+        //     contractAddress: "0xb59490ab09a0f526cc7305822ac65f2ab12f9723",
+        //   },
+        //   tags: ["Featured", "ERC20", "Ethereum"],
+        // },
+        // {
+        //   id: "ERC20-2",
+        //   type: "ERC20",
+        //   name: " ATA Analysis",
+        //   description: "Sample Analysis For ATA To View The Details And Trends",
+        //   created: "Web3go Offical Team",
+        //   data: {
+        //     contractAddress: "0xa2120b9e674d3fc3875f415a7df52e382f141225",
+        //   },
+        //   tags: ["Featured", "ERC20", "Ethereum"],
+        // },
       ],
 
       parachainCrowdloanDashboardList: [
@@ -521,6 +525,24 @@ export default {
         },
       ],
       stakingDashboardList: [
+        {
+          id: "Litentry-Mainnet-1",
+          type: "LitentryMainnetStaking",
+          name: "Staking Analysis",
+          description: "Litentry Mainnet staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Litentry"],
+          icon: require(`./../assets/images/home/litentry.png`),
+        },
+        {
+          id: "CalamariStaking-Mainnet-1",
+          type: "CalamariStaking",
+          name: "Staking Analysis",
+          description: "Calamari Mainnet staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Calamari"],
+          icon: require(`./../assets/images/home/calamari.png`),
+        },
         {
           id: "Moonbeam-1",
           type: "Moonbeam",
@@ -566,24 +588,6 @@ export default {
         //   tags: ["Featured", "Kusama", "Litentry"],
         //   icon: require(`./../assets/images/home/litentry.png`),
         // },
-        {
-          id: "Litentry-Mainnet-1",
-          type: "LitentryMainnetStaking",
-          name: "Staking Analysis",
-          description: "Litentry Mainnet staking analysis and simulate",
-          created: "Web3go Offical Team",
-          tags: ["Featured", "Kusama", "Litentry"],
-          icon: require(`./../assets/images/home/litentry.png`),
-        },
-        {
-          id: "CalamariStaking-Mainnet-1",
-          type: "CalamariStaking",
-          name: "Staking Analysis",
-          description: "Calamari Mainnet staking analysis and simulate",
-          created: "Web3go Offical Team",
-          tags: ["Featured", "Kusama", "Calamari"],
-          icon: require(`./../assets/images/home/calamari.png`),
-        },
       ],
       rmrkNFTDashboardList: [
         {
@@ -722,7 +726,7 @@ export default {
       if (type === "LitentryMainnetStaking") {
         return require(`./../assets/images/home/litentry-staking-dashboard.png`);
       }
-       if (type === "CalamariStaking") {
+      if (type === "CalamariStaking") {
         return require(`./../assets/images/home/calamari-staking-dashboard.png`);
       }
       return require(`./../assets/images/home/card-line${num}.png`);
@@ -859,7 +863,10 @@ export default {
           },
         });
       }
-      if (String(type).startsWith("Litentry")||String(type).startsWith("Calamari")) {
+      if (
+        String(type).startsWith("Litentry") ||
+        String(type).startsWith("Calamari")
+      ) {
         this.$router.push({
           name: type,
           params: {
