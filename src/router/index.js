@@ -388,6 +388,66 @@ export default new Router({
             base_api: window.OAK_STAKING_API
         },
     },
+    // {
+    //     path: "/LitentryTestnetStaking",
+    //     name: "LitentryTestnetStaking",
+    //     component: StakingTemplateA,
+    //     meta: {
+    //         parachain: {
+    //             name: 'Litentry Rococo Network',
+    //             icon: 'static/parachain-icon/litentry.png',
+    //             symbol: 'LIT',
+    //             decimals: 12,
+    //             minBond: 50,
+    //             canDelegate: true,
+    //             delegateParameterCount: 2,
+    //             walletSupport: 'polkadot.js',
+    //             ss58Format: 131, // polkadot.js 
+    //             rpcUrls: ["wss://rpc.rococo-parachain-sg.litentry.io"], //MetaMask,polkadot.js
+    //         },
+    //         base_api: window.LITENTRY_STAKING_TESTNET_API
+    //     },
+    // },
+    {
+        path: "/LitentryMainnetStaking",
+        name: "LitentryMainnetStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'Litentry Mainnet Network',
+                icon: 'static/parachain-icon/litentry.png',
+                symbol: 'LIT',
+                decimals: 12,
+                minBond: 50,
+                canDelegate: true,
+                delegateParameterCount: 2,
+                walletSupport: 'polkadot.js',
+                ss58Format: 31, // polkadot.js 
+                rpcUrls: ["wss://rpc.litentry-parachain.litentry.io"], //MetaMask,polkadot.js
+            },
+            base_api: window.LITENTRY_STAKING_MAINNET_API
+        },
+    },
+    {
+        path: "/CalamariStaking",
+        name: "CalamariStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'Calamari Network',
+                icon: 'static/parachain-icon/calamari.png',
+                symbol: 'KMA',
+                decimals: 12,
+                minBond: 5000,
+                canDelegate: true,
+                delegateParameterCount: 4,
+                walletSupport: 'polkadot.js',
+                ss58Format: 78, // polkadot.js 
+                rpcUrls: ["wss://ws.calamari.systems/"], //MetaMask,polkadot.js
+            },
+            base_api: window.CALAMARI_STAKING_MAINNET_API
+        },
+    },
     {
         path: "/Moonriver",
         name: "Moonriver",
