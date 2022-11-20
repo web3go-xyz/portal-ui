@@ -421,6 +421,7 @@ export default new Router({
                 minBond: 50,
                 canDelegate: false,
                 delegateParameterCount: 2,
+                filterNoRewardRoundWhenCalcAPR: true,
                 walletSupport: 'polkadot.js',
                 ss58Format: 31, // polkadot.js 
                 rpcUrls: ["wss://rpc.litentry-parachain.litentry.io"], //MetaMask,polkadot.js

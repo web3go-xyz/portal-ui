@@ -1169,6 +1169,9 @@ export default {
     minBond() {
       return this.parachain.minBond || 1;
     },
+    filterNoRewardRoundWhenCalcAPR() {
+      return (this.parachain.filterNoRewardRoundWhenCalcAPR || false) === true;
+    },
     onePageTableData() {
       return this.tableData.slice(
         (this.pageIndex - 1) * this.pageSize,
@@ -1485,6 +1488,7 @@ export default {
       return 0;
     },
     getRewardInRounds(c, rounds) {
+      let roundsHasReward = 0;
       let rewardInRounds = 0;
       let startIndex = c.historyReward.length - rounds;
       if (startIndex < 0) {
@@ -1492,7 +1496,11 @@ export default {
       }
       for (let index = startIndex; index < c.historyReward.length; index++) {
         const element = c.historyReward[index];
-        rewardInRounds += element.reward.toNumber();
+        let reward = element.reward.toNumber();
+        if (reward > 0) {
+          roundsHasReward++;
+        }
+        rewardInRounds += reward;
       }
 
       startIndex = c.historyNominatorTotalReward.length - rounds;
@@ -1508,21 +1516,35 @@ export default {
         rewardInRounds += element.reward.toNumber();
       }
 
-      return rewardInRounds;
+      return {
+        collatorRewardInRounds: rewardInRounds,
+        rounds: rounds,
+        roundsHasReward: roundsHasReward,
+      };
     },
     async getAPR(currentCollator) {
       let params = {
         blockPerRound: this.roundInfo.length,
         collatorStake: this.getTotalStake(currentCollator).toNumber(),
         collatorTotalReward: currentCollator.totalReward.toNumber(),
-        rounds: this.roundsPickedByDropdown,
-        collatorRewardInRounds: this.getRewardInRounds(
-          currentCollator,
-          this.roundsPickedByDropdown
-        ),
+        rounds: 0,
+        collatorRewardInRounds: 0,
         totalSupply: this.totalSupply,
         averageBlocks: currentCollator.averageBlocks,
       };
+      let rewardInRounds = this.getRewardInRounds(
+        currentCollator,
+        this.roundsPickedByDropdown
+      );
+      console.log(
+        `filterNoRewardRoundWhenCalcAPR:`,
+        this.filterNoRewardRoundWhenCalcAPR
+      );
+      params.rounds =
+        this.filterNoRewardRoundWhenCalcAPR === true
+          ? rewardInRounds.roundsHasReward
+          : rewardInRounds.rounds;
+      params.collatorRewardInRounds = rewardInRounds.collatorRewardInRounds;
 
       return await aprUtlis.calculate(this.paraChainName, params);
     },
