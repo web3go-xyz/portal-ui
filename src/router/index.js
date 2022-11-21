@@ -419,7 +419,7 @@ export default new Router({
                 symbol: 'LIT',
                 decimals: 12,
                 minBond: 50,
-                canDelegate: false,
+                canDelegate: true,
                 delegateParameterCount: 2,
                 filterNoRewardRoundWhenCalcAPR: true,
                 walletSupport: 'polkadot.js',
