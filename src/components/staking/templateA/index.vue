@@ -122,9 +122,17 @@
           <img src="@/assets/images/staking/icon2.png" alt="" />
           <div class="right">
             <div class="title">Round Progress</div>
-            <div class="number">
-              {{ blockNumber - roundInfo.first }}/{{ roundInfo.length }}
-            </div>
+
+            <el-tooltip placement="top" trigger="hover">
+              <div slot="content" class="tooltip-100px">
+                Estimate:
+                {{ estimateMinutes }}
+                minutes
+              </div>
+              <div class="number">
+                {{ blockNumber - roundInfo.first }}/{{ roundInfo.length }}
+              </div>
+            </el-tooltip>
           </div>
           <el-progress
             class="circle"
@@ -1139,6 +1147,12 @@ export default {
     }
   },
   computed: {
+    estimateMinutes() {
+      let targetSeconds = this.parachain.targetSeconds || 12;
+      let blocks =
+        this.roundInfo.length - (this.blockNumber - this.roundInfo.first);
+      return Math.ceil((blocks * targetSeconds) / 60);
+    },
     isEthereum() {
       if (this.parachain.walletSupport) {
         return this.parachain.walletSupport.indexOf("MetaMask") > -1;
