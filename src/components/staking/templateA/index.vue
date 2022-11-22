@@ -1099,6 +1099,7 @@ export default {
 
       allAccounts: [], //account choose list shown on dialog
       showAccountChooseDialog: false,
+      delegateEventPending: null,
     };
   },
   async created() {
@@ -1261,12 +1262,12 @@ export default {
         this.formatWithDecimals(freeBalance).toFixed();
     },
     ifShowDelegate(row) {
-      const find = row.allNominators.find(
-        (sv) => sv.owner == this.linkAccount.address
-      );
-      if (find || !this.currentWalletAccount) {
-        return false;
-      }
+      // const find = row.allNominators.find(
+      //   (sv) => sv.owner == this.linkAccount.address
+      // );
+      // if (find || !this.currentWalletAccount) {
+      //   return false;
+      // }
       return true;
     },
     ifAlreadyDelegate(row) {
@@ -1282,7 +1283,17 @@ export default {
       this.$refs.delegateModal.init(row.id, true);
     },
     handleDelegate(row) {
-      this.$refs.delegateModal.init(row.id);
+
+      const ready = () => this.linkAccount && this.linkAccount.address; 
+      const proxy = () => {
+        // waiting for choose an account
+        this.delegateEventPending = row;
+        return ready() && this.$refs.delegateModal.init(row.id);
+      }
+      if (!ready()) {
+        return this.handleLinkAccount(2).then(proxy);
+      }
+      proxy();
     },
     formatWithDecimals(value) {
       return BigNumber(value).dividedBy(this.decimalsFormat);
@@ -2194,8 +2205,13 @@ export default {
         });
       });
     },
-    async handleLinkAccount() {
+    async handleLinkAccount(event) {
       this.allAccounts = [];
+      
+      // for now, event=2 only for Delegator
+      if (typeof event !== 2) {
+        this.delegateEventPending = null;
+      }
 
       if (this.parachain.walletSupport === "MetaMask") {
         this.handleLinkAccount_MetaMask(
@@ -2213,7 +2229,7 @@ export default {
         console.log("allAccounts from polkadot.js:", allAccounts);
 
         this.allAccounts = allAccounts;
-        this.showAccountChooseDialog = true;
+        allAccounts.length && (this.showAccountChooseDialog = true);
       }
       console.log(
         `wallet [${this.parachain.walletSupport}] not supported yet. current support: [MetaMask,polkadot.js]`
@@ -2239,6 +2255,14 @@ export default {
       this.showAccountChooseDialog = false;
 
       console.log(`accountChoosen:`, account, `,account:`, account);
+
+      this.linkAccount.address = account.address;
+      if (this.delegateEventPending) {
+        this.handleDelegate(this.delegateEventPending).then(()=> {
+          this.delegateEventPending = null;
+        });
+      }
+
       await this.handleLinkAccount_PolkadotJs(
         this.paraChainName,
         this.parachain.ss58Format,
