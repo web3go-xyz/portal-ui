@@ -1289,7 +1289,7 @@ export default {
         return ready() && this.$refs.delegateModal.init(row.id);
       }
       if (!ready()) {
-        return this.handleLinkAccount().then(()=>this.delegateEventPending = row).then(proxy);
+        return this.handleLinkAccount().then(()=>{this.delegateEventPending = row}).then(proxy);
       }
       proxy();
     },
