@@ -168,10 +168,13 @@
           </el-select>
           <span>Round</span>
         </div>
+        <div style="width: 100%; overflow: hidden">
         <el-table
           v-loading="loading"
           :data="onePageTableData"
           @sort-change="sortChange"
+          class="stakeTable"
+          style="width:100%;"
         >
           <el-table-column label="Rank" width="90">
             <template slot="header" slot-scope="scope">
@@ -201,7 +204,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column width="250" label="Collator">
+          <el-table-column label="Collator" width="180">
             <template slot-scope="scope">
               <div class="icon-cell">
                 <identity-icon-plus
@@ -222,34 +225,30 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Stake">
+          <el-table-column label="Stake" width="180">
             <template slot-scope="scope">
-              <div>
-                <div>
                   Self:<span
                     >{{ getSelfStake(scope.row) | roundNumber(2) }}
                     {{ symbol }}</span
                   >
-                </div>
-                <div>
+                <br/>
+                
                   Delegators:
                   <span
                     >{{ getNominatorStake(scope.row) | roundNumber(2) }}
                     {{ symbol }}</span
                   >
-                </div>
-                <div>
+                
+                  <br/>
                   Total:
                   <span
                     >{{ getTotalStake(scope.row) | roundNumber(2) }}
                     {{ symbol }}</span
                   >
-                </div>
-              </div>
             </template>
           </el-table-column>
 
-          <el-table-column label="Total Reward" width="150">
+          <el-table-column label="Total Reward" width="120">
             <template slot-scope="scope">
               <span
                 >{{ scope.row.totalReward | roundNumber(2) }} {{ symbol }}</span
@@ -304,7 +303,7 @@
           </el-table-column>
           <el-table-column
             label="Current Blocks"
-            width="140"
+            width="120"
             prop="currentBlocks"
             align="center"
           >
@@ -351,15 +350,15 @@
             </template>
           </el-table-column>
           <el-table-column
-            width="280"
+            width="220px"
             prop="name"
             label="Rewards(Last 10 rounds)"
           >
             <template slot-scope="scope">
-              <div :ref="'tableChart' + scope.row.id" class="table-chart"></div>
+              <div :id="'tableChart' + scope.row.id" class="table-chart"></div>
             </template>
           </el-table-column>
-          <el-table-column :width="parachain.canDelegate ? '200' : '130'">
+          <el-table-column width="220" fixed="right">
             <template slot-scope="scope">
               <div class="div-operation">
                 <span
@@ -416,6 +415,7 @@
             </template>
           </el-table-column>
         </el-table>
+        </div>
         <div class="pagination-wrap">
           <el-pagination
             background
@@ -1103,6 +1103,7 @@ export default {
     };
   },
   async created() {
+    await this.preSessionCheck();
     if (this.parachain.walletSupport === "MetaMask") {
       const alreadyLinkMetaMask = localStorage.getItem("alreadyLinkMetaMask");
       if (alreadyLinkMetaMask) {
@@ -1234,6 +1235,40 @@ export default {
     },
   },
   methods: {
+
+    async preSessionCheck() {
+      const savedAccountStr = (() => {
+        const cache = localStorage.getItem("currentAccount");
+        if (!cache) return;
+        try {
+          return JSON.parse(cache).address
+        } catch(e) { console.warn('illegal cache') }
+      })();
+      
+      if (!savedAccountStr) return;
+      let accounts = [];
+      if (this.parachain.walletSupport === "polkadot.js") {
+        accounts = (await this.getAccountList_PolkadotJs(
+          this.paraChainName,
+          this.parachain.ss58Format
+        )).map(it => it.address);
+      } else if (this.isEthereum) {
+          const ethereum = window.ethereum;
+          if (ethereum.isConnected && ethereum.isConnected()) {
+            const account =  await ethereum.request({ method: 'eth_requestAccounts' });
+            if (account) {
+              accounts = [account];
+            }
+          }
+          return;
+      } else {
+        throw new Error('Unsupported Wallet Runtime..')
+      }
+      let matches = accounts && accounts.filter(it => it === savedAccountStr)
+      if (!matches || !matches.length) {
+        localStorage.setItem("currentAccount", null);
+      }
+    },
     getFreeBalance(accountInfo) {
       if (accountInfo && accountInfo.data) {
         console.log(`getFreeBalance:`, accountInfo);
@@ -2123,9 +2158,10 @@ export default {
           v.dispose();
         });
         this.chartInstances = [];
+        const echarts = window.echarts
         this.onePageTableData.forEach((v) => {
           let chartId = `tableChart${v.id}`;
-          const charInstance = echarts.init(this.$refs[chartId]);
+          const charInstance = echarts.init(document.getElementById(chartId));
           charInstance.setOption({
             tooltip: {
               appendToBody: true,
@@ -2921,6 +2957,7 @@ export default {
       .table-chart {
         width: 216px;
         height: 90px;
+        position: relative;
       }
       .active-block-producer {
         background: #19d991 !important;
@@ -3188,9 +3225,14 @@ export default {
   background: rgb(250, 250, 250) !important;
   box-shadow: rgba(0, 0, 0, 0.6) 0px 2px 20px 0px !important;
 }
+.tab-content .stakeTable .el-table__body-wrapper, .tab-content1 
+.stakeTable .el-table__body-wrapper {
+  overflow: auto !important;
+}
 </style>
 <style lang="less" scoped>
 .div-operation {
+  padding-left: 10px;
   display: flex;
   align-items: center;
   .subscribe {
