@@ -204,7 +204,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="Collator" width="180">
+          <el-table-column label="Collator" min-width="180">
             <template slot-scope="scope">
               <div class="icon-cell">
                 <identity-icon-plus
@@ -225,7 +225,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Stake" width="180">
+          <el-table-column label="Stake" min-width="180">
             <template slot-scope="scope">
                   Self:<span
                     >{{ getSelfStake(scope.row) | roundNumber(2) }}
@@ -257,7 +257,7 @@
           </el-table-column>
           <el-table-column
             label="Min Bond"
-            width="120"
+            min-width="120"
             prop="minBond"
             sortable="custom"
             align="center"
@@ -280,7 +280,7 @@
 
           <el-table-column
             label="Avg Blocks"
-            width="120"
+            min-width="120"
             prop="averageBlocks"
             align="center"
           >
@@ -303,7 +303,7 @@
           </el-table-column>
           <el-table-column
             label="Current Blocks"
-            width="120"
+            min-width="120"
             prop="currentBlocks"
             align="center"
           >
@@ -326,9 +326,9 @@
           <el-table-column
             label="APR"
             prop="apr"
-            width="120"
+            min-width="120"
             sortable="custom"
-            align="right"
+            align="center"
           >
             <template slot="header" slot-scope="scope">
               <div style="display: inline-flex; align-items: center">
@@ -350,7 +350,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            width="220px"
+          min-width="220px"
             prop="name"
             label="Rewards(Last 10 rounds)"
           >
