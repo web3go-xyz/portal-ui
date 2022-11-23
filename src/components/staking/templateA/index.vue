@@ -1282,16 +1282,14 @@ export default {
     handleDelegateMore(row) {
       this.$refs.delegateModal.init(row.id, true);
     },
-    handleDelegate(row) {
+    async handleDelegate(row) {
 
       const ready = () => this.linkAccount && this.linkAccount.address; 
       const proxy = () => {
-        // waiting for choose an account
-        this.delegateEventPending = row;
         return ready() && this.$refs.delegateModal.init(row.id);
       }
       if (!ready()) {
-        return this.handleLinkAccount(2).then(proxy);
+        return this.handleLinkAccount().then(()=>{this.delegateEventPending = row}).then(proxy);
       }
       proxy();
     },
@@ -2205,13 +2203,11 @@ export default {
         });
       });
     },
-    async handleLinkAccount(event) {
+    async handleLinkAccount() {
       this.allAccounts = [];
       
-      // for now, event=2 only for Delegator
-      if (typeof event !== 2) {
-        this.delegateEventPending = null;
-      }
+      // clear delegate status
+      this.delegateEventPending = null;
 
       if (this.parachain.walletSupport === "MetaMask") {
         this.handleLinkAccount_MetaMask(
