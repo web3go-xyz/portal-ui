@@ -350,7 +350,7 @@
             </template>
           </el-table-column>
           <el-table-column
-          min-width="220px"
+          min-width="220"
             prop="name"
             label="Rewards(Last 10 rounds)"
           >
@@ -1128,9 +1128,25 @@ export default {
     this.timer4header = setInterval(() => {
       this.getHeaderData();
     }, self.refreshHeaderDataInterval);
+    
+    let lastResizeRun = null;
+    window.onresize = () => {
+      if (lastResizeRun) {
+        try {
+          clearTimeout(lastResizeRun);
+          lastResizeRun = null;
+        } catch(e) {console.warn(e);}
+      }
+      lastResizeRun = setTimeout(() => {
+        if (this.chartInstances && this.chartInstances.length) {
+          this.chartInstances.forEach(it => it.resize());
+        }
+      }, 200)
+    }
   },
   beforeDestroy() {
     console.log("staking view destroy");
+    window.onresize = null;
     if (this.timer) {
       clearInterval(this.timer);
     }
