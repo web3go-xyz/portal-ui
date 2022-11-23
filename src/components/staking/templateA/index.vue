@@ -1282,7 +1282,7 @@ export default {
     handleDelegateMore(row) {
       this.$refs.delegateModal.init(row.id, true);
     },
-    handleDelegate(row) {
+    async handleDelegate(row) {
 
       const ready = () => this.linkAccount && this.linkAccount.address; 
       const proxy = () => {
@@ -2203,7 +2203,7 @@ export default {
         });
       });
     },
-    async handleLinkAccount(event) {
+    async handleLinkAccount() {
       this.allAccounts = [];
       
       // clear delegate status
