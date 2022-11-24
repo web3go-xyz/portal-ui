@@ -1208,13 +1208,6 @@ export default {
       return (this.parachain.filterNoRewardRoundWhenCalcAPR || false) === true;
     },
     onePageTableData() {
-      let hasDelegateRecord = false;
-      this.tableData.forEach(it => {
-              it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
-              it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
-              hasDelegateRecord = hasDelegateRecord || it.isDelegated;
-      });
-      this.hasDelegateRecord = hasDelegateRecord;
       return this.tableData.slice(
         (this.pageIndex - 1) * this.pageSize,
         this.pageIndex * this.pageSize
@@ -1322,7 +1315,7 @@ export default {
       this.linkAccount.freeBalance =
         this.formatWithDecimals(freeBalance).toFixed();
     },
-    ifShowDelegate(row) {
+    ifShowDelegate() { // row
       // const find = row.allNominators.find(
       //   (sv) => sv.owner == this.linkAccount.address
       // );
@@ -1332,10 +1325,10 @@ export default {
       return true;
     },
     ifAlreadyDelegate(row) {
-      const find = row.allNominators.find(
+      const find = this.linkAccount.address && row.allNominators.find(
         (sv) => sv.owner == this.linkAccount.address
       );
-      if (find && this.currentWalletAccount) {
+      if (find) { // this.currentWalletAccount
         return true;
       }
       return false;
@@ -2164,11 +2157,13 @@ export default {
             }
 
             let tableData = this.sort4Display(nominatorRes);
-            // tableData && tableData.forEach(it => {
-            //   it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
-            //   it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
-            //   this.hasDelegateRecord = this.hasDelegateRecord || it.isDelegated;
-            // })
+            let hasDelegateRecord = false;
+            tableData && tableData.forEach(it => {
+              it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
+              it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+              hasDelegateRecord = hasDelegateRecord || it.isDelegated;
+            })
+            this.hasDelegateRecord = hasDelegateRecord;
             this.tableData = tableData;
             this.$localforage.setItem(
               this.paraChainName + "CollectorSortList",
