@@ -168,10 +168,13 @@
           </el-select>
           <span>Round</span>
         </div>
+        <div style="width: 100%; overflow: hidden">
         <el-table
           v-loading="loading"
           :data="onePageTableData"
           @sort-change="sortChange"
+          class="stakeTable"
+          style="width:100%;"
         >
           <el-table-column label="Rank" width="90">
             <template slot="header" slot-scope="scope">
@@ -201,7 +204,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column width="250" label="Collator">
+          <el-table-column label="Collator" min-width="180">
             <template slot-scope="scope">
               <div class="icon-cell">
                 <identity-icon-plus
@@ -222,34 +225,30 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Stake">
+          <el-table-column label="Stake" min-width="180">
             <template slot-scope="scope">
-              <div>
-                <div>
                   Self:<span
                     >{{ getSelfStake(scope.row) | roundNumber(2) }}
                     {{ symbol }}</span
                   >
-                </div>
-                <div>
+                <br/>
+                
                   Delegators:
                   <span
                     >{{ getNominatorStake(scope.row) | roundNumber(2) }}
                     {{ symbol }}</span
                   >
-                </div>
-                <div>
+                
+                  <br/>
                   Total:
                   <span
                     >{{ getTotalStake(scope.row) | roundNumber(2) }}
                     {{ symbol }}</span
                   >
-                </div>
-              </div>
             </template>
           </el-table-column>
 
-          <el-table-column label="Total Reward" width="150">
+          <el-table-column label="Total Reward" width="120">
             <template slot-scope="scope">
               <span
                 >{{ scope.row.totalReward | roundNumber(2) }} {{ symbol }}</span
@@ -258,7 +257,7 @@
           </el-table-column>
           <el-table-column
             label="Min Bond"
-            width="120"
+            min-width="120"
             prop="minBond"
             sortable="custom"
             align="center"
@@ -281,7 +280,7 @@
 
           <el-table-column
             label="Avg Blocks"
-            width="120"
+            min-width="120"
             prop="averageBlocks"
             align="center"
           >
@@ -304,7 +303,7 @@
           </el-table-column>
           <el-table-column
             label="Current Blocks"
-            width="140"
+            min-width="120"
             prop="currentBlocks"
             align="center"
           >
@@ -327,9 +326,9 @@
           <el-table-column
             label="APR"
             prop="apr"
-            width="120"
+            min-width="120"
             sortable="custom"
-            align="right"
+            align="center"
           >
             <template slot="header" slot-scope="scope">
               <div style="display: inline-flex; align-items: center">
@@ -351,15 +350,15 @@
             </template>
           </el-table-column>
           <el-table-column
-            width="280"
+          min-width="220"
             prop="name"
             label="Rewards(Last 10 rounds)"
           >
             <template slot-scope="scope">
-              <div :ref="'tableChart' + scope.row.id" class="table-chart"></div>
+              <div :id="'tableChart' + scope.row.id" class="table-chart"></div>
             </template>
           </el-table-column>
-          <el-table-column :width="parachain.canDelegate ? '200' : '130'">
+          <el-table-column width="220" fixed="right">
             <template slot-scope="scope">
               <div class="div-operation">
                 <span
@@ -397,7 +396,7 @@
                   </div>
                 </el-tooltip>
                 <div
-                  v-if="ifShowDelegate(scope.row) && parachain.canDelegate"
+                  v-if="!scope.row.isDelegated && scope.row.isDelegatable"
                   @click="handleDelegate(scope.row)"
                   class="table-btn"
                   style="margin-left: 8px"
@@ -405,7 +404,7 @@
                   Delegate
                 </div>
                 <div
-                  v-if="ifAlreadyDelegate(scope.row) && parachain.canDelegate"
+                  v-if="scope.row.isDelegated"
                   @click="goToMyStake"
                   class="table-btn"
                   style="margin-left: 8px; background: rgb(95, 106, 249)"
@@ -416,6 +415,7 @@
             </template>
           </el-table-column>
         </el-table>
+        </div>
         <div class="pagination-wrap">
           <el-pagination
             background
@@ -543,7 +543,7 @@
                             :percentage="
                               getCollectPercentByRank(
                                 parseInt(maxCollector * 0.9)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -572,7 +572,7 @@
                             :percentage="
                               getCollectPercentByRank(
                                 parseInt(maxCollector * 0.6)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -686,7 +686,7 @@
                               getSingleNominatorStakePercentByRank(
                                 scope.row,
                                 maxNominator
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -715,7 +715,7 @@
                               getSingleNominatorStakePercentByRank(
                                 scope.row,
                                 parseInt(maxNominator * 0.9)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -744,7 +744,7 @@
                               getSingleNominatorStakePercentByRank(
                                 scope.row,
                                 parseInt(maxNominator * 0.5)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -767,7 +767,7 @@
               <el-progress
                 :text-inside="true"
                 :stroke-width="16"
-                :percentage="getMyRatio(scope.row)"
+                :percentage="getMyRatio(scope.row) || 0"
               ></el-progress>
             </template>
           </el-table-column>
@@ -886,7 +886,7 @@
                 <el-progress
                   :text-inside="true"
                   :stroke-width="16"
-                  :percentage="getSumulatePercent(currentSimulate)"
+                  :percentage="getSumulatePercent(currentSimulate) || 0"
                 ></el-progress>
               </div>
             </div>
@@ -908,7 +908,7 @@
                   :text-inside="true"
                   :stroke-width="16"
                   :percentage="
-                    getSumulatePercentByRank(currentSimulate, maxNominator)
+                    getSumulatePercentByRank(currentSimulate, maxNominator)||0
                   "
                 ></el-progress>
               </div>
@@ -936,7 +936,7 @@
                     getSumulatePercentByRank(
                       currentSimulate,
                       parseInt(maxNominator * 0.9)
-                    )
+                    ) || 0
                   "
                 ></el-progress>
               </div>
@@ -964,7 +964,7 @@
                     getSumulatePercentByRank(
                       currentSimulate,
                       parseInt(maxNominator * 0.5)
-                    )
+                    ) || 0
                   "
                 ></el-progress>
               </div>
@@ -1100,9 +1100,11 @@ export default {
       allAccounts: [], //account choose list shown on dialog
       showAccountChooseDialog: false,
       delegateEventPending: null,
+      hasDelegateRecord: false,
     };
   },
   async created() {
+    await this.preSessionCheck();
     if (this.parachain.walletSupport === "MetaMask") {
       const alreadyLinkMetaMask = localStorage.getItem("alreadyLinkMetaMask");
       if (alreadyLinkMetaMask) {
@@ -1127,9 +1129,27 @@ export default {
     this.timer4header = setInterval(() => {
       this.getHeaderData();
     }, self.refreshHeaderDataInterval);
+    
+    let lastResizeRun = null;
+    window.onresize = () => {
+      if (lastResizeRun) {
+        try {
+          clearTimeout(lastResizeRun);
+          lastResizeRun = null;
+        } catch(e) {console.warn(e);}
+      }
+      lastResizeRun = setTimeout(() => {
+        if (this.chartInstances && this.chartInstances.length) {
+          this.chartInstances.forEach(it => {
+            this.$nextTick( () => it.resize())
+          });
+        }
+      }, 1000)
+    }
   },
   beforeDestroy() {
     console.log("staking view destroy");
+    window.onresize = null;
     if (this.timer) {
       clearInterval(this.timer);
     }
@@ -1188,10 +1208,10 @@ export default {
       return (this.parachain.filterNoRewardRoundWhenCalcAPR || false) === true;
     },
     onePageTableData() {
-      return this.tableData.slice(
+      return this.freshTableStatus(this.tableData.slice(
         (this.pageIndex - 1) * this.pageSize,
         this.pageIndex * this.pageSize
-      );
+      ));
     },
     startRoundIndex4AverageBlocksCalculation() {
       return this.roundInfo.current - 1 - (this.roundsPickedByDropdown || 0);
@@ -1230,10 +1250,44 @@ export default {
       if (!percent || percent === Infinity || percent < 0) {
         return 0;
       }
-      return Number((percent * 100).toFixed(2));
+      return Number((percent * 100).toFixed(2)) || 0;
     },
   },
   methods: {
+
+    async preSessionCheck() {
+      const savedAccountStr = (() => {
+        const cache = localStorage.getItem("currentAccount");
+        if (!cache) return;
+        try {
+          return JSON.parse(cache).address
+        } catch(e) { console.warn('illegal cache') }
+      })();
+      
+      if (!savedAccountStr) return;
+      let accounts = [];
+      if (this.parachain.walletSupport === "polkadot.js") {
+        accounts = (await this.getAccountList_PolkadotJs(
+          this.paraChainName,
+          this.parachain.ss58Format
+        )).map(it => it.address);
+      } else if (this.isEthereum) {
+          const ethereum = window.ethereum;
+          if (ethereum.isConnected && ethereum.isConnected()) {
+            const account =  await ethereum.request({ method: 'eth_requestAccounts' });
+            if (account) {
+              accounts = [account];
+            }
+          }
+          return;
+      } else {
+        throw new Error('Unsupported Wallet Runtime..')
+      }
+      let matches = accounts && accounts.filter(it => it === savedAccountStr)
+      if (!matches || !matches.length) {
+        localStorage.setItem("currentAccount", null);
+      }
+    },
     getFreeBalance(accountInfo) {
       if (accountInfo && accountInfo.data) {
         console.log(`getFreeBalance:`, accountInfo);
@@ -1261,7 +1315,7 @@ export default {
       this.linkAccount.freeBalance =
         this.formatWithDecimals(freeBalance).toFixed();
     },
-    ifShowDelegate(row) {
+    ifShowDelegate() { // row
       // const find = row.allNominators.find(
       //   (sv) => sv.owner == this.linkAccount.address
       // );
@@ -1271,10 +1325,10 @@ export default {
       return true;
     },
     ifAlreadyDelegate(row) {
-      const find = row.allNominators.find(
+      const find = this.linkAccount.address && row.allNominators.find(
         (sv) => sv.owner == this.linkAccount.address
       );
-      if (find && this.currentWalletAccount) {
+      if (find) { // this.currentWalletAccount
         return true;
       }
       return false;
@@ -2102,7 +2156,8 @@ export default {
               element.apr = await self.getAPR(element);
             }
 
-            this.tableData = this.sort4Display(nominatorRes);
+            this.tableData = this.freshTableStatus(this.sort4Display(nominatorRes));
+
             this.$localforage.setItem(
               this.paraChainName + "CollectorSortList",
               JSON.stringify(nominatorRes)
@@ -2117,15 +2172,27 @@ export default {
         });
       });
     },
+    freshTableStatus(tableData) {
+      tableData = tableData || this.tableData;
+      let hasDelegateRecord = false;
+      tableData && tableData.forEach(it => {
+        it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
+        it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+        hasDelegateRecord = hasDelegateRecord || it.isDelegated;
+      })
+      this.hasDelegateRecord = hasDelegateRecord;
+      return tableData;
+    },
     generateTableChart() {
       this.$nextTick(() => {
         this.chartInstances.forEach((v) => {
           v.dispose();
         });
         this.chartInstances = [];
+        const echarts = window.echarts
         this.onePageTableData.forEach((v) => {
           let chartId = `tableChart${v.id}`;
-          const charInstance = echarts.init(this.$refs[chartId]);
+          const charInstance = echarts.init(document.getElementById(chartId));
           charInstance.setOption({
             tooltip: {
               appendToBody: true,
@@ -2921,6 +2988,7 @@ export default {
       .table-chart {
         width: 216px;
         height: 90px;
+        position: relative;
       }
       .active-block-producer {
         background: #19d991 !important;
@@ -3188,9 +3256,14 @@ export default {
   background: rgb(250, 250, 250) !important;
   box-shadow: rgba(0, 0, 0, 0.6) 0px 2px 20px 0px !important;
 }
+.tab-content .stakeTable .el-table__body-wrapper, .tab-content1 
+.stakeTable .el-table__body-wrapper {
+  overflow: auto !important;
+}
 </style>
 <style lang="less" scoped>
 .div-operation {
+  padding-left: 10px;
   display: flex;
   align-items: center;
   .subscribe {
