@@ -358,7 +358,7 @@
               <div :id="'tableChart' + scope.row.id" class="table-chart"></div>
             </template>
           </el-table-column>
-          <el-table-column :width="hasDelegateRecord ? 300:220" fixed="right">
+          <el-table-column width="220" fixed="right">
             <template slot-scope="scope">
               <div class="div-operation">
                 <span
@@ -396,7 +396,7 @@
                   </div>
                 </el-tooltip>
                 <div
-                  v-if="scope.row.isDelegatable"
+                  v-if="!scope.row.isDelegated && scope.row.isDelegatable"
                   @click="handleDelegate(scope.row)"
                   class="table-btn"
                   style="margin-left: 8px"
@@ -543,7 +543,7 @@
                             :percentage="
                               getCollectPercentByRank(
                                 parseInt(maxCollector * 0.9)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -572,7 +572,7 @@
                             :percentage="
                               getCollectPercentByRank(
                                 parseInt(maxCollector * 0.6)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -686,7 +686,7 @@
                               getSingleNominatorStakePercentByRank(
                                 scope.row,
                                 maxNominator
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -715,7 +715,7 @@
                               getSingleNominatorStakePercentByRank(
                                 scope.row,
                                 parseInt(maxNominator * 0.9)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -744,7 +744,7 @@
                               getSingleNominatorStakePercentByRank(
                                 scope.row,
                                 parseInt(maxNominator * 0.5)
-                              )
+                              ) || 0
                             "
                           ></el-progress>
                         </div>
@@ -767,7 +767,7 @@
               <el-progress
                 :text-inside="true"
                 :stroke-width="16"
-                :percentage="getMyRatio(scope.row)"
+                :percentage="getMyRatio(scope.row) || 0"
               ></el-progress>
             </template>
           </el-table-column>
@@ -886,7 +886,7 @@
                 <el-progress
                   :text-inside="true"
                   :stroke-width="16"
-                  :percentage="getSumulatePercent(currentSimulate)"
+                  :percentage="getSumulatePercent(currentSimulate) || 0"
                 ></el-progress>
               </div>
             </div>
@@ -908,7 +908,7 @@
                   :text-inside="true"
                   :stroke-width="16"
                   :percentage="
-                    getSumulatePercentByRank(currentSimulate, maxNominator)
+                    getSumulatePercentByRank(currentSimulate, maxNominator)||0
                   "
                 ></el-progress>
               </div>
@@ -936,7 +936,7 @@
                     getSumulatePercentByRank(
                       currentSimulate,
                       parseInt(maxNominator * 0.9)
-                    )
+                    ) || 0
                   "
                 ></el-progress>
               </div>
@@ -964,7 +964,7 @@
                     getSumulatePercentByRank(
                       currentSimulate,
                       parseInt(maxNominator * 0.5)
-                    )
+                    ) || 0
                   "
                 ></el-progress>
               </div>
@@ -1208,10 +1208,10 @@ export default {
       return (this.parachain.filterNoRewardRoundWhenCalcAPR || false) === true;
     },
     onePageTableData() {
-      return this.tableData.slice(
+      return this.freshTableStatus(this.tableData.slice(
         (this.pageIndex - 1) * this.pageSize,
         this.pageIndex * this.pageSize
-      );
+      ));
     },
     startRoundIndex4AverageBlocksCalculation() {
       return this.roundInfo.current - 1 - (this.roundsPickedByDropdown || 0);
@@ -1250,7 +1250,7 @@ export default {
       if (!percent || percent === Infinity || percent < 0) {
         return 0;
       }
-      return Number((percent * 100).toFixed(2));
+      return Number((percent * 100).toFixed(2)) || 0;
     },
   },
   methods: {
@@ -2156,15 +2156,8 @@ export default {
               element.apr = await self.getAPR(element);
             }
 
-            let tableData = this.sort4Display(nominatorRes);
-            let hasDelegateRecord = false;
-            tableData && tableData.forEach(it => {
-              it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
-              it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
-              hasDelegateRecord = hasDelegateRecord || it.isDelegated;
-            })
-            this.hasDelegateRecord = hasDelegateRecord;
-            this.tableData = tableData;
+            this.tableData = this.freshTableStatus(this.sort4Display(nominatorRes));
+
             this.$localforage.setItem(
               this.paraChainName + "CollectorSortList",
               JSON.stringify(nominatorRes)
@@ -2178,6 +2171,17 @@ export default {
           });
         });
       });
+    },
+    freshTableStatus(tableData) {
+      tableData = tableData || this.tableData;
+      let hasDelegateRecord = false;
+      tableData && tableData.forEach(it => {
+        it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
+        it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+        hasDelegateRecord = hasDelegateRecord || it.isDelegated;
+      })
+      this.hasDelegateRecord = hasDelegateRecord;
+      return tableData;
     },
     generateTableChart() {
       this.$nextTick(() => {
