@@ -358,7 +358,7 @@
               <div :id="'tableChart' + scope.row.id" class="table-chart"></div>
             </template>
           </el-table-column>
-          <el-table-column width="220" fixed="right">
+          <el-table-column :width="hasDelegateRecord ? 300:220" fixed="right">
             <template slot-scope="scope">
               <div class="div-operation">
                 <span
@@ -396,7 +396,7 @@
                   </div>
                 </el-tooltip>
                 <div
-                  v-if="ifShowDelegate(scope.row) && parachain.canDelegate"
+                  v-if="scope.row.isDelegatable"
                   @click="handleDelegate(scope.row)"
                   class="table-btn"
                   style="margin-left: 8px"
@@ -404,7 +404,7 @@
                   Delegate
                 </div>
                 <div
-                  v-if="ifAlreadyDelegate(scope.row) && parachain.canDelegate"
+                  v-if="scope.row.isDelegated"
                   @click="goToMyStake"
                   class="table-btn"
                   style="margin-left: 8px; background: rgb(95, 106, 249)"
@@ -1100,6 +1100,7 @@ export default {
       allAccounts: [], //account choose list shown on dialog
       showAccountChooseDialog: false,
       delegateEventPending: null,
+      hasDelegateRecord: false,
     };
   },
   async created() {
@@ -1139,9 +1140,11 @@ export default {
       }
       lastResizeRun = setTimeout(() => {
         if (this.chartInstances && this.chartInstances.length) {
-          this.chartInstances.forEach(it => it.resize());
+          this.chartInstances.forEach(it => {
+            this.$nextTick( () => it.resize())
+          });
         }
-      }, 200)
+      }, 1000)
     }
   },
   beforeDestroy() {
@@ -1205,6 +1208,13 @@ export default {
       return (this.parachain.filterNoRewardRoundWhenCalcAPR || false) === true;
     },
     onePageTableData() {
+      let hasDelegateRecord = false;
+      this.tableData.forEach(it => {
+              it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
+              it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+              hasDelegateRecord = hasDelegateRecord || it.isDelegated;
+      });
+      this.hasDelegateRecord = hasDelegateRecord;
       return this.tableData.slice(
         (this.pageIndex - 1) * this.pageSize,
         this.pageIndex * this.pageSize
@@ -2153,7 +2163,13 @@ export default {
               element.apr = await self.getAPR(element);
             }
 
-            this.tableData = this.sort4Display(nominatorRes);
+            let tableData = this.sort4Display(nominatorRes);
+            // tableData && tableData.forEach(it => {
+            //   it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
+            //   it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+            //   this.hasDelegateRecord = this.hasDelegateRecord || it.isDelegated;
+            // })
+            this.tableData = tableData;
             this.$localforage.setItem(
               this.paraChainName + "CollectorSortList",
               JSON.stringify(nominatorRes)
