@@ -1,18 +1,21 @@
 <template>
   <div>
     <el-dialog
-      :title="isDelegateMore ? 'DelegateMore' : 'Delegate'"
+      :title="isDelegateMore ? 'DelegateMore to' : 'Delegate to'"
       :visible.sync="visible"
       width="30%"
     >
       <div class="wallet-wrap">
         <!-- <img class="icon" :src="paraChainIcon" alt="" /> -->
         <identity-icon-plus :addressInfo="receiverAccount"></identity-icon-plus>
-
+      </div>
+      <div class="avaliable-token-wrap">
         <div class="number">
-          （{{ linkAccount.freeBalance | roundNumber(2) }} {{ symbol }}）
+          （avaliable {{ linkAccount.freeBalance | roundNumber(2) }}
+          {{ symbol }}）
         </div>
       </div>
+
       <div class="input-wrap">
         <el-input-number
           v-model="num"
@@ -206,6 +209,12 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.avaliable-token-wrap {
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0px;
+  font-weight: bold;
+}
 .wallet-wrap {
   display: flex;
   align-items: center;
