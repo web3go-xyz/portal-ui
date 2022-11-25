@@ -1,5 +1,6 @@
 <template>
-  <div class="unstake-root" v-if="!disabled">
+  <div class="unstake-root" ref="root">
+    <!--  v-if="!disabled" -->
     <div
       class="table-btn revoke"
       @click="handleRevoke"
@@ -79,7 +80,6 @@ export default {
     "roundInfo",
     "blockNumber",
     "paraChainName",
-    "revokeStateCompCount",
   ],
   components: {
     // IdentityIconPlus,
@@ -142,31 +142,41 @@ export default {
       disabled: false,
     };
   },
-  created() {
-    if (!this.revokeStateCompCount[this.collator]) {
-      this.revokeStateCompCount[this.collator] = 1;
-    } else {
-      this.revokeStateCompCount[this.collator] =
-        this.revokeStateCompCount[this.collator] + 1;
-      this.disabled = true;
-    }
-    if (this.disabled) return;
-    // if (window['RevokeStake' + this.collator])
-    this.leaveDelegatorsDelay =
-      this.api.consts.parachainStaking.leaveDelegatorsDelay;
-    this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
-      "{leaveDelegatorsDelay}",
-      this.leaveDelegatorsDelay
-    );
-  },
+  created() {},
   mounted() {
-    if (this.disabled) return;
-    aprUtlis
-      .getBlockTargetSeconds(this.paraChainName)
-      .then((d) => {
-        this.targetSecondsPerBlock = d;
-      })
-      .then(this.initCountdown);
+    // fixed表头会导致重复, 所以用这个来记录 用于优化
+    // this.$nextTick(() => {
+      const parentDoms = document.body.querySelectorAll(
+        "#my-stake-table .el-table__fixed-body-wrapper .unstake-root"
+      );
+      let disabled = true;
+      parentDoms && parentDoms.forEach(it => (it === this.$refs.root) && (disabled = false));
+      this.disabled = disabled;
+    //   alert(this.disabled);
+      // if (!this.revokeStateCompCount[this.collator]) {
+      //   this.revokeStateCompCount[this.collator] = 1;
+      //   this.disabled = false;
+      // } else {
+      //   this.revokeStateCompCount[this.collator] =
+      //     this.revokeStateCompCount[this.collator] + 1;
+      //   this.disabled = true;
+      // }
+      // if (this.disabled) return;
+      // if (window['RevokeStake' + this.collator])
+      this.leaveDelegatorsDelay =
+        this.api.consts.parachainStaking.leaveDelegatorsDelay;
+      this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
+        "{leaveDelegatorsDelay}",
+        this.leaveDelegatorsDelay
+      );
+      if (this.disabled) return;
+      aprUtlis
+        .getBlockTargetSeconds(this.paraChainName)
+        .then((d) => {
+          this.targetSecondsPerBlock = d;
+        })
+        .then(this.initCountdown);
+    // });
   },
   methods: {
     handleRevoke() {
@@ -211,7 +221,7 @@ export default {
                 // this.$message.error("operation failed");
                 this.$message({
                   showClose: true,
-                  message: "operation failed.",
+                  message: "Something is wrong.",
                   type: "error",
                   duration: 8000,
                 });
@@ -411,6 +421,8 @@ export default {
     // alert("destroy");
     this.countdown.timer && clearInterval(this.countdown.timer);
     this.countdown.timer = null;
+    // this.revokeStateCompCount[this.collator] = this.revokeStateCompCount[this.collator] - 1;
+    // alert(this.revokeStateCompCount[this.collator] + ',destroy')
   },
 };
 </script>

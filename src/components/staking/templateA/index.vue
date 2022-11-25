@@ -452,7 +452,7 @@
             reward history
           </div>
         </div>
-        <el-table class="my-stack-table stakeTable" v-loading="loading" :data="tableData2">
+        <el-table class="my-stack-table stakeTable" v-loading="loading" :data="tableData2" id="my-stake-table">
           <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
@@ -789,7 +789,6 @@
               :roundInfo="roundInfo"
               :blockNumber="blockNumber"
               :paraChainName="paraChainName"
-              :revokeStateCompCount="revokeStateCompCount"
               @statusChanged="onRevokeStatusChange"
               />
             </template>
@@ -1114,8 +1113,6 @@ export default {
       showAccountChooseDialog: false,
       delegateEventPending: null,
       hasDelegateRecord: false,
-      // fixed表头会导致重复, 所以用这个来记录 用于优化
-      revokeStateCompCount: {},
       preferedWidthForMyStakeActions: 230 // or 320 My Stakes按钮显示宽度
     };
   },
@@ -1325,7 +1322,6 @@ export default {
     },
     goToMyStake(resetCounter) {
       if (resetCounter === true || this.activeTab !== '2') { // 
-        this.revokeStateCompCount = {};
         this.preferedWidthForMyStakeActions = 230;
       }
       this.activeTab = "2";
