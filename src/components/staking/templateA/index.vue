@@ -1326,6 +1326,7 @@ export default {
     goToMyStake(resetCounter) {
       if (resetCounter === true || this.activeTab !== '2') { // 
         this.revokeStateCompCount = {};
+        this.preferedWidthForMyStakeActions = 230;
       }
       this.activeTab = "2";
     },
@@ -2208,9 +2209,9 @@ export default {
     },
     onRevokeStatusChange(v) {
       this.freshTableStatus();
-      let preferedWidthForMyStakeActions = 230;
-      if (v.status > 1) preferedWidthForMyStakeActions = 320;
-      this.preferedWidthForMyStakeActions = preferedWidthForMyStakeActions;
+      if (v.status > 1) this.preferedWidthForMyStakeActions = 320;
+      // else if (v.status > 2) preferedWidthForMyStakeActions = 350;
+      // alert(preferedWidthForMyStakeActions + ',' + v.status)
 
       const REVOKED = 4;
       if(this.tableData2 && REVOKED === v.status) {
