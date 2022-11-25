@@ -2214,7 +2214,7 @@ export default {
 
       const REVOKED = 4;
       if(this.tableData2 && REVOKED === v.status) {
-        this.tableData2 = this.tableData2.filter(it => it.id === v.collator);
+        this.tableData2 = this.tableData2.filter(it => it.id !== v.collator);
       }
     },
     generateTableChart() {
