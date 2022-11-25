@@ -430,7 +430,7 @@
           </el-pagination>
         </div>
       </div>
-      <div v-show="activeTab == 2" class="tab-content tab-content2">
+      <div v-if="activeTab == 2" class="tab-content tab-content2">
         <div class="search-wrap">
           <el-input
             class="search-input"
@@ -452,7 +452,7 @@
             reward history
           </div>
         </div>
-        <el-table class="my-stack-table" v-loading="loading" :data="tableData2">
+        <el-table class="my-stack-table stakeTable" v-loading="loading" :data="tableData2">
           <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
@@ -771,7 +771,7 @@
               ></el-progress>
             </template>
           </el-table-column>
-          <el-table-column v-if="parachain.canDelegate" width="140">
+          <el-table-column v-if="parachain.canDelegate" :width="preferedWidthForMyStakeActions" fixed="right">
             <template slot-scope="scope">
               <div
                 v-if="currentWalletAccount"
@@ -780,6 +780,18 @@
               >
                 DelegateMore
               </div>
+              <RevokeStake
+              v-if="activeTab == 2 && apiPromise && roundInfo && blockNumber"
+              :api="apiPromise"
+              :collator="scope.row.id"
+              :linkAccount="linkAccount"
+              :currentWalletAccount="currentWalletAccount"
+              :roundInfo="roundInfo"
+              :blockNumber="blockNumber"
+              :paraChainName="paraChainName"
+              :revokeStateCompCount="revokeStateCompCount"
+              @statusChanged="onRevokeStatusChange"
+              />
             </template>
           </el-table-column>
         </el-table>
@@ -1021,10 +1033,10 @@ import stakingService from "@/api/staking/index.js";
 import aprUtlis from "./apr.utils";
 import chainUtlis from "@/chain/chain.utils";
 import DelegateModal from "./DelegateModal";
+import RevokeStake from "./RevokeStake";
 import {
   web3Accounts,
-  web3Enable,
-  web3AccountsSubscribe,
+  web3Enable
 } from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
@@ -1033,6 +1045,7 @@ export default {
   components: {
     IdentityIconPlus,
     DelegateModal,
+    RevokeStake
   },
   data() {
     return {
@@ -1101,6 +1114,9 @@ export default {
       showAccountChooseDialog: false,
       delegateEventPending: null,
       hasDelegateRecord: false,
+      // fixed表头会导致重复, 所以用这个来记录 用于优化
+      revokeStateCompCount: {},
+      preferedWidthForMyStakeActions: 230 // or 320 My Stakes按钮显示宽度
     };
   },
   async created() {
@@ -1250,7 +1266,12 @@ export default {
       if (!percent || percent === Infinity || percent < 0) {
         return 0;
       }
-      return Number((percent * 100).toFixed(2)) || 0;
+      const result = Number((percent * 100).toFixed(2));
+      if (!result) {
+        console.info(result)
+        debugger;
+      }
+      return  result || 0;
     },
   },
   methods: {
@@ -1302,7 +1323,10 @@ export default {
       }
       return 0;
     },
-    goToMyStake() {
+    goToMyStake(resetCounter) {
+      if (resetCounter === true || this.activeTab !== '2') { // 
+        this.revokeStateCompCount = {};
+      }
       this.activeTab = "2";
     },
     async delegateSuccess() {
@@ -1814,7 +1838,6 @@ export default {
       return this.getTotalStake(row);
     },
     getHeaderData() {
-      let self = this;
       stakingService.getLatestBlockNumber().then((d) => {
         this.blockNumber = d;
       });
@@ -2182,6 +2205,17 @@ export default {
       })
       this.hasDelegateRecord = hasDelegateRecord;
       return tableData;
+    },
+    onRevokeStatusChange(v) {
+      this.freshTableStatus();
+      let preferedWidthForMyStakeActions = 230;
+      if (v.status > 1) preferedWidthForMyStakeActions = 320;
+      this.preferedWidthForMyStakeActions = preferedWidthForMyStakeActions;
+
+      const REVOKED = 4;
+      if(this.tableData2 && REVOKED === v.status) {
+        this.tableData2 = this.tableData2.filter(it => it.id === v.collator);
+      }
     },
     generateTableChart() {
       this.$nextTick(() => {
@@ -2738,7 +2772,11 @@ export default {
         params: { data: row },
       });
     },
-    handleClick(e) {},
+    handleClick() {
+      if (this.activeTab == '2') {
+        this.goToMyStake(true);
+      }
+    },
     shotFilter(str) {
       return str.slice(0, 6) + "..." + str.slice(str.length - 4, str.length);
     },
@@ -2820,6 +2858,12 @@ export default {
       opacity: 0.7;
     }
   }
+  .table-btn.revoke {
+      margin-left: 8px; 
+      background: #FFFFFF;
+      color: rgba(41, 40, 40, 0.8);
+      border: 1px solid rgba(41, 40, 40, 0.3);
+    }
   .pagination-wrap {
     margin-top: 10px;
   }
