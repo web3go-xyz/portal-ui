@@ -152,17 +152,7 @@ export default {
       let disabled = true;
       parentDoms && parentDoms.forEach(it => (it === this.$refs.root) && (disabled = false));
       this.disabled = disabled;
-    //   alert(this.disabled);
-      // if (!this.revokeStateCompCount[this.collator]) {
-      //   this.revokeStateCompCount[this.collator] = 1;
-      //   this.disabled = false;
-      // } else {
-      //   this.revokeStateCompCount[this.collator] =
-      //     this.revokeStateCompCount[this.collator] + 1;
-      //   this.disabled = true;
-      // }
-      // if (this.disabled) return;
-      // if (window['RevokeStake' + this.collator])
+
       this.leaveDelegatorsDelay =
         this.api.consts.parachainStaking.leaveDelegatorsDelay;
       this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
@@ -418,11 +408,8 @@ export default {
     test() {},
   },
   beforeDestroy() {
-    // alert("destroy");
     this.countdown.timer && clearInterval(this.countdown.timer);
     this.countdown.timer = null;
-    // this.revokeStateCompCount[this.collator] = this.revokeStateCompCount[this.collator] - 1;
-    // alert(this.revokeStateCompCount[this.collator] + ',destroy')
   },
 };
 </script>
@@ -540,46 +527,5 @@ export default {
       background: transparent;
     }
   }
-}
-
-.wallet-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: initial;
-  margin-bottom: 20px;
-
-  .icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-    vertical-align: middle;
-  }
-
-  .number {
-    font-family: Rubik-Regular, Rubik;
-    font-weight: 400;
-    vertical-align: middle;
-    font-size: 16px;
-    color: rgba(41, 40, 40, 0.6);
-  }
-}
-
-.input-wrap {
-  margin-left: 10px;
-
-  /deep/ .el-input-number__decrease,
-  body.white-theme .el-input-number__decrease {
-    border-left: 0 !important;
-  }
-
-  .symbol {
-    margin-left: 10px;
-  }
-}
-
-.btn-wrap {
-  margin-top: 20px;
-  text-align: center;
 }
 </style>
