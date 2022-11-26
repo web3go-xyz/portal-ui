@@ -2212,6 +2212,7 @@ export default {
       const REVOKED = 4;
       if(this.tableData2 && REVOKED === v.status) {
         this.tableData2 = this.tableData2.filter(it => it.id !== v.collator);
+        this.getAllData();
       }
     },
     generateTableChart() {
@@ -2331,7 +2332,14 @@ export default {
     },
 
     async getAccountList_PolkadotJs(chain, ss58Format) {
-      await web3Enable(`Web3Go ${chain} Staking dashboard`);
+      let isLinked = false;
+      await web3Enable(`Web3Go ${chain} Staking dashboard`).then((injectedExtensions) => {
+        isLinked = injectedExtensions && injectedExtensions.length > 0;
+      });
+      if (!isLinked) {
+        this.$message.error('We couldn\'t connect to wallet, please check the extension and try again.');
+        return;
+      }
       const allAccounts = await web3Accounts({
         ss58Format: ss58Format,
         accountType: ["ed25519", "sr25519", "ecdsa"],

@@ -108,7 +108,7 @@ export default {
           cancel: {
             title: "Cancel Revoke",
             subtitle:
-              "Are you sure you want to revoke your delegation to this collator?",
+              "Are you sure you want to cancel your revoke request?",
             context: "",
             yesAction: "doHandleCancelRevoke",
             noAction: "closeDialog",
