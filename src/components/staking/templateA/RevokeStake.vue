@@ -6,6 +6,7 @@
       @click="handleRevoke"
       v-if="status.current === status.TO_REVOKE"
       v-loading="ui.revokeBtnLoading"
+      title="you can schedule to revoke delegation from current collator."
     >
       Revoke
     </div>
@@ -18,7 +19,7 @@
         Est. <span>{{ countdown.formatTime }}</span>
       </div>
       <div class="tip"><span>till exectue revoke task </span></div>
-      <div class="btn" @click="countdownDecline">
+      <div class="btn" @click="countdownDecline" title="you will cancel previous scheduled request and continue with delegation.">
         <i class="el-icon-error"></i>
       </div>
     </div>
@@ -33,8 +34,8 @@
           placeholder="Execute"
           @change="countdownDecisionMaker"
         >
-          <el-option label="Execute" value="Execute"></el-option>
-          <el-option label="Cancel" value="Cancel"></el-option>
+          <el-option label="Execute" value="Execute" title="now you can execute previous scheduled request to get your tokens back from delegation."></el-option>
+          <el-option label="Cancel" value="Cancel" title="you will cancel previous scheduled request and continue with delegation."></el-option>
         </el-select>
       </div>
     </div>
