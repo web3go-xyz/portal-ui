@@ -286,6 +286,7 @@ export default {
         if (!this.countdown.timer) {
           clearInterval(this.countdown.timer);
           this.countdown.timer = null;
+          startTimestamp = null;
         }
       } else {
         this.countdown.formatTime = `${hours}h ${minutes}m`; // `${minutes}m ${String(seconds).padStart('0', 2)}s`
