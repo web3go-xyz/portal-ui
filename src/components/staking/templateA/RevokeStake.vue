@@ -279,7 +279,7 @@ export default {
       startTimestamp = startTimestamp || new Date().getTime();
       const remainingSeconds = s - parseInt((new Date().getTime() - startTimestamp)/1000);
       const hours = Math.floor(remainingSeconds / 3600);
-      const minutes = Math.floor(remainingSeconds / 60);
+      const minutes = Math.floor((remainingSeconds % 3600) / 60);
       //const seconds = remainingSeconds - minutes * 60;
       if (minutes < 1 && seconds < 1) {
         this.signalStatus(this.status.TO_EXECUTE);
