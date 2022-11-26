@@ -107,8 +107,7 @@ export default {
           },
           cancel: {
             title: "Cancel Revoke",
-            subtitle:
-              "Are you sure you want to cancel your revoke request?",
+            subtitle: "Are you sure you want to cancel your revoke request?",
             context: "",
             yesAction: "doHandleCancelRevoke",
             noAction: "closeDialog",
@@ -146,30 +145,33 @@ export default {
   mounted() {
     // fixed表头会导致重复, 所以用这个来记录 用于优化
     // this.$nextTick(() => {
-      const parentDoms = document.body.querySelectorAll(
-        "#my-stake-table .el-table__fixed-body-wrapper .unstake-root"
-      );
-      let disabled = true;
-      parentDoms && parentDoms.forEach(it => (it === this.$refs.root) && (disabled = false));
-      this.disabled = disabled;
+    const parentDoms = document.body.querySelectorAll(
+      "#my-stake-table .el-table__fixed-body-wrapper .unstake-root"
+    );
+    let disabled = true;
+    parentDoms &&
+      parentDoms.forEach((it) => it === this.$refs.root && (disabled = false));
+    this.disabled = disabled;
 
-      this.leaveDelegatorsDelay =
-        this.api.consts.parachainStaking.leaveDelegatorsDelay;
-      this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
-        "{leaveDelegatorsDelay}",
-        this.leaveDelegatorsDelay
-      );
-      if (this.disabled) return;
-      aprUtlis
-        .getBlockTargetSeconds(this.paraChainName)
-        .then((d) => {
-          this.targetSecondsPerBlock = d;
-        })
-        .then(this.initCountdown);
+    this.leaveDelegatorsDelay =
+      this.api.consts.parachainStaking.leaveDelegatorsDelay;
+    this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
+      "{leaveDelegatorsDelay}",
+      this.leaveDelegatorsDelay
+    );
+    if (this.disabled) return;
+    aprUtlis
+      .getBlockTargetSeconds(this.paraChainName)
+      .then((d) => {
+        this.targetSecondsPerBlock = d;
+      })
+      .then(this.initCountdown);
     // });
   },
   methods: {
     handleRevoke() {
+      if (this.ui.revokeBtnLoading) return;
+
       this.ui.confirm.current = this.ui.confirm.revoke;
       this.ui.confirm.show = true;
     },
@@ -272,10 +274,12 @@ export default {
         this.signalStatus(this.status.TO_EXECUTE);
       }
     },
-    doCountdown(s) {
-      this.countdown.remainingSeconds = s;
-      const minutes = Math.floor(s / 60);
-      const seconds = s - minutes * 60;
+    doCountdown(s, startTimestamp) {
+      startTimestamp = startTimestamp || new Date().getTime();
+      const remainingSeconds = s - parseInt((new Date().getTime() - startTimestamp)/1000);
+      const hours = Math.floor(remainingSeconds / 3600);
+      const minutes = Math.floor(remainingSeconds / 60);
+      //const seconds = remainingSeconds - minutes * 60;
       if (minutes < 1 && seconds < 1) {
         this.signalStatus(this.status.TO_EXECUTE);
         this.countdown.formatTime = "";
@@ -284,11 +288,11 @@ export default {
           this.countdown.timer = null;
         }
       } else {
-        this.countdown.formatTime = `${minutes}m ${seconds}s`; // `${minutes}m ${String(seconds).padStart('0', 2)}s`
+        this.countdown.formatTime = `${hours}h ${minutes}m`; // `${minutes}m ${String(seconds).padStart('0', 2)}s`
         if (!this.countdown.timer) {
           this.countdown.timer = setInterval(() => {
-            this.doCountdown(this.countdown.remainingSeconds - 1);
-          }, 1000);
+            this.doCountdown(s, startTimestamp);
+          }, 10000);
         }
       }
     },
@@ -510,7 +514,7 @@ export default {
     div.btn {
       color: rgba(41, 40, 40, 0.6);
       position: absolute;
-      right: 2px;
+      right: 8px;
       top: -16px;
       font-size: 18px;
       cursor: pointer;
