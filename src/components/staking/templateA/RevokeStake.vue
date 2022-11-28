@@ -102,7 +102,7 @@ export default {
             title: "Revoke",
             subtitle:
               "Are you sure you want to revoke your delegation to this collator?",
-            context: `This action will be scheduled for the next {leaveDelegatorsDelay} round and then it will have to be manually executed`,
+            context: `This action will be scheduled for the next {leaveDelegatorsDelay} rounds and then it will have to be manually executed`,
             yesAction: "doRevoke",
             noAction: "closeDialog",
           },
