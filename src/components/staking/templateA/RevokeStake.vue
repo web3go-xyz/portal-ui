@@ -2,12 +2,12 @@
   <div class="unstake-root" ref="root">
     <!--  v-if="!disabled" -->
     <div
-      class="table-btn revoke"
+      :class="['table-btn', 'revoke', ui.revokeBtnLoading? 'disabled':'']"
       @click="handleRevoke"
       v-if="status.current === status.TO_REVOKE"
-      v-loading="ui.revokeBtnLoading"
       title="you can schedule to unstake delegation from current collator."
     >
+      <i class="el-icon-loading" v-if="ui.revokeBtnLoading"></i>
       Unstake
     </div>
     <div
@@ -30,13 +30,14 @@
     <div
       class="countdown-wrap"
       v-if="status.current === status.TO_EXECUTE"
-      v-loading="decision.loading"
     >
       <div class="decision">
         <el-select
           v-model="decision.v"
           placeholder="Execute"
+          v-loading="decision.loading"
           @change="countdownDecisionMaker"
+          :disabled="decision.loading"
         >
           <el-option
             label="Execute"
@@ -486,6 +487,20 @@ export default {
     border: 1px solid rgba(41, 40, 40, 0.3);
   }
 }
+.unstake-root .countdown-wrap .decision {
+  .el-select .el-input {
+    input.el-input__inner {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      // text-align: center;
+    }
+    input.el-input__inner::placeholder {
+      color: rgba(41, 40, 40, 0.8);
+    }
+  }
+}
 </style>
 <style lang="less" scoped>
 .unstake-root {
@@ -511,8 +526,15 @@ export default {
     background: #ffffff;
     color: rgba(41, 40, 40, 0.8);
     border: 1px solid rgba(41, 40, 40, 0.3);
-  }
 
+    // i {
+    //   color: #17c684;
+    // }
+  }
+  .table-btn.revoke.disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
   .countdown-wrap {
     // display: inline-block;
     position: absolute;
