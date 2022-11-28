@@ -6,9 +6,9 @@
       @click="handleRevoke"
       v-if="status.current === status.TO_REVOKE"
       v-loading="ui.revokeBtnLoading"
-      title="you can schedule to revoke delegation from current collator."
+      title="you can schedule to unstake delegation from current collator."
     >
-      Revoke
+      Unstake
     </div>
     <div
       class="countdown-wrap"
@@ -18,7 +18,7 @@
       <div class="num">
         Est. <span>{{ countdown.formatTime }}</span>
       </div>
-      <div class="tip"><span>till exectue revoke task </span></div>
+      <div class="tip"><span>till exectue unstake task </span></div>
       <div class="btn" @click="countdownDecline" title="you will cancel previous scheduled request and continue with delegation.">
         <i class="el-icon-error"></i>
       </div>
@@ -45,7 +45,7 @@
       :visible.sync="ui.confirm.show"
       :close-on-click-modal="false"
       append-to-body
-      width="460px"
+      width="465px"
       class="revoke-dialog"
     >
       <h2>{{ ui.confirm.current.subtitle }}</h2>
@@ -99,16 +99,16 @@ export default {
         confirm: {
           show: false,
           revoke: {
-            title: "Revoke",
+            title: "Unstake",
             subtitle:
-              "Are you sure you want to revoke your delegation to this collator?",
+              "Are you sure you want to unstake your delegation to this collator?",
             context: `This action will be scheduled for the next {leaveDelegatorsDelay} rounds and then it will have to be manually executed`,
             yesAction: "doRevoke",
             noAction: "closeDialog",
           },
           cancel: {
             title: "Cancel Revoke",
-            subtitle: "Are you sure you want to cancel your revoke request?",
+            subtitle: "Are you sure you want to cancel your unstake request?",
             context: "",
             yesAction: "doHandleCancelRevoke",
             noAction: "closeDialog",
@@ -153,6 +153,7 @@ export default {
     parentDoms &&
       parentDoms.forEach((it) => it === this.$refs.root && (disabled = false));
     this.disabled = disabled;
+    if (this.disabled) return;
 
     this.leaveDelegatorsDelay =
       this.api.consts.parachainStaking.leaveDelegatorsDelay;
@@ -160,7 +161,6 @@ export default {
       "{leaveDelegatorsDelay}",
       this.leaveDelegatorsDelay
     );
-    if (this.disabled) return;
     aprUtlis
       .getBlockTargetSeconds(this.paraChainName)
       .then((d) => {
@@ -494,7 +494,7 @@ export default {
     // display: inline-block;
     position: absolute;
     width: 140px;
-    margin-left: 15px;
+    // margin-left: 15px;
     //position: relative;
     font-style: normal;
     font-weight: 400;

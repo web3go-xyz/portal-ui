@@ -774,7 +774,7 @@
           <el-table-column v-if="parachain.canDelegate" :width="preferedWidthForMyStakeActions" fixed="right">
             <template slot-scope="scope">
               <div
-                v-if="currentWalletAccount"
+                v-if="currentWalletAccount && scope.row.revokeStatus <= 1"
                 class="table-btn"
                 @click="handleDelegateMore(scope.row)"
               >
@@ -1113,7 +1113,7 @@ export default {
       showAccountChooseDialog: false,
       delegateEventPending: null,
       hasDelegateRecord: false,
-      preferedWidthForMyStakeActions: 230 // or 320 My Stakes按钮显示宽度
+      preferedWidthForMyStakeActions: 250 // or 200 in other case. My Stakes按钮显示宽度
     };
   },
   async created() {
@@ -1322,7 +1322,7 @@ export default {
     },
     goToMyStake(resetCounter) {
       if (resetCounter === true || this.activeTab !== '2') { // 
-        this.preferedWidthForMyStakeActions = 230;
+        this.preferedWidthForMyStakeActions = 200;
       }
       this.activeTab = "2";
     },
@@ -1734,7 +1734,15 @@ export default {
     getMyStackList() {
       const arr = this.tableData.filter((v) => {
         const result = v.allNominators.find(
-          (sv) => sv.owner == this.searchAccount
+          (sv) => {
+            if(sv.owner == this.searchAccount) {
+               // status definition is available at RevokeStake.vue, 
+               // and the revokeStatus would be updated by RevokeStake.vue later.
+              sv.revokeStatus = sv.revokeStatus || 0;
+              return true;
+            }
+            return false;
+          }
         );
         return result;
       });
@@ -2198,6 +2206,7 @@ export default {
       tableData && tableData.forEach(it => {
         it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
         it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+        it.revokeStatus = it.revokeStatus || 0;
         hasDelegateRecord = hasDelegateRecord || it.isDelegated;
       })
       this.hasDelegateRecord = hasDelegateRecord;
@@ -2205,15 +2214,23 @@ export default {
     },
     onRevokeStatusChange(v) {
       this.freshTableStatus();
-      if (v.status > 1) this.preferedWidthForMyStakeActions = 320;
-      // else if (v.status > 2) preferedWidthForMyStakeActions = 350;
+      if (v.status <= 1) this.preferedWidthForMyStakeActions = 250;
+      //else  this.preferedWidthForMyStakeActions = 200;
       // alert(preferedWidthForMyStakeActions + ',' + v.status)
 
       const REVOKED = 4;
+
       if(this.tableData2 && REVOKED === v.status) {
         this.tableData2 = this.tableData2.filter(it => it.id !== v.collator);
         this.getAllData();
+      } else {
+        const row = this.tableData2.filter(it => it.id === v.collator)[0];
+        if (row)  {
+          row.revokeStatus = v.status;
+        }
       }
+
+      
     },
     generateTableChart() {
       this.$nextTick(() => {
@@ -2360,7 +2377,9 @@ export default {
 
       this.linkAccount.address = account.address;
       if (this.delegateEventPending) {
-        this.handleDelegate(this.delegateEventPending).then(()=> {
+        if (this.parachain.canDelegate && this.ifAlreadyDelegate(this.delegateEventPending) ) { //this.delegateEventPending.isDelegated) {
+          this.delegateEventPending = null;
+        } else this.handleDelegate(this.delegateEventPending).then(()=> {
           this.delegateEventPending = null;
         });
       }
