@@ -533,14 +533,14 @@ export default {
       font-size: 10px;
       line-height: 16px;
       color: rgba(41, 40, 40, 0.3);
-      top: -2px;
+      top: -4px;
     }
     div.btn {
       color: rgba(41, 40, 40, 0.6);
       position: absolute;
-      right: 8px;
+      right: 6px;
       top: -16px;
-      font-size: 18px;
+      font-size: 17px;
       cursor: pointer;
     }
     div.btn:hover {
