@@ -19,7 +19,11 @@
         Est. <span>{{ countdown.formatTime }}</span>
       </div>
       <div class="tip"><span>till exectue unstake task </span></div>
-      <div class="btn" @click="countdownDecline" title="you will cancel previous scheduled request and continue with delegation.">
+      <div
+        class="btn"
+        @click="countdownDecline"
+        title="you will cancel previous scheduled request and continue with delegation."
+      >
         <i class="el-icon-error"></i>
       </div>
     </div>
@@ -34,8 +38,16 @@
           placeholder="Execute"
           @change="countdownDecisionMaker"
         >
-          <el-option label="Execute" value="Execute" title="now you can execute previous scheduled request to get your tokens back from delegation."></el-option>
-          <el-option label="Cancel" value="Cancel" title="you will cancel previous scheduled request and continue with delegation."></el-option>
+          <el-option
+            label="Execute"
+            value="Execute"
+            title="now you can execute previous scheduled request to get your tokens back from delegation."
+          ></el-option>
+          <el-option
+            label="Cancel"
+            value="Cancel"
+            title="you will cancel previous scheduled request and continue with delegation."
+          ></el-option>
         </el-select>
       </div>
     </div>
@@ -45,7 +57,7 @@
       :visible.sync="ui.confirm.show"
       :close-on-click-modal="false"
       append-to-body
-      width="465px"
+      width="487px"
       class="revoke-dialog"
     >
       <h2>{{ ui.confirm.current.subtitle }}</h2>
@@ -277,7 +289,8 @@ export default {
     },
     doCountdown(s, startTimestamp) {
       startTimestamp = startTimestamp || new Date().getTime();
-      const remainingSeconds = s - parseInt((new Date().getTime() - startTimestamp)/1000);
+      const remainingSeconds =
+        s - parseInt((new Date().getTime() - startTimestamp) / 1000);
       const hours = Math.floor(remainingSeconds / 3600);
       const minutes = Math.floor((remainingSeconds % 3600) / 60);
       //const seconds = remainingSeconds - minutes * 60;
@@ -422,8 +435,17 @@ export default {
   
 <style lang="less">
 .revoke-dialog {
-  .el-dialog__body {
-    padding: 15px 20px;
+  .el-dialog {
+    border-radius: 10px;
+    .el-dialog__header {
+      padding: 24px 24px 0;
+    }
+    .el-dialog__body {
+      padding: 0 24px;
+    }
+    .el-dialog__footer {
+      padding: 24px;
+    }
   }
   h2 {
     //   font-family: "Inter";
