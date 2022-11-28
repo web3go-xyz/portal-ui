@@ -2226,7 +2226,7 @@ export default {
 
       if(this.tableData2 && REVOKED === v.status) {
         this.tableData2 = this.tableData2.filter(it => it.id !== v.collator);
-        this.getAllData();
+        this.delegateSuccess();
       } else {
         const row = this.tableData2.filter(it => it.id === v.collator)[0];
         if (row)  {
@@ -3326,7 +3326,7 @@ export default {
   }
 }
 </style>
-<style>
+<style lang="less">
 .simulate-popover {
   background: rgb(250, 250, 250) !important;
   box-shadow: rgba(0, 0, 0, 0.6) 0px 2px 20px 0px !important;
@@ -3334,6 +3334,11 @@ export default {
 .tab-content .stakeTable .el-table__body-wrapper, .tab-content1 
 .stakeTable .el-table__body-wrapper {
   overflow: auto !important;
+}
+.stakeTable  {
+  .el-table__fixed-right::before, .el-table__fixed::before {
+    background-color: transparent;
+  }
 }
 </style>
 <style lang="less" scoped>

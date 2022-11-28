@@ -224,6 +224,7 @@ export default {
                 this.initCountdown();
               } else if (txStatus.fail) {
                 // this.$message.error("operation failed");
+                this.ui.revokeBtnLoading = false;
                 this.$message({
                   showClose: true,
                   message: "Something is wrong.",
@@ -294,7 +295,7 @@ export default {
       const hours = Math.floor(remainingSeconds / 3600);
       const minutes = Math.floor((remainingSeconds % 3600) / 60);
       //const seconds = remainingSeconds - minutes * 60;
-      if (minutes < 1 && seconds < 1) {
+      if (hours < 1 && minutes < 1) {
         this.signalStatus(this.status.TO_EXECUTE);
         this.countdown.formatTime = "";
         if (!this.countdown.timer) {
