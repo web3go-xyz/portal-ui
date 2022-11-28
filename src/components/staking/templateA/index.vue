@@ -1738,7 +1738,7 @@ export default {
             if(sv.owner == this.searchAccount) {
                // status definition is available at RevokeStake.vue, 
                // and the revokeStatus would be updated by RevokeStake.vue later.
-              sv.revokeStatus = sv.revokeStatus || 0;
+              sv.revokeStatus = sv.revokeStatus || 2;
               return true;
             }
             return false;
@@ -2206,12 +2206,16 @@ export default {
       tableData && tableData.forEach(it => {
         it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
         it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
-        it.revokeStatus = it.revokeStatus || 0;
+        // status definition is available at RevokeStake.vue, 
+        // and the revokeStatus would be updated by RevokeStake.vue later.
+        // revokeStatus is to control the DelegateMore
+        it.revokeStatus = it.revokeStatus || 2;
         hasDelegateRecord = hasDelegateRecord || it.isDelegated;
       })
       this.hasDelegateRecord = hasDelegateRecord;
       return tableData;
     },
+    // status definition is available at RevokeStake.vue#data#status, 
     onRevokeStatusChange(v) {
       this.freshTableStatus();
       if (v.status <= 1) this.preferedWidthForMyStakeActions = 250;
@@ -2226,7 +2230,10 @@ export default {
       } else {
         const row = this.tableData2.filter(it => it.id === v.collator)[0];
         if (row)  {
-          row.revokeStatus = v.status;
+        // status definition is available at RevokeStake.vue, 
+        // and the revokeStatus would be updated by RevokeStake.vue later.
+        // revokeStatus is to control the DelegateMore
+          this.$nextTick(() => row.revokeStatus = v.status );
         }
       }
 
