@@ -119,7 +119,7 @@ export default {
             noAction: "closeDialog",
           },
           cancel: {
-            title: "Cancel Revoke",
+            title: "Cancel Unstake",
             subtitle: "Are you sure you want to cancel your unstake request?",
             context: "",
             yesAction: "doHandleCancelRevoke",
