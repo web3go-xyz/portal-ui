@@ -430,7 +430,7 @@
           </el-pagination>
         </div>
       </div>
-      <div v-show="activeTab == 2" class="tab-content tab-content2">
+      <div v-if="activeTab == 2" class="tab-content tab-content2">
         <div class="search-wrap">
           <el-input
             class="search-input"
@@ -452,7 +452,7 @@
             reward history
           </div>
         </div>
-        <el-table class="my-stack-table" v-loading="loading" :data="tableData2">
+        <el-table class="my-stack-table stakeTable" v-loading="loading" :data="tableData2" id="my-stake-table">
           <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
@@ -771,15 +771,26 @@
               ></el-progress>
             </template>
           </el-table-column>
-          <el-table-column v-if="parachain.canDelegate" width="140">
+          <el-table-column v-if="parachain.canDelegate" :width="preferedWidthForMyStakeActions" fixed="right">
             <template slot-scope="scope">
               <div
-                v-if="currentWalletAccount"
+                v-if="currentWalletAccount && scope.row.revokeStatus <= 1"
                 class="table-btn"
                 @click="handleDelegateMore(scope.row)"
               >
                 DelegateMore
               </div>
+              <RevokeStake
+              v-if="activeTab == 2 && apiPromise && roundInfo && blockNumber"
+              :api="apiPromise"
+              :collator="scope.row.id"
+              :linkAccount="linkAccount"
+              :currentWalletAccount="currentWalletAccount"
+              :roundInfo="roundInfo"
+              :blockNumber="blockNumber"
+              :paraChainName="paraChainName"
+              @statusChanged="onRevokeStatusChange"
+              />
             </template>
           </el-table-column>
         </el-table>
@@ -1021,10 +1032,10 @@ import stakingService from "@/api/staking/index.js";
 import aprUtlis from "./apr.utils";
 import chainUtlis from "@/chain/chain.utils";
 import DelegateModal from "./DelegateModal";
+import RevokeStake from "./RevokeStake";
 import {
   web3Accounts,
-  web3Enable,
-  web3AccountsSubscribe,
+  web3Enable
 } from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
@@ -1033,6 +1044,7 @@ export default {
   components: {
     IdentityIconPlus,
     DelegateModal,
+    RevokeStake
   },
   data() {
     return {
@@ -1101,6 +1113,7 @@ export default {
       showAccountChooseDialog: false,
       delegateEventPending: null,
       hasDelegateRecord: false,
+      preferedWidthForMyStakeActions: 250 // or 200 in other case. My Stakes按钮显示宽度
     };
   },
   async created() {
@@ -1250,7 +1263,12 @@ export default {
       if (!percent || percent === Infinity || percent < 0) {
         return 0;
       }
-      return Number((percent * 100).toFixed(2)) || 0;
+      const result = Number((percent * 100).toFixed(2));
+      if (!result) {
+        console.info(result)
+        debugger;
+      }
+      return  result || 0;
     },
   },
   methods: {
@@ -1302,7 +1320,10 @@ export default {
       }
       return 0;
     },
-    goToMyStake() {
+    goToMyStake(resetCounter) {
+      if (resetCounter === true || this.activeTab !== '2') { // 
+        this.preferedWidthForMyStakeActions = 200;
+      }
       this.activeTab = "2";
     },
     async delegateSuccess() {
@@ -1713,7 +1734,15 @@ export default {
     getMyStackList() {
       const arr = this.tableData.filter((v) => {
         const result = v.allNominators.find(
-          (sv) => sv.owner == this.searchAccount
+          (sv) => {
+            if(sv.owner == this.searchAccount) {
+               // status definition is available at RevokeStake.vue, 
+               // and the revokeStatus would be updated by RevokeStake.vue later.
+              sv.revokeStatus = sv.revokeStatus || 2;
+              return true;
+            }
+            return false;
+          }
         );
         return result;
       });
@@ -1814,7 +1843,6 @@ export default {
       return this.getTotalStake(row);
     },
     getHeaderData() {
-      let self = this;
       stakingService.getLatestBlockNumber().then((d) => {
         this.blockNumber = d;
       });
@@ -2178,10 +2206,38 @@ export default {
       tableData && tableData.forEach(it => {
         it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
         it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+        // status definition is available at RevokeStake.vue, 
+        // and the revokeStatus would be updated by RevokeStake.vue later.
+        // revokeStatus is to control the DelegateMore
+        it.revokeStatus = it.revokeStatus || 2;
         hasDelegateRecord = hasDelegateRecord || it.isDelegated;
       })
       this.hasDelegateRecord = hasDelegateRecord;
       return tableData;
+    },
+    // status definition is available at RevokeStake.vue#data#status, 
+    onRevokeStatusChange(v) {
+      this.freshTableStatus();
+      if (v.status <= 1) this.preferedWidthForMyStakeActions = 250;
+      //else  this.preferedWidthForMyStakeActions = 200;
+      // alert(preferedWidthForMyStakeActions + ',' + v.status)
+
+      const REVOKED = 4;
+
+      if(this.tableData2 && REVOKED === v.status) {
+        this.tableData2 = this.tableData2.filter(it => it.id !== v.collator);
+        this.delegateSuccess();
+      } else {
+        const row = this.tableData2.filter(it => it.id === v.collator)[0];
+        if (row)  {
+        // status definition is available at RevokeStake.vue, 
+        // and the revokeStatus would be updated by RevokeStake.vue later.
+        // revokeStatus is to control the DelegateMore
+          this.$nextTick(() => row.revokeStatus = v.status );
+        }
+      }
+
+      
     },
     generateTableChart() {
       this.$nextTick(() => {
@@ -2300,7 +2356,14 @@ export default {
     },
 
     async getAccountList_PolkadotJs(chain, ss58Format) {
-      await web3Enable(`Web3Go ${chain} Staking dashboard`);
+      let isLinked = false;
+      await web3Enable(`Web3Go ${chain} Staking dashboard`).then((injectedExtensions) => {
+        isLinked = injectedExtensions && injectedExtensions.length > 0;
+      });
+      if (!isLinked) {
+        this.$message.error('We couldn\'t connect to wallet, please check the extension and try again.');
+        return;
+      }
       const allAccounts = await web3Accounts({
         ss58Format: ss58Format,
         accountType: ["ed25519", "sr25519", "ecdsa"],
@@ -2321,7 +2384,9 @@ export default {
 
       this.linkAccount.address = account.address;
       if (this.delegateEventPending) {
-        this.handleDelegate(this.delegateEventPending).then(()=> {
+        if (this.parachain.canDelegate && this.ifAlreadyDelegate(this.delegateEventPending) ) { //this.delegateEventPending.isDelegated) {
+          this.delegateEventPending = null;
+        } else this.handleDelegate(this.delegateEventPending).then(()=> {
           this.delegateEventPending = null;
         });
       }
@@ -2738,7 +2803,11 @@ export default {
         params: { data: row },
       });
     },
-    handleClick(e) {},
+    handleClick() {
+      if (this.activeTab == '2') {
+        this.goToMyStake(true);
+      }
+    },
     shotFilter(str) {
       return str.slice(0, 6) + "..." + str.slice(str.length - 4, str.length);
     },
@@ -2820,6 +2889,12 @@ export default {
       opacity: 0.7;
     }
   }
+  .table-btn.revoke {
+      margin-left: 8px; 
+      background: #FFFFFF;
+      color: rgba(41, 40, 40, 0.8);
+      border: 1px solid rgba(41, 40, 40, 0.3);
+    }
   .pagination-wrap {
     margin-top: 10px;
   }
@@ -3251,7 +3326,7 @@ export default {
   }
 }
 </style>
-<style>
+<style lang="less">
 .simulate-popover {
   background: rgb(250, 250, 250) !important;
   box-shadow: rgba(0, 0, 0, 0.6) 0px 2px 20px 0px !important;
@@ -3259,6 +3334,11 @@ export default {
 .tab-content .stakeTable .el-table__body-wrapper, .tab-content1 
 .stakeTable .el-table__body-wrapper {
   overflow: auto !important;
+}
+.stakeTable  {
+  .el-table__fixed-right::before, .el-table__fixed::before {
+    background-color: transparent;
+  }
 }
 </style>
 <style lang="less" scoped>
