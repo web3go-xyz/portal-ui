@@ -2,7 +2,7 @@
   <div class="unstake-root" ref="root">
     <!--  v-if="!disabled" -->
     <div
-      :class="['table-btn', 'revoke', ui.revokeBtnLoading? 'disabled':'']"
+      :class="['table-btn', 'revoke', ui.revokeBtnLoading ? 'disabled' : '']"
       @click="handleRevoke"
       v-if="status.current === status.TO_REVOKE"
       title="you can schedule to unstake delegation from current collator."
@@ -27,10 +27,7 @@
         <i class="el-icon-error"></i>
       </div>
     </div>
-    <div
-      class="countdown-wrap"
-      v-if="status.current === status.TO_EXECUTE"
-    >
+    <div class="countdown-wrap" v-if="status.current === status.TO_EXECUTE">
       <div class="decision">
         <el-select
           v-model="decision.v"
@@ -281,12 +278,24 @@ export default {
         (whenExecutableRoundIndex - currentRoundIndex) * blocksPerRound;
       const estBlocksV2 = estBlocksV1 - blocksFinishedInCurrentRound;
       const estSeconds = estBlocksV2 * this.targetSecondsPerBlock;
-
+      // if (!window.test) {
+      //   window.test = [5,1, -5];
+      //   window.testI = 0 ;
+      // }
+      // let estSeconds = window.test[window.testI++];
       if (estSeconds > 0) {
         this.doCountdown(estSeconds);
         this.signalStatus(this.status.TO_WAIT);
       } else {
+        this.cleanCountdown();
         this.signalStatus(this.status.TO_EXECUTE);
+      }
+    },
+    cleanCountdown(loading = false) {
+      if (this.countdown.timer) {
+        this.countdown.loading = loading;
+        clearInterval(this.countdown.timer);
+        this.countdown.timer = null;
       }
     },
     doCountdown(s, startTimestamp) {
@@ -294,18 +303,16 @@ export default {
       const remainingSeconds =
         s - parseInt((new Date().getTime() - startTimestamp) / 1000);
       const hours = Math.floor(remainingSeconds / 3600);
-      const minutes = Math.floor((remainingSeconds % 3600) / 60);
-      //const seconds = remainingSeconds - minutes * 60;
-      if (hours < 1 && minutes < 1) {
-        this.signalStatus(this.status.TO_EXECUTE);
-        this.countdown.formatTime = "";
-        if (!this.countdown.timer) {
-          clearInterval(this.countdown.timer);
-          this.countdown.timer = null;
-          startTimestamp = null;
-        }
+      const minutes = Math.ceil((remainingSeconds % 3600) / 60);
+      const seconds = remainingSeconds - minutes * 60;
+
+      if (hours < 1 && minutes < 1 && seconds < 2) {
+        this.countdown.formatTime = "loading";
+        this.cleanCountdown(true);
+        this.initCountdown();
       } else {
         this.countdown.formatTime = `${hours}h ${minutes}m`; // `${minutes}m ${String(seconds).padStart('0', 2)}s`
+        console.info(".......", this.countdown.timer);
         if (!this.countdown.timer) {
           this.countdown.timer = setInterval(() => {
             this.doCountdown(s, startTimestamp);
@@ -532,7 +539,7 @@ export default {
     // }
   }
   .table-btn.revoke.disabled {
-    opacity: .5;
+    opacity: 0.5;
     cursor: not-allowed;
   }
   .countdown-wrap {
