@@ -543,6 +543,15 @@ export default {
           tags: ["Featured", "Kusama", "Calamari"],
           icon: require(`./../assets/images/home/calamari.png`),
         },
+         {
+          id: "DataHighwayStaking-Mainnet-1",
+          type: "DataHighwayStaking",
+          name: "Staking Analysis",
+          description: "DataHighway Mainnet staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "DataHighway"],
+          icon: require(`./../assets/images/home/datahighway.png`),
+        },
         {
           id: "Moonbeam-1",
           type: "Moonbeam",
@@ -579,15 +588,15 @@ export default {
           tags: ["Featured", "Kusama", "Turing"],
           icon: require(`./../assets/images/home/oak-turing.png`),
         },
-        // {
-        //   id: "Litentry-Testnet-1",
-        //   type: "LitentryTestnetStaking",
-        //   name: "Staking Analysis",
-        //   description: "Litentry Testnet staking analysis and simulate",
-        //   created: "Web3go Offical Team",
-        //   tags: ["Featured", "Kusama", "Litentry"],
-        //   icon: require(`./../assets/images/home/litentry.png`),
-        // },
+         {
+           id: "Litentry-Testnet-1",
+           type: "LitentryTestnetStaking",
+           name: "Staking Analysis",
+           description: "Litentry Testnet staking analysis and simulate",
+           created: "Web3go Offical Team",
+           tags: ["Featured", "Kusama", "Litentry"],
+           icon: require(`./../assets/images/home/litentry.png`),
+         },
       ],
       rmrkNFTDashboardList: [
         {
@@ -729,6 +738,9 @@ export default {
       if (type === "CalamariStaking") {
         return require(`./../assets/images/home/calamari-staking-dashboard.png`);
       }
+      if (type === "DataHighwayStaking") {
+        return require(`./../assets/images/home/datahighway-staking-dashboard.png`);
+      }
       return require(`./../assets/images/home/card-line${num}.png`);
     },
 
@@ -865,7 +877,8 @@ export default {
       }
       if (
         String(type).startsWith("Litentry") ||
-        String(type).startsWith("Calamari")
+        String(type).startsWith("Calamari") ||
+        String(type).startsWith("DataHighway")
       ) {
         this.$router.push({
           name: type,

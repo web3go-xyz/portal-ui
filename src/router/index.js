@@ -388,26 +388,26 @@ export default new Router({
             base_api: window.OAK_STAKING_API
         },
     },
-    // {
-    //     path: "/LitentryTestnetStaking",
-    //     name: "LitentryTestnetStaking",
-    //     component: StakingTemplateA,
-    //     meta: {
-    //         parachain: {
-    //             name: 'Litentry Rococo Network',
-    //             icon: 'static/parachain-icon/litentry.png',
-    //             symbol: 'LIT',
-    //             decimals: 12,
-    //             minBond: 50,
-    //             canDelegate: true,
-    //             delegateParameterCount: 2,
-    //             walletSupport: 'polkadot.js',
-    //             ss58Format: 131, // polkadot.js 
-    //             rpcUrls: ["wss://rpc.rococo-parachain-sg.litentry.io"], //MetaMask,polkadot.js
-    //         },
-    //         base_api: window.LITENTRY_STAKING_TESTNET_API
-    //     },
-    // },
+     {
+         path: "/LitentryTestnetStaking",
+         name: "LitentryTestnetStaking",
+         component: StakingTemplateA,
+         meta: {
+             parachain: {
+                 name: 'Litentry Rococo Network',
+                 icon: 'static/parachain-icon/litentry.png',
+                 symbol: 'LIT',
+                 decimals: 12,
+                 minBond: 50,
+                 canDelegate: true,
+                 delegateParameterCount: 2,
+                 walletSupport: 'polkadot.js',
+                 ss58Format: 131, // polkadot.js 
+                 rpcUrls: ["wss://rpc.rococo-parachain-sg.litentry.io"], //MetaMask,polkadot.js
+             },
+             base_api: window.LITENTRY_STAKING_TESTNET_API
+         },
+     },
     {
         path: "/LitentryMainnetStaking",
         name: "LitentryMainnetStaking",
@@ -447,6 +447,26 @@ export default new Router({
                 rpcUrls: ["wss://ws.calamari.systems/"], //MetaMask,polkadot.js
             },
             base_api: window.CALAMARI_STAKING_MAINNET_API
+        },
+    },
+    {
+        path: "/DataHighwayStaking",
+        name: "DataHighwayStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'DataHighway Tanganika',
+                icon: 'static/parachain-icon/datahighway.png',
+                symbol: 'DHX',
+                decimals: 18,
+                minBond: 10,
+                canDelegate: true,
+                delegateParameterCount: 4,
+                walletSupport: 'polkadot.js',
+                ss58Format: 33, // polkadot.js 
+                rpcUrls: ["wss://tanganika-archive.datahighway.com/"], //MetaMask,polkadot.js
+            },
+            base_api: window.DATAHIGHWAY_TANGANIKA_STAKING_MAINNET_API
         },
     },
     {
