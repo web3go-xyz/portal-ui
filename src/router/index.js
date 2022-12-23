@@ -356,7 +356,9 @@ export default new Router({
                 symbol: 'BNC',
                 decimals: 12,
                 minBond: 50,
-                // canDelegate: true,
+                canDelegate: true,
+                supportSimulate: true,
+                supportNotify: false,
                 walletSupport: 'polkadot.js',
                 // walletSupport: 'MetaMask',
                 ss58Format: 6, // polkadot.js 
@@ -381,6 +383,8 @@ export default new Router({
                 decimals: 10,
                 minBond: 50,
                 canDelegate: true,
+                supportSimulate: true,
+                supportNotify: false,
                 walletSupport: 'polkadot.js',
                 ss58Format: 51, // polkadot.js 
                 rpcUrls: [window.OAK_TURING_WSS || "wss://rpc.turing.oak.tech"], //MetaMask,polkadot.js 
@@ -388,26 +392,28 @@ export default new Router({
             base_api: window.OAK_STAKING_API
         },
     },
-     {
-         path: "/LitentryTestnetStaking",
-         name: "LitentryTestnetStaking",
-         component: StakingTemplateA,
-         meta: {
-             parachain: {
-                 name: 'Litentry Rococo Network',
-                 icon: 'static/parachain-icon/litentry.png',
-                 symbol: 'LIT',
-                 decimals: 12,
-                 minBond: 50,
-                 canDelegate: true,
-                 delegateParameterCount: 2,
-                 walletSupport: 'polkadot.js',
-                 ss58Format: 131, // polkadot.js 
-                 rpcUrls: ["wss://rpc.rococo-parachain-sg.litentry.io"], //MetaMask,polkadot.js
-             },
-             base_api: window.LITENTRY_STAKING_TESTNET_API
-         },
-     },
+    {
+        path: "/LitentryTestnetStaking",
+        name: "LitentryTestnetStaking",
+        component: StakingTemplateA,
+        meta: {
+            parachain: {
+                name: 'Litentry Rococo Network',
+                icon: 'static/parachain-icon/litentry.png',
+                symbol: 'LIT',
+                decimals: 12,
+                minBond: 50,
+                canDelegate: true,
+                delegateParameterCount: 2,
+                supportSimulate: true,
+                supportNotify: false,
+                walletSupport: 'polkadot.js',
+                ss58Format: 131, // polkadot.js 
+                rpcUrls: ["wss://rpc.rococo-parachain-sg.litentry.io"], //MetaMask,polkadot.js
+            },
+            base_api: window.LITENTRY_STAKING_TESTNET_API
+        },
+    },
     {
         path: "/LitentryMainnetStaking",
         name: "LitentryMainnetStaking",
@@ -421,6 +427,8 @@ export default new Router({
                 minBond: 50,
                 canDelegate: true,
                 delegateParameterCount: 2,
+                supportSimulate: true,
+                supportNotify: false,
                 filterNoRewardRoundWhenCalcAPR: true,
                 walletSupport: 'polkadot.js',
                 ss58Format: 31, // polkadot.js 
@@ -442,6 +450,8 @@ export default new Router({
                 minBond: 5000,
                 canDelegate: true,
                 delegateParameterCount: 4,
+                supportSimulate: true,
+                supportNotify: false,
                 walletSupport: 'polkadot.js',
                 ss58Format: 78, // polkadot.js 
                 rpcUrls: ["wss://ws.calamari.systems/"], //MetaMask,polkadot.js
@@ -460,8 +470,10 @@ export default new Router({
                 symbol: 'DHX',
                 decimals: 18,
                 minBond: 10,
-                canDelegate: true,
+                canDelegate: false,
                 delegateParameterCount: 4,
+                supportSimulate: false,
+                supportNotify: false,
                 walletSupport: 'polkadot.js',
                 ss58Format: 33, // polkadot.js 
                 rpcUrls: ["wss://tanganika-archive.datahighway.com/"], //MetaMask,polkadot.js
@@ -481,6 +493,8 @@ export default new Router({
                 decimals: 18,
                 minBond: 5,
                 canDelegate: false,
+                supportSimulate: true,
+                supportNotify: true,
                 walletSupport: 'MetaMask',
                 chainId: "0x505", //MetaMask Moonriver
                 rpcUrls: ["https://rpc.moonriver.moonbeam.network"], //MetaMask,polkadot.js 

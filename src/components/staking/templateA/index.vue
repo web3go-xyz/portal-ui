@@ -25,7 +25,7 @@
           （{{ linkAccount.freeBalance | roundNumber(2) }} {{ symbol }}）
         </div>
         <div v-else><i class="el-icon-loading"></i></div>
-        <div>
+        <div v-if="supportNotify">
           <el-popover placement="bottom" width="400" trigger="click">
             <div class="popover-subscribe">
               <div class="subscribe-address">
@@ -169,252 +169,267 @@
           <span>Round</span>
         </div>
         <div style="width: 100%; overflow: hidden">
-        <el-table
-          v-loading="loading"
-          :data="onePageTableData"
-          @sort-change="sortChange"
-          class="stakeTable"
-          style="width:100%;"
-        >
-          <el-table-column label="Rank" width="90">
-            <template slot="header" slot-scope="scope">
-              <div>
-                Rank
-                <el-tooltip placement="top" trigger="hover">
-                  <div slot="content" class="tooltip-300px">
-                    Current Rank by total stake of collator.
-                    <br />
-                    <br />
-                    The green icon means the current collator was choosen and
-                    produce blocks in current round.
-                  </div>
-                  <i class="el-icon-warning-outline"></i>
-                </el-tooltip>
-              </div>
-            </template>
-            <template slot-scope="scope">
-              <div
-                class="rank-icon"
-                :class="{
-                  'active-block-producer': scope.row.activeBlockProducer,
-                }"
-              >
-                {{ scope.row.rankIndex + 1 }}
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="Collator" min-width="180">
-            <template slot-scope="scope">
-              <div class="icon-cell">
-                <identity-icon-plus
-                  @click.native="turnActionPage(scope)"
-                  :addressInfo="{
-                    address: scope.row.id,
-                    addressDisplayCompact: true,
-                    isEthereum: isEthereum,
-                    fontSize: 16,
+          <el-table
+            v-loading="loading"
+            :data="onePageTableData"
+            @sort-change="sortChange"
+            class="stakeTable"
+            style="width: 100%"
+          >
+            <el-table-column label="Rank" width="90">
+              <template slot="header" slot-scope="scope">
+                <div>
+                  Rank
+                  <el-tooltip placement="top" trigger="hover">
+                    <div slot="content" class="tooltip-300px">
+                      Current Rank by total stake of collator.
+                      <br />
+                      <br />
+                      The green icon means the current collator was choosen and
+                      produce blocks in current round.
+                    </div>
+                    <i class="el-icon-warning-outline"></i>
+                  </el-tooltip>
+                </div>
+              </template>
+              <template slot-scope="scope">
+                <div
+                  class="rank-icon"
+                  :class="{
+                    'active-block-producer': scope.row.activeBlockProducer,
                   }"
-                ></identity-icon-plus>
-                <!-- <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
+                >
+                  {{ scope.row.rankIndex + 1 }}
+                </div>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="Collator" min-width="180">
+              <template slot-scope="scope">
+                <div class="icon-cell">
+                  <identity-icon-plus
+                    @click.native="turnActionPage(scope)"
+                    :addressInfo="{
+                      address: scope.row.id,
+                      addressDisplayCompact: true,
+                      isEthereum: isEthereum,
+                      fontSize: 16,
+                    }"
+                  ></identity-icon-plus>
+                  <!-- <img class="icon" :src="makeBlockie(scope.row.id)" alt="" />
                 <el-tooltip :content="scope.row.id" placement="top">
                   <span class="span" >{{
                     shotFilter(scope.row.id)
                   }}</span>
                 </el-tooltip> -->
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="Stake" min-width="180">
-            <template slot-scope="scope">
-                  Self:<span
-                    >{{ getSelfStake(scope.row) | roundNumber(2) }}
-                    {{ symbol }}</span
-                  >
-                <br/>
-                
-                  Delegators:
-                  <span
-                    >{{ getNominatorStake(scope.row) | roundNumber(2) }}
-                    {{ symbol }}</span
-                  >
-                
-                  <br/>
-                  Total:
-                  <span
-                    >{{ getTotalStake(scope.row) | roundNumber(2) }}
-                    {{ symbol }}</span
-                  >
-            </template>
-          </el-table-column>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="Stake" min-width="180">
+              <template slot-scope="scope">
+                Self:<span
+                  >{{ getSelfStake(scope.row) | roundNumber(2) }}
+                  {{ symbol }}</span
+                >
+                <br />
 
-          <el-table-column label="Total Reward" width="120">
-            <template slot-scope="scope">
-              <span
-                >{{ scope.row.totalReward | roundNumber(2) }} {{ symbol }}</span
-              >
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Min Bond"
-            min-width="120"
-            prop="minBond"
-            sortable="custom"
-            align="center"
-          >
-            <template slot="header" slot-scope="scope">
-              <div style="display: inline-flex; align-items: center">
-                Min Bond
-                <el-tooltip placement="top" trigger="hover">
-                  <div slot="content" class="tooltip-300px">
-                    Min Bond means the minimum bond amount to join the collator.
-                  </div>
-                  <i class="el-icon-warning-outline"></i>
-                </el-tooltip>
-              </div>
-            </template>
-            <template slot-scope="scope">
-              <span>{{ scope.row.minBond | roundNumber(0) }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            label="Avg Blocks"
-            min-width="120"
-            prop="averageBlocks"
-            align="center"
-          >
-            <template slot="header" slot-scope="scope">
-              <div>
-                Avg Blocks
-                <el-tooltip placement="top" trigger="hover">
-                  <div slot="content" class="tooltip-300px">
-                    Average Blocks in past 10 round which has been rewarded (
-                    round {{ startRoundIndex4AverageBlocksCalculation }} -
-                    {{ endRoundIndex }} ). <br /><br />
-                  </div>
-                  <i class="el-icon-warning-outline"></i>
-                </el-tooltip>
-              </div>
-            </template>
-            <template slot-scope="scope">
-              <span>{{ scope.row.averageBlocks | roundNumber(1) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Current Blocks"
-            min-width="120"
-            prop="currentBlocks"
-            align="center"
-          >
-            <template slot="header" slot-scope="scope">
-              <div>
-                Current Blocks
-                <el-tooltip placement="top" trigger="hover">
-                  <div slot="content" class="tooltip-300px">
-                    Blocks produced in the current round
-                    {{ currentRoundIndex }}. <br /><br />
-                  </div>
-                  <i class="el-icon-warning-outline"></i>
-                </el-tooltip>
-              </div>
-            </template>
-            <template slot-scope="scope">
-              <span>{{ scope.row.currentBlocks }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="APR"
-            prop="apr"
-            min-width="120"
-            sortable="custom"
-            align="center"
-          >
-            <template slot="header" slot-scope="scope">
-              <div style="display: inline-flex; align-items: center">
-                APR
-                <el-tooltip placement="top" trigger="hover">
-                  <div slot="content" class="tooltip-300px">
-                    APR means the annualized income pledged to the current
-                    collator.
-                    <br />
-                    APR formula= ( reward / rounds / stake ) * roundPerYear *
-                    100
-                  </div>
-                  <i class="el-icon-warning-outline"></i>
-                </el-tooltip>
-              </div>
-            </template>
-            <template slot-scope="scope">
-              <span>{{ scope.row.apr | roundNumber(2) }}%</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-          min-width="220"
-            prop="name"
-            label="Rewards(Last 10 rounds)"
-          >
-            <template slot-scope="scope">
-              <div :id="'tableChart' + scope.row.id" class="table-chart"></div>
-            </template>
-          </el-table-column>
-          <el-table-column width="220" fixed="right">
-            <template slot-scope="scope">
-              <div class="div-operation">
+                Delegators:
                 <span
-                  @click="showDetail(scope.$index, scope.row)"
-                  :ref="'simulateBtn' + scope.row.id"
-                  class="table-operation-span"
-                  ><i class="el-icon-data-line"></i>Simulate</span
+                  >{{ getNominatorStake(scope.row) | roundNumber(2) }}
+                  {{ symbol }}</span
                 >
 
-                <el-tooltip effect="light" placement="bottom">
-                  <div slot="content">
-                    Add current collator into watch list with specified
-                    email,<br />
-                    you'll recieve notification email when the rank reach the
-                    end of max collators.<br />current thresold is the last 10%.
+                <br />
+                Total:
+                <span
+                  >{{ getTotalStake(scope.row) | roundNumber(2) }}
+                  {{ symbol }}</span
+                >
+              </template>
+            </el-table-column>
+
+            <el-table-column label="Total Reward" width="120">
+              <template slot-scope="scope">
+                <span
+                  >{{ scope.row.totalReward | roundNumber(2) }}
+                  {{ symbol }}</span
+                >
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Min Bond"
+              min-width="120"
+              prop="minBond"
+              sortable="custom"
+              align="center"
+            >
+              <template slot="header" slot-scope="scope">
+                <div style="display: inline-flex; align-items: center">
+                  Min Bond
+                  <el-tooltip placement="top" trigger="hover">
+                    <div slot="content" class="tooltip-300px">
+                      Min Bond means the minimum bond amount to join the
+                      collator.
+                    </div>
+                    <i class="el-icon-warning-outline"></i>
+                  </el-tooltip>
+                </div>
+              </template>
+              <template slot-scope="scope">
+                <span>{{ scope.row.minBond | roundNumber(0) }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              label="Avg Blocks"
+              min-width="120"
+              prop="averageBlocks"
+              align="center"
+            >
+              <template slot="header" slot-scope="scope">
+                <div>
+                  Avg Blocks
+                  <el-tooltip placement="top" trigger="hover">
+                    <div slot="content" class="tooltip-300px">
+                      Average Blocks in past 10 round which has been rewarded (
+                      round {{ startRoundIndex4AverageBlocksCalculation }} -
+                      {{ endRoundIndex }} ). <br /><br />
+                    </div>
+                    <i class="el-icon-warning-outline"></i>
+                  </el-tooltip>
+                </div>
+              </template>
+              <template slot-scope="scope">
+                <span>{{ scope.row.averageBlocks | roundNumber(1) }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Current Blocks"
+              min-width="120"
+              prop="currentBlocks"
+              align="center"
+            >
+              <template slot="header" slot-scope="scope">
+                <div>
+                  Current Blocks
+                  <el-tooltip placement="top" trigger="hover">
+                    <div slot="content" class="tooltip-300px">
+                      Blocks produced in the current round
+                      {{ currentRoundIndex }}. <br /><br />
+                    </div>
+                    <i class="el-icon-warning-outline"></i>
+                  </el-tooltip>
+                </div>
+              </template>
+              <template slot-scope="scope">
+                <span>{{ scope.row.currentBlocks }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="APR"
+              prop="apr"
+              min-width="120"
+              sortable="custom"
+              align="center"
+            >
+              <template slot="header" slot-scope="scope">
+                <div style="display: inline-flex; align-items: center">
+                  APR
+                  <el-tooltip placement="top" trigger="hover">
+                    <div slot="content" class="tooltip-300px">
+                      APR means the annualized income pledged to the current
+                      collator.
+                      <br />
+                      APR formula= ( reward / rounds / stake ) * roundPerYear *
+                      100
+                    </div>
+                    <i class="el-icon-warning-outline"></i>
+                  </el-tooltip>
+                </div>
+              </template>
+              <template slot-scope="scope">
+                <span>{{ scope.row.apr | roundNumber(2) }}%</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              min-width="220"
+              prop="name"
+              label="Rewards(Last 10 rounds)"
+            >
+              <template slot-scope="scope">
+                <div
+                  :id="'tableChart' + scope.row.id"
+                  class="table-chart"
+                ></div>
+              </template>
+            </el-table-column>
+            <el-table-column width="220" fixed="right">
+              <template slot-scope="scope">
+                <div class="div-operation">
+                  <span
+                    v-if="supportSimulate"
+                    @click="showDetail(scope.$index, scope.row)"
+                    :ref="'simulateBtn' + scope.row.id"
+                    class="table-operation-span"
+                    ><i class="el-icon-data-line"></i>Simulate</span
+                  >
+
+                  <el-tooltip
+                    v-if="supportNotify"
+                    effect="light"
+                    placement="bottom"
+                  >
+                    <div slot="content">
+                      Add current collator into watch list with specified
+                      email,<br />
+                      you'll recieve notification email when the rank reach the
+                      end of max collators.<br />current thresold is the last
+                      10%.
+                    </div>
+                    <div
+                      v-show="showSubscribe(scope.row)"
+                      class="subscribe"
+                      @click="subscribe(scope.row)"
+                    >
+                      <i class="el-icon-circle-plus-outline"></i>
+                    </div>
+                  </el-tooltip>
+                  <el-tooltip
+                    v-if="supportNotify"
+                    effect="light"
+                    placement="bottom"
+                  >
+                    <div slot="content">
+                      remove current collator from watch list.
+                    </div>
+                    <div
+                      v-show="alreadySubscribed(scope.row)"
+                      class="subscribe-already"
+                      @click="unsubscribe(scope.row)"
+                    >
+                      <i class="el-icon-remove-outline"></i>
+                    </div>
+                  </el-tooltip>
+                  <div
+                    v-if="!scope.row.isDelegated && scope.row.isDelegatable"
+                    @click="handleDelegate(scope.row)"
+                    class="table-btn"
+                    style="margin-left: 8px"
+                  >
+                    Delegate
                   </div>
                   <div
-                    v-show="showSubscribe(scope.row)"
-                    class="subscribe"
-                    @click="subscribe(scope.row)"
+                    v-if="scope.row.isDelegated"
+                    @click="goToMyStake"
+                    class="table-btn"
+                    style="margin-left: 8px; background: rgb(95, 106, 249)"
                   >
-                    <i class="el-icon-circle-plus-outline"></i>
+                    MyStake
                   </div>
-                </el-tooltip>
-                <el-tooltip effect="light" placement="bottom">
-                  <div slot="content">
-                    remove current collator from watch list.
-                  </div>
-                  <div
-                    v-show="alreadySubscribed(scope.row)"
-                    class="subscribe-already"
-                    @click="unsubscribe(scope.row)"
-                  >
-                    <i class="el-icon-remove-outline"></i>
-                  </div>
-                </el-tooltip>
-                <div
-                  v-if="!scope.row.isDelegated && scope.row.isDelegatable"
-                  @click="handleDelegate(scope.row)"
-                  class="table-btn"
-                  style="margin-left: 8px"
-                >
-                  Delegate
                 </div>
-                <div
-                  v-if="scope.row.isDelegated"
-                  @click="goToMyStake"
-                  class="table-btn"
-                  style="margin-left: 8px; background: rgb(95, 106, 249)"
-                >
-                  MyStake
-                </div>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
         <div class="pagination-wrap">
           <el-pagination
@@ -452,7 +467,12 @@
             reward history
           </div>
         </div>
-        <el-table class="my-stack-table stakeTable" v-loading="loading" :data="tableData2" id="my-stake-table">
+        <el-table
+          class="my-stack-table stakeTable"
+          v-loading="loading"
+          :data="tableData2"
+          id="my-stake-table"
+        >
           <el-table-column width="250" label="Collator">
             <template slot-scope="scope">
               <div class="icon-cell">
@@ -771,7 +791,11 @@
               ></el-progress>
             </template>
           </el-table-column>
-          <el-table-column v-if="parachain.canDelegate" :width="preferedWidthForMyStakeActions" fixed="right">
+          <el-table-column
+            v-if="parachain.canDelegate"
+            :width="preferedWidthForMyStakeActions"
+            fixed="right"
+          >
             <template slot-scope="scope">
               <div
                 v-if="currentWalletAccount && scope.row.revokeStatus <= 1"
@@ -781,15 +805,15 @@
                 DelegateMore
               </div>
               <RevokeStake
-              v-if="activeTab == 2 && apiPromise && roundInfo && blockNumber"
-              :api="apiPromise"
-              :collator="scope.row.id"
-              :linkAccount="linkAccount"
-              :currentWalletAccount="currentWalletAccount"
-              :roundInfo="roundInfo"
-              :blockNumber="blockNumber"
-              :paraChainName="paraChainName"
-              @statusChanged="onRevokeStatusChange"
+                v-if="activeTab == 2 && apiPromise && roundInfo && blockNumber"
+                :api="apiPromise"
+                :collator="scope.row.id"
+                :linkAccount="linkAccount"
+                :currentWalletAccount="currentWalletAccount"
+                :roundInfo="roundInfo"
+                :blockNumber="blockNumber"
+                :paraChainName="paraChainName"
+                @statusChanged="onRevokeStatusChange"
               />
             </template>
           </el-table-column>
@@ -919,7 +943,7 @@
                   :text-inside="true"
                   :stroke-width="16"
                   :percentage="
-                    getSumulatePercentByRank(currentSimulate, maxNominator)||0
+                    getSumulatePercentByRank(currentSimulate, maxNominator) || 0
                   "
                 ></el-progress>
               </div>
@@ -1033,10 +1057,7 @@ import aprUtlis from "./apr.utils";
 import chainUtlis from "@/chain/chain.utils";
 import DelegateModal from "./DelegateModal";
 import RevokeStake from "./RevokeStake";
-import {
-  web3Accounts,
-  web3Enable
-} from "@polkadot/extension-dapp";
+import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
 export default {
@@ -1044,7 +1065,7 @@ export default {
   components: {
     IdentityIconPlus,
     DelegateModal,
-    RevokeStake
+    RevokeStake,
   },
   data() {
     return {
@@ -1113,7 +1134,7 @@ export default {
       showAccountChooseDialog: false,
       delegateEventPending: null,
       hasDelegateRecord: false,
-      preferedWidthForMyStakeActions: 250 // or 200 in other case. My Stakes按钮显示宽度
+      preferedWidthForMyStakeActions: 250, // or 200 in other case. My Stakes按钮显示宽度
     };
   },
   async created() {
@@ -1142,23 +1163,25 @@ export default {
     this.timer4header = setInterval(() => {
       this.getHeaderData();
     }, self.refreshHeaderDataInterval);
-    
+
     let lastResizeRun = null;
     window.onresize = () => {
       if (lastResizeRun) {
         try {
           clearTimeout(lastResizeRun);
           lastResizeRun = null;
-        } catch(e) {console.warn(e);}
+        } catch (e) {
+          console.warn(e);
+        }
       }
       lastResizeRun = setTimeout(() => {
         if (this.chartInstances && this.chartInstances.length) {
-          this.chartInstances.forEach(it => {
-            this.$nextTick( () => it.resize())
+          this.chartInstances.forEach((it) => {
+            this.$nextTick(() => it.resize());
           });
         }
-      }, 1000)
-    }
+      }, 1000);
+    };
   },
   beforeDestroy() {
     console.log("staking view destroy");
@@ -1217,14 +1240,29 @@ export default {
     minBond() {
       return this.parachain.minBond || 1;
     },
+    supportNotify() {
+      if (this.parachain.supportNotify !== undefined) {
+        return this.parachain.supportNotify;
+      }
+      return false;
+    },
+    supportSimulate() {
+      if (this.parachain.supportSimulate !== undefined) {
+        return this.parachain.supportSimulate;
+      }
+      return false;
+    },
+
     filterNoRewardRoundWhenCalcAPR() {
       return (this.parachain.filterNoRewardRoundWhenCalcAPR || false) === true;
     },
     onePageTableData() {
-      return this.freshTableStatus(this.tableData.slice(
-        (this.pageIndex - 1) * this.pageSize,
-        this.pageIndex * this.pageSize
-      ));
+      return this.freshTableStatus(
+        this.tableData.slice(
+          (this.pageIndex - 1) * this.pageSize,
+          this.pageIndex * this.pageSize
+        )
+      );
     },
     startRoundIndex4AverageBlocksCalculation() {
       return this.roundInfo.current - 1 - (this.roundsPickedByDropdown || 0);
@@ -1265,43 +1303,48 @@ export default {
       }
       const result = Number((percent * 100).toFixed(2));
       if (!result) {
-        console.info(result)
+        console.info(result);
         debugger;
       }
-      return  result || 0;
+      return result || 0;
     },
   },
   methods: {
-
     async preSessionCheck() {
       const savedAccountStr = (() => {
         const cache = localStorage.getItem("currentAccount");
         if (!cache) return;
         try {
-          return JSON.parse(cache).address
-        } catch(e) { console.warn('illegal cache') }
+          return JSON.parse(cache).address;
+        } catch (e) {
+          console.warn("illegal cache");
+        }
       })();
-      
+
       if (!savedAccountStr) return;
       let accounts = [];
       if (this.parachain.walletSupport === "polkadot.js") {
-        accounts = (await this.getAccountList_PolkadotJs(
-          this.paraChainName,
-          this.parachain.ss58Format
-        )).map(it => it.address);
+        accounts = (
+          await this.getAccountList_PolkadotJs(
+            this.paraChainName,
+            this.parachain.ss58Format
+          )
+        ).map((it) => it.address);
       } else if (this.isEthereum) {
-          const ethereum = window.ethereum;
-          if (ethereum.isConnected && ethereum.isConnected()) {
-            const account =  await ethereum.request({ method: 'eth_requestAccounts' });
-            if (account) {
-              accounts = [account];
-            }
+        const ethereum = window.ethereum;
+        if (ethereum.isConnected && ethereum.isConnected()) {
+          const account = await ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          if (account) {
+            accounts = [account];
           }
-          return;
+        }
+        return;
       } else {
-        throw new Error('Unsupported Wallet Runtime..')
+        throw new Error("Unsupported Wallet Runtime..");
       }
-      let matches = accounts && accounts.filter(it => it === savedAccountStr)
+      let matches = accounts && accounts.filter((it) => it === savedAccountStr);
       if (!matches || !matches.length) {
         localStorage.setItem("currentAccount", null);
       }
@@ -1321,7 +1364,8 @@ export default {
       return 0;
     },
     goToMyStake(resetCounter) {
-      if (resetCounter === true || this.activeTab !== '2') { // 
+      if (resetCounter === true || this.activeTab !== "2") {
+        //
         this.preferedWidthForMyStakeActions = 200;
       }
       this.activeTab = "2";
@@ -1336,7 +1380,8 @@ export default {
       this.linkAccount.freeBalance =
         this.formatWithDecimals(freeBalance).toFixed();
     },
-    ifShowDelegate() { // row
+    ifShowDelegate() {
+      // row
       // const find = row.allNominators.find(
       //   (sv) => sv.owner == this.linkAccount.address
       // );
@@ -1346,10 +1391,11 @@ export default {
       return true;
     },
     ifAlreadyDelegate(row) {
-      const find = this.linkAccount.address && row.allNominators.find(
-        (sv) => sv.owner == this.linkAccount.address
-      );
-      if (find) { // this.currentWalletAccount
+      const find =
+        this.linkAccount.address &&
+        row.allNominators.find((sv) => sv.owner == this.linkAccount.address);
+      if (find) {
+        // this.currentWalletAccount
         return true;
       }
       return false;
@@ -1358,13 +1404,16 @@ export default {
       this.$refs.delegateModal.init(row.id, true);
     },
     async handleDelegate(row) {
-
-      const ready = () => this.linkAccount && this.linkAccount.address; 
+      const ready = () => this.linkAccount && this.linkAccount.address;
       const proxy = () => {
         return ready() && this.$refs.delegateModal.init(row.id);
-      }
+      };
       if (!ready()) {
-        return this.handleLinkAccount().then(()=>{this.delegateEventPending = row}).then(proxy);
+        return this.handleLinkAccount()
+          .then(() => {
+            this.delegateEventPending = row;
+          })
+          .then(proxy);
       }
       proxy();
     },
@@ -1733,17 +1782,15 @@ export default {
     },
     getMyStackList() {
       const arr = this.tableData.filter((v) => {
-        const result = v.allNominators.find(
-          (sv) => {
-            if(sv.owner == this.searchAccount) {
-               // status definition is available at RevokeStake.vue, 
-               // and the revokeStatus would be updated by RevokeStake.vue later.
-              sv.revokeStatus = sv.revokeStatus || 2;
-              return true;
-            }
-            return false;
+        const result = v.allNominators.find((sv) => {
+          if (sv.owner == this.searchAccount) {
+            // status definition is available at RevokeStake.vue,
+            // and the revokeStatus would be updated by RevokeStake.vue later.
+            sv.revokeStatus = sv.revokeStatus || 2;
+            return true;
           }
-        );
+          return false;
+        });
         return result;
       });
       this.tableData2 = arr;
@@ -2184,7 +2231,9 @@ export default {
               element.apr = await self.getAPR(element);
             }
 
-            this.tableData = this.freshTableStatus(this.sort4Display(nominatorRes));
+            this.tableData = this.freshTableStatus(
+              this.sort4Display(nominatorRes)
+            );
 
             this.$localforage.setItem(
               this.paraChainName + "CollectorSortList",
@@ -2203,19 +2252,22 @@ export default {
     freshTableStatus(tableData) {
       tableData = tableData || this.tableData;
       let hasDelegateRecord = false;
-      tableData && tableData.forEach(it => {
-        it.isDelegatable = this.ifShowDelegate(it) && this.parachain.canDelegate;
-        it.isDelegated = this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
-        // status definition is available at RevokeStake.vue, 
-        // and the revokeStatus would be updated by RevokeStake.vue later.
-        // revokeStatus is to control the DelegateMore
-        it.revokeStatus = it.revokeStatus || 2;
-        hasDelegateRecord = hasDelegateRecord || it.isDelegated;
-      })
+      tableData &&
+        tableData.forEach((it) => {
+          it.isDelegatable =
+            this.ifShowDelegate(it) && this.parachain.canDelegate;
+          it.isDelegated =
+            this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+          // status definition is available at RevokeStake.vue,
+          // and the revokeStatus would be updated by RevokeStake.vue later.
+          // revokeStatus is to control the DelegateMore
+          it.revokeStatus = it.revokeStatus || 2;
+          hasDelegateRecord = hasDelegateRecord || it.isDelegated;
+        });
       this.hasDelegateRecord = hasDelegateRecord;
       return tableData;
     },
-    // status definition is available at RevokeStake.vue#data#status, 
+    // status definition is available at RevokeStake.vue#data#status,
     onRevokeStatusChange(v) {
       this.freshTableStatus();
       if (v.status <= 1) this.preferedWidthForMyStakeActions = 250;
@@ -2224,20 +2276,18 @@ export default {
 
       const REVOKED = 4;
 
-      if(this.tableData2 && REVOKED === v.status) {
-        this.tableData2 = this.tableData2.filter(it => it.id !== v.collator);
+      if (this.tableData2 && REVOKED === v.status) {
+        this.tableData2 = this.tableData2.filter((it) => it.id !== v.collator);
         this.delegateSuccess();
       } else {
-        const row = this.tableData2.filter(it => it.id === v.collator)[0];
-        if (row)  {
-        // status definition is available at RevokeStake.vue, 
-        // and the revokeStatus would be updated by RevokeStake.vue later.
-        // revokeStatus is to control the DelegateMore
-          this.$nextTick(() => row.revokeStatus = v.status );
+        const row = this.tableData2.filter((it) => it.id === v.collator)[0];
+        if (row) {
+          // status definition is available at RevokeStake.vue,
+          // and the revokeStatus would be updated by RevokeStake.vue later.
+          // revokeStatus is to control the DelegateMore
+          this.$nextTick(() => (row.revokeStatus = v.status));
         }
       }
-
-      
     },
     generateTableChart() {
       this.$nextTick(() => {
@@ -2245,7 +2295,7 @@ export default {
           v.dispose();
         });
         this.chartInstances = [];
-        const echarts = window.echarts
+        const echarts = window.echarts;
         this.onePageTableData.forEach((v) => {
           let chartId = `tableChart${v.id}`;
           const charInstance = echarts.init(document.getElementById(chartId));
@@ -2328,7 +2378,7 @@ export default {
     },
     async handleLinkAccount() {
       this.allAccounts = [];
-      
+
       // clear delegate status
       this.delegateEventPending = null;
 
@@ -2357,11 +2407,15 @@ export default {
 
     async getAccountList_PolkadotJs(chain, ss58Format) {
       let isLinked = false;
-      await web3Enable(`Web3Go ${chain} Staking dashboard`).then((injectedExtensions) => {
-        isLinked = injectedExtensions && injectedExtensions.length > 0;
-      });
+      await web3Enable(`Web3Go ${chain} Staking dashboard`).then(
+        (injectedExtensions) => {
+          isLinked = injectedExtensions && injectedExtensions.length > 0;
+        }
+      );
       if (!isLinked) {
-        this.$message.error('We couldn\'t connect to wallet, please check the extension and try again.');
+        this.$message.error(
+          "We couldn't connect to wallet, please check the extension and try again."
+        );
         return;
       }
       const allAccounts = await web3Accounts({
@@ -2384,11 +2438,16 @@ export default {
 
       this.linkAccount.address = account.address;
       if (this.delegateEventPending) {
-        if (this.parachain.canDelegate && this.ifAlreadyDelegate(this.delegateEventPending) ) { //this.delegateEventPending.isDelegated) {
+        if (
+          this.parachain.canDelegate &&
+          this.ifAlreadyDelegate(this.delegateEventPending)
+        ) {
+          //this.delegateEventPending.isDelegated) {
           this.delegateEventPending = null;
-        } else this.handleDelegate(this.delegateEventPending).then(()=> {
-          this.delegateEventPending = null;
-        });
+        } else
+          this.handleDelegate(this.delegateEventPending).then(() => {
+            this.delegateEventPending = null;
+          });
       }
 
       await this.handleLinkAccount_PolkadotJs(
@@ -2804,7 +2863,7 @@ export default {
       });
     },
     handleClick() {
-      if (this.activeTab == '2') {
+      if (this.activeTab == "2") {
         this.goToMyStake(true);
       }
     },
@@ -2890,11 +2949,11 @@ export default {
     }
   }
   .table-btn.revoke {
-      margin-left: 8px; 
-      background: #FFFFFF;
-      color: rgba(41, 40, 40, 0.8);
-      border: 1px solid rgba(41, 40, 40, 0.3);
-    }
+    margin-left: 8px;
+    background: #ffffff;
+    color: rgba(41, 40, 40, 0.8);
+    border: 1px solid rgba(41, 40, 40, 0.3);
+  }
   .pagination-wrap {
     margin-top: 10px;
   }
@@ -3331,12 +3390,13 @@ export default {
   background: rgb(250, 250, 250) !important;
   box-shadow: rgba(0, 0, 0, 0.6) 0px 2px 20px 0px !important;
 }
-.tab-content .stakeTable .el-table__body-wrapper, .tab-content1 
-.stakeTable .el-table__body-wrapper {
+.tab-content .stakeTable .el-table__body-wrapper,
+.tab-content1 .stakeTable .el-table__body-wrapper {
   overflow: auto !important;
 }
-.stakeTable  {
-  .el-table__fixed-right::before, .el-table__fixed::before {
+.stakeTable {
+  .el-table__fixed-right::before,
+  .el-table__fixed::before {
     background-color: transparent;
   }
 }
