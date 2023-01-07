@@ -23,6 +23,7 @@
         class="btn"
         @click="countdownDecline"
         title="you will cancel previous scheduled request and continue with delegation."
+        v-if="countdown.supportCancel"
       >
         <i class="el-icon-error"></i>
       </div>
@@ -45,6 +46,7 @@
             label="Cancel"
             value="Cancel"
             title="you will cancel previous scheduled request and continue with delegation."
+            v-if="countdown.supportCancel"
           ></el-option>
         </el-select>
       </div>
@@ -91,6 +93,7 @@ export default {
     "roundInfo",
     "blockNumber",
     "paraChainName",
+    "symbol",
   ],
   components: {
     // IdentityIconPlus,
@@ -131,6 +134,7 @@ export default {
         remainingSeconds: 0,
         formatTime: "",
         loading: false,
+        supportCancel: true,
       },
       decision: {
         v: "",
@@ -146,7 +150,7 @@ export default {
       // the number of rounds that must be waited
       // before a scheduled request for a delegator to leave
       // the set of delegators can be executed
-      leaveDelegatorsDelay: 28,
+      //leaveDelegatorsDelay: 28,
 
       targetSecondsPerBlock: 12, //seconds
       disabled: false,
@@ -165,12 +169,23 @@ export default {
     this.disabled = disabled;
     if (this.disabled) return;
 
-    this.leaveDelegatorsDelay =
-      this.api.consts.parachainStaking.leaveDelegatorsDelay;
-    this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
-      "{leaveDelegatorsDelay}",
-      this.leaveDelegatorsDelay
-    );
+
+    if (this.symbol === 'DHX') {
+      this.countdown.supportCancel = false;
+      //this.leaveDelegatorsDelay = this.api.consts.parachainStaking.stakeDuration/this.round.length;
+
+      this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
+        "next {leaveDelegatorsDelay} rounds",
+        '7 days'
+      );
+    } else {
+      const leaveDelegatorsDelay = this.api.consts.parachainStaking.leaveDelegatorsDelay;
+
+      this.ui.confirm.revoke.context = this.ui.confirm.revoke.context.replace(
+        "{leaveDelegatorsDelay}",
+        leaveDelegatorsDelay
+      );
+    }
     aprUtlis
       .getBlockTargetSeconds(this.paraChainName)
       .then((d) => {
@@ -206,8 +221,10 @@ export default {
     async doRevoke() {
       this.ui.revokeBtnLoading = true;
       this.ui.confirm.show = false;
-      const unsub = await this.api.tx.parachainStaking
-        .scheduleRevokeDelegation(this.collator)
+
+      const specialMethod = { DHX: "revokeDelegation" };
+      const method = specialMethod[this.symbol] || "scheduleRevokeDelegation";
+      const unsub = await this.api.tx.parachainStaking[method](this.collator)
         .signAndSend(
           this.linkAccount.address,
           await this.getSign(),
@@ -240,49 +257,66 @@ export default {
           // console.log(":( transaction failed", error);
         });
     },
-    // to inspect the countdown status
-    async initCountdown() {
-      let res = [];
+    async try2GetEstTimeInSec() {
+      //let res = [];
       try {
-        res = (
-          await this.api.query.parachainStaking.delegationScheduledRequests(
-            this.collator
-          )
-        ).toHuman();
+        if (this.symbol === "DHX") {
+          // datahighway
+          const unstakingInfo4TanganikaRaw = (
+            await this.api.query.parachainStaking.unstaking(
+              this.linkAccount.address
+            )
+          ).toHuman();
+          if (unstakingInfo4TanganikaRaw) {
+            for (const key of Object.keys(unstakingInfo4TanganikaRaw)) {
+              const whenExecutableRoundIndex = key.replace(/,/g, "") - 0;
+              const estSeconds = (whenExecutableRoundIndex - this.blockNumber) * this.targetSecondsPerBlock;
+              return estSeconds;
+            }
+          } else {
+            return -1;
+          }
+        } else {
+          // default
+          const resRaw = (
+            await this.api.query.parachainStaking.delegationScheduledRequests(
+              this.collator
+            )
+          ).toHuman();
+          const revokedRecordsMatched = resRaw.filter(
+            (it) =>
+              it.whenExecutable && it.delegator === this.linkAccount.address
+          );
+          if (!revokedRecordsMatched.length) {
+            retunr - 1;
+          }
+          const whenExecutableRoundIndex = Number(
+            revokedRecordsMatched[0].whenExecutable.replace(/,/g, "")
+          );
+          const blocksPerRound = this.roundInfo.length;
+          const currentRoundIndex = this.roundInfo.current;
+          const blocksFinishedInCurrentRound =
+            this.blockNumber - this.roundInfo.first;
+
+          const estBlocksV1 =
+            (whenExecutableRoundIndex - currentRoundIndex) * blocksPerRound;
+          const estBlocksV2 = estBlocksV1 - blocksFinishedInCurrentRound;
+          const estSeconds = estBlocksV2 * this.targetSecondsPerBlock;
+          return estSeconds;
+        }
       } catch (e) {
         console.warn("encountered errors while fetching the revoking status");
       }
 
-      const matched = res.filter(
-        (it) => it.whenExecutable && it.delegator === this.linkAccount.address
-      );
-      if (!matched.length) {
+      return -1;
+    },
+    // to inspect the countdown status
+    async initCountdown() {
+      const estSeconds = await this.try2GetEstTimeInSec();
+      if (estSeconds === -1) {
         this.signalStatus(this.status.TO_REVOKE);
         return;
       }
-
-      /*
-        est_blocks_v1= (whenExecutable_roundIndex - current_roundIndex ) * blocks_per_round
-        est_blocks_v2= est_blocks_v1 - ( blocks_finished_in_current_round )
-        */
-      //   this.api.consts.parachainStaking.blocks_per_round;
-      const whenExecutableRoundIndex = Number(
-        matched[0].whenExecutable.replace(/,/g, "")
-      );
-      const blocksPerRound = this.roundInfo.length;
-      const currentRoundIndex = this.roundInfo.current;
-      const blocksFinishedInCurrentRound =
-        this.blockNumber - this.roundInfo.first;
-
-      const estBlocksV1 =
-        (whenExecutableRoundIndex - currentRoundIndex) * blocksPerRound;
-      const estBlocksV2 = estBlocksV1 - blocksFinishedInCurrentRound;
-      const estSeconds = estBlocksV2 * this.targetSecondsPerBlock;
-      // if (!window.test) {
-      //   window.test = [5,1, -5];
-      //   window.testI = 0 ;
-      // }
-      // let estSeconds = window.test[window.testI++];
       if (estSeconds > 0) {
         this.doCountdown(estSeconds);
         this.signalStatus(this.status.TO_WAIT);
@@ -331,6 +365,7 @@ export default {
       this.ui.confirm.show = false;
       div.loading = true;
       const unsub = await this.api.tx.parachainStaking
+      // executeLeaveCandidates
         .cancelDelegationRequest(this.collator)
         .signAndSend(
           this.linkAccount.address,
@@ -380,9 +415,15 @@ export default {
     },
     async doRequestExecuteRevoke() {
       this.decision.loading = true;
-      const unsub = await this.api.tx.parachainStaking
-        .executeDelegationRequest(this.linkAccount.address, this.collator)
-        .signAndSend(
+      const proxy = () => {
+        if (this.symbol === 'DHX') {
+          return this.api.tx.parachainStaking.unlockUnstaked(this.linkAccount.address)
+        } else {
+          this.api.tx.parachainStaking.executeDelegationRequest(this.linkAccount.address, this.collator)
+        }
+      }
+
+      const unsub = await proxy().signAndSend(
           this.linkAccount.address,
           await this.getSign(),
           ({ events = [], status, txHash }) => {

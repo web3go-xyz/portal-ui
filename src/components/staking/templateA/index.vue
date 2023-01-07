@@ -808,6 +808,7 @@
                 v-if="activeTab == 2 && apiPromise && roundInfo && blockNumber"
                 :api="apiPromise"
                 :collator="scope.row.id"
+                :symbol="symbol"
                 :linkAccount="linkAccount"
                 :currentWalletAccount="currentWalletAccount"
                 :roundInfo="roundInfo"
@@ -1115,6 +1116,7 @@ export default {
       refreshDataInterval: 5 * 60 * 1000,
       timer4header: null,
       refreshHeaderDataInterval: 30 * 1000,
+      tanganikaPendingUnstakeCollator: '',
 
       linkAccountSubscribeData: {
         subscribe_address: "",
@@ -1304,7 +1306,6 @@ export default {
       const result = Number((percent * 100).toFixed(2));
       if (!result) {
         console.info(result);
-        debugger;
       }
       return result || 0;
     },
@@ -1368,6 +1369,7 @@ export default {
         //
         this.preferedWidthForMyStakeActions = 200;
       }
+      this.getMyStackList();
       this.activeTab = "2";
     },
     async delegateSuccess() {
@@ -1782,6 +1784,9 @@ export default {
     },
     getMyStackList() {
       const arr = this.tableData.filter((v) => {
+        if (v.id === this.tanganikaPendingUnstakeCollator) {
+          return true;
+        }
         const result = v.allNominators.find((sv) => {
           if (sv.owner == this.searchAccount) {
             // status definition is available at RevokeStake.vue,
@@ -1811,6 +1816,9 @@ export default {
     },
     getMyRatio(row) {
       const find = row.allNominators.find((v) => v.owner == this.searchAccount);
+      if (!find) {
+        return;
+      }
       const nominatorStake = this.getNominatorStake(row);
       const result = find.amount.dividedBy(nominatorStake);
       return Number(result.multipliedBy(100).toFixed(2));
@@ -1998,6 +2006,7 @@ export default {
                 sv.amount = this.formatWithDecimals(sv.amount);
               });
               v.allNominators = [...v.topDelegations, ...v.bottomDelegations];
+
               //排序Nominator
               v.allNominators.sort((a, b) => {
                 const totalB = b.amount;
@@ -2245,6 +2254,7 @@ export default {
             if (this.searchAccount) {
               this.getMyStackList();
             }
+            this.patchForDHXExtraStakes();
           });
         });
       });
@@ -2258,6 +2268,9 @@ export default {
             this.ifShowDelegate(it) && this.parachain.canDelegate;
           it.isDelegated =
             this.ifAlreadyDelegate(it) && this.parachain.canDelegate;
+          if (!it.isDelegated &&  it.id && this.tanganikaPendingUnstakeCollator === it.id) {
+            it.isDelegated = true;
+          }
           // status definition is available at RevokeStake.vue,
           // and the revokeStatus would be updated by RevokeStake.vue later.
           // revokeStatus is to control the DelegateMore
@@ -2277,7 +2290,7 @@ export default {
       const REVOKED = 4;
 
       if (this.tableData2 && REVOKED === v.status) {
-        this.tableData2 = this.tableData2.filter((it) => it.id !== v.collator);
+        this.tableData2 = this.tableData2.filter((it) =>  it.id !== v.collator);
         this.delegateSuccess();
       } else {
         const row = this.tableData2.filter((it) => it.id === v.collator)[0];
@@ -2457,6 +2470,18 @@ export default {
         account
       );
     },
+    async initPolkadotApi(chain, rpcUrls) {
+      if (this.apiPromise) {
+        return;
+      }
+      const wsProvider = new WsProvider(rpcUrls);
+      let types = chainUtlis.getTypes(chain);
+      console.log("types:", types);
+      const api = await ApiPromise.create({
+        provider: wsProvider,
+      });
+      this.apiPromise = api;
+    },
     async handleLinkAccount_PolkadotJs(chain, ss58Format, rpcUrls, account) {
       let currentAddress = account.address;
 
@@ -2467,17 +2492,13 @@ export default {
       }
       this.refreshMySubscribe(this.linkAccount);
 
-      const wsProvider = new WsProvider(rpcUrls);
-      let types = chainUtlis.getTypes(chain);
-      console.log("types:", types);
-      const api = await ApiPromise.create({
-        provider: wsProvider,
-      });
-      this.apiPromise = api;
+      if (!this.apiPromise) {
+        await this.initPolkadotApi(chain, rpcUrls);
+      }
       // const blockHash = await api.rpc.chain.getBlockHash(100);
       // const header = await api.derive.chain.getHeader(blockHash);
       // console.log(`#${header.number}-${blockHash}: ${header.author}`);
-      const accountInfo = await api.query.system.account(currentAddress);
+      const accountInfo = await this.apiPromise.query.system.account(currentAddress);
       console.log(`accountInfo:${accountInfo}`);
       let freeBalance = this.getFreeBalance(accountInfo);
       console.log(`freeBalance:${freeBalance}`);
@@ -2919,7 +2940,68 @@ export default {
       }
       return d;
     },
+
+    async patchForDHXExtraStakes() {
+      if (this.symbol !== 'DHX' || !this.parachain.canDelegate) {
+        return;
+      }
+      if (!this.tableData.length || !this.linkAccount.address) {
+        return;
+      }
+      if (!this.apiPromise) {
+        await this.initPolkadotApi(this.paraChainName, this.parachain.rpcUrls);
+      }
+      const unstakingInfo4TanganikaRaw = (
+            await this.apiPromise.query.parachainStaking.unstaking(
+              this.linkAccount.address
+            )
+          ).toHuman();
+      if (!unstakingInfo4TanganikaRaw || !Object.keys(unstakingInfo4TanganikaRaw).length) {
+        return;
+      }
+      // special for Tanganika: since the unstaking records is mising so keep abreast with
+      // other networks, we need to add the part for Revoke functionalities.
+      const data = await stakingService.getDelegatorActionHistory(
+        {
+          delegatorAccount: this.linkAccount.address,
+          pageIndex: 1,
+          pageSize: 1,
+          actionType: 'left'
+        }
+      )
+        //  // TODO TEST
+        //  if (data.totalCount < 1) {
+        //   data = {
+        //     "list": [
+        //         {
+        //             "roundindex": 866,
+        //             "account": this.linkAccount.address,
+        //             "collator": "4Mq4E4PWkzK8U8yskS7TRuF3LV62goFtxfxtJwaRbbHZ2YVx",
+        //             "actiontype": "left",
+        //             "balancechange": 10
+        //         }
+        //     ],
+        //     "totalCount": 9
+        //   };
+        // }
+        // // TODO TEST END
+        if (data.totalCount) {
+          this.tanganikaPendingUnstakeCollator = data.list[0].collator;
+          // this.tableData.forEach((it) => {
+          //   it.isDelegated = it.isDelegated || data.list[0].collator === it.id;
+          // });
+        }
+        // debugger;
+      
+
+    }
+
   },
+  watch: {
+    'linkAccount.address': function(n, o) {
+      n && this.patchForDHXExtraStakes();
+    }
+  }
 };
 </script>
 

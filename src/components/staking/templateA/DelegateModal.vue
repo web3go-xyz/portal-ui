@@ -51,7 +51,7 @@ export default {
       num: 1,
       visible: false,
       receiverAccount: {},
-      btnLoading: false,
+      btnLoading: false
     };
   },
   computed: {
@@ -87,6 +87,25 @@ export default {
     formatWithDecimals(value) {
       return BigNumber(value).multipliedBy(this.decimalsFormat).toString();
     },
+    async getDelegationInfo(delegator) {
+      const result = {
+        delegationCount: 0,
+      };
+      if (this.symbol === "DHX") { // unavailabe for the Tanganika, but it doesn't matter
+        // const delegationCount = (
+        //   await this.api.query.parachainStaking.counterForCandidatePool(
+        //     delegator
+        //   )
+        // ).toHuman();
+        result.delegationCount = 0; // delegationCount;
+      } else {
+        const candidateInfo = (
+          await this.api.query.parachainStaking.candidateInfo(delegator)
+        ).toHuman();
+        result.delegationCount = candidateInfo.delegationCount;
+      }
+      return result;
+    },
     async confirm() {
       if (this.num <= 0) {
         this.$message.error("Please enter a number greater than 0");
@@ -101,8 +120,11 @@ export default {
         this.currentWalletAccount.meta.source
       );
       if (this.isDelegateMore) {
-        await this.api.tx.parachainStaking
-          .delegatorBondMore(
+        const specialMethod = {
+            DHX: 'delegatorStakeMore'
+          }
+        const method = specialMethod[this.symbol] || 'delegatorBondMore';
+        await this.api.tx.parachainStaking[method](
             this.receiverAccount.address,
             this.formatWithDecimals(this.num)
           )
@@ -129,12 +151,6 @@ export default {
             console.log(":( transaction failed", error);
           });
       } else {
-        const candidateInfoBack =
-          await this.api.query.parachainStaking.candidateInfo(
-            this.receiverAccount.address
-          );
-        const candidateInfo = candidateInfoBack.toHuman();
-        const delegationCount = candidateInfo.delegationCount;
         const delegatorInfo =
           await this.api.query.parachainStaking.delegatorState(
             this.linkAccount.address
@@ -147,18 +163,25 @@ export default {
           "111",
           this.receiverAccount.address,
           this.formatWithDecimals(this.num),
-          delegationCount,
+          // delegationCount,
           myDelegationCount
         );
         console.log(`delegateParameterCount:${this.delegateParameterCount}`);
         let delegateTx = null;
+        const specialMethod = {
+            DHX: 'joinDelegators'
+          }
+        const method = specialMethod[this.symbol] || 'delegate';
         if (this.delegateParameterCount < 4) {
-          delegateTx = await this.api.tx.parachainStaking.delegate(
+          delegateTx = await this.api.tx.parachainStaking[method](
             this.receiverAccount.address,
             this.formatWithDecimals(this.num)
           );
         } else {
-          delegateTx = await this.api.tx.parachainStaking.delegate(
+          const { delegationCount } = await this.getDelegationInfo(
+          this.receiverAccount.address
+        );
+          delegateTx = await this.api.tx.parachainStaking[method](
             this.receiverAccount.address,
             this.formatWithDecimals(this.num),
             delegationCount,
@@ -201,7 +224,7 @@ export default {
       this.receiverAccount = { ...this.linkAccount, address };
       this.visible = true;
     },
-  },
+  }
 };
 </script>
 
