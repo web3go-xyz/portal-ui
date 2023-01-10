@@ -12,7 +12,7 @@ let basApi = {
     formatUrl: function (url) {
         return utils.formatUrl(this.base_api || '/', url);
     },
-    base_api: 'http://18.139.21.203:20010/'
+    base_api: window.MOONBEAM_PUBLIC_DASHBOARD_BASE_API || 'https://web3go.xyz/moonbeam-public-data/' 
 }
 
 export default basApi;
