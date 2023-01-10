@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import Overview from "@/components/MoonbeamDashboard/Overview";
+import Overview from "./Overview";
 export default {
   components: {
     Overview,

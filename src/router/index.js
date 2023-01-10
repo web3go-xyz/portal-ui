@@ -6,7 +6,7 @@ import ProfileHome from "@/components/profile/ProfileHome";
 import Insight from "@/components/Insight";
 import InsightDetail from "@/components/Insight/InsightDetail";
 import BAS from "@/components/BAS";
-import MoonbeamDashboard from "@/components/MoonbeamDashboard/index";
+import MoonbeamPublicDashboard from "@/components/MoonbeamPublicDashboard/index";
 
 
 import ProfileIndex from "@/components/profile/ProfileIndex";
@@ -100,12 +100,12 @@ export default new Router({
         component: BAS
     },
     {
-        path: "/MoonbeamDashboard",
-        name: "MoonbeamDashboard",
+        path: "/MoonbeamPublicDashboard",
+        name: "MoonbeamPublicDashboard",
         meta: {
-            parent: 'MoonbeamDashboard'
+            parent: 'MoonbeamPublicDashboard'
         },
-        component: MoonbeamDashboard
+        component: MoonbeamPublicDashboard
     },
     {
         path: "/InsightDetail",
