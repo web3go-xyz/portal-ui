@@ -1,11 +1,6 @@
 <template>
   <div class="page-wrap">
     <div class="page">
-      <div class="banner">
-        <div class="circle">
-          <img src="@/assets/images/basicon.png" alt="" />
-        </div>
-      </div>
       <div class="intro">
         <div class="big-title">Moonbeam Overview</div>
         <div class="sub-title">
@@ -40,7 +35,7 @@
 </template>
 
 <script>
-import Overview from "@/components/MoonBeamDashboard/Overview";
+import Overview from "@/components/MoonbeamDashboard/Overview";
 export default {
   components: {
     Overview,
@@ -86,7 +81,7 @@ export default {
     }
   }
   .intro {
-    margin-top: 105px;
+    margin-top: 20px;
     text-align: center;
     .big-title {
       margin-bottom: 14px;

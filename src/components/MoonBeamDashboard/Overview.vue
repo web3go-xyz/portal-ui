@@ -1,44 +1,30 @@
 <template>
   <div class="component-wrap">
-    <div class="row">
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/c3fbc52a-343f-45f6-bd40-841f6fa2fe57"
-          frameborder="0"
-          width="100%"
-          height="350"
-          allowtransparency
-        ></iframe>
-      </div>
-
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/cc4dbe19-a97d-4a2d-96ea-b73c5d699f32"
-          frameborder="0"
-          width="100%"
-          height="350"
-          allowtransparency
-        ></iframe>
-      </div>
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/6bfe4a87-2034-457a-b7bc-b3f46e5b46fc"
-          frameborder="0"
-          width="100%"
-          height="350"
-          allowtransparency
-        ></iframe>
-      </div>
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/633c5aab-9009-41b7-8c33-52410aa80e74"
-          frameborder="0"
-          width="100%"
-          height="350"
-          allowtransparency
-        ></iframe>
+    <div class="info-wrap">
+      <div class="info">
+        <div v-for="(v, i) in numData" :key="i" class="item">
+          <div class="num">
+            <countTo
+              v-if="v.value !== undefined"
+              :startVal="0"
+              :endVal="v.value"
+              :duration="3000"
+            ></countTo>
+            <span v-else>--</span>
+          </div>
+          <div class="label">
+            {{ v.display
+            }}<el-tooltip placement="top" trigger="hover">
+              <div slot="content" class="tooltip-300px">
+                <span v-html="v.comment"> </span>
+              </div>
+              <i class="el-icon-warning-outline"></i>
+            </el-tooltip>
+          </div>
+        </div>
       </div>
     </div>
+   
     <div class="row">
       <div class="col">
         <iframe
@@ -110,27 +96,23 @@
 
 <script>
 import countTo from "vue-count-to";
-import basApi from "@/api/bas";
+import basApi from "@/api/moonbeamDashboard";
 
 export default {
   components: { countTo },
   data() {
     return {
-      numData: {},
+      numData: [],
     };
   },
   created() {
-    basApi
-      .basOverview({
-        apikey: 123456,
-      })
-      .then((d) => {
-        d.total_gas = this.$utils.formatTokenNumber(
-          d.total_gas,
-          Math.pow(10, d.gas_token_decimals)
-        );
-        this.numData = d;
+    basApi.addressSummary().then((d) => {
+      d.forEach((v) => {
+        v.value = Number(v.value);
+        v.comment = v.comment.replace("\n", "<br/>");
       });
+      this.numData = d;
+    });
   },
   mounted() {},
 };
@@ -143,11 +125,12 @@ export default {
     display: flex;
     justify-content: center;
     margin-bottom: 114px;
+    padding: 0 20px;
     .info {
       background: #ffffff;
       box-shadow: 14px 17px 37px 18px rgba(112, 144, 176, 0.08);
       border-radius: 30px;
-      width: 1185px;
+      width: 100%;
       height: 141px;
       box-sizing: border-box;
       display: flex;
@@ -173,21 +156,26 @@ export default {
         }
         .num {
           font-weight: 700;
-          font-size: 36px;
+          font-size: 32px;
           color: #2b3674;
         }
         .label {
+          height: 34px;
           display: block;
           margin-top: 12px;
           font-weight: 500;
-          font-size: 16px;
+          font-size: 14px;
           color: #a3aed0;
+          .el-icon-warning-outline {
+            margin-left: 4px;
+          }
         }
       }
     }
   }
   .row {
     display: flex;
+    margin-top: 20px;
     .col {
       flex: 1;
     }
