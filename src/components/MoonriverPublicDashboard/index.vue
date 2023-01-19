@@ -1,182 +1,166 @@
 <template>
-  <div class="component-wrap">
-    <div class="info-wrap">
-      <div class="info">
-        <div v-for="(v, i) in numData" :key="i" class="item">
-          <div class="num">
-            <countTo
-              v-if="v.value !== undefined"
-              :startVal="0"
-              :endVal="v.value"
-              :duration="3000"
-            ></countTo>
-            <span v-else>--</span>
-          </div>
-          <div class="label">
-            {{ v.display
-            }}<el-tooltip placement="top" trigger="hover">
-              <div slot="content" class="tooltip-300px">
-                <span v-html="v.comment"> </span>
-              </div>
-              <i class="el-icon-warning-outline"></i>
-            </el-tooltip>
-          </div>
+  <div class="page-wrap">
+    <div class="page">
+      <div class="intro">
+        <div class="big-title">Moonbeam Overview</div>
+        <div class="sub-title">
+          <img src="@/assets/images/worldIcon.png" alt="" />
+          <span @click="jumpUrl('https://moonbeam.network/')"
+            >https://moonbeam.network/</span
+          >
+        </div>
+        <div class="text">
+          Made by the Web3Go team (Moonbeam Community Enthusiasts) We are early
+          Moonbeam supporters and our mission is to provide open data analytics
+          for the Moonbeam community. We started with a Moonbeam Collator
+          Dashboard (
+          <a
+            class="link"
+            target="blank"
+            href="https://app.web3go.xyz/#/Moonbeam"
+            >https://app.web3go.xyz/#/Moonbeam</a
+          >
+          )and have been working over the past year on more dashboards to
+          provide greater visibility into what is happening on Moonbeam (both
+          EVM and substrate). We will continue to refine our dashboards and add
+          more information. Please reach out if you have suggestions or
+          questions.
         </div>
       </div>
-    </div>
-   
-    <div class="row">
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/85ccc88c-5b1c-447a-ac0b-80113dee9b7d"
-          frameborder="0"
-          width="100%"
-          height="500"
-          allowtransparency
-        ></iframe>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/85ccc88c-5b1c-447a-ac0b-80113dee9b7d"
-          frameborder="0"
-          width="100%"
-          height="500"
-          allowtransparency
-        ></iframe>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/7c834069-ee41-4288-8aa7-524cf07bc815"
-          frameborder="0"
-          width="100%"
-          height="500"
-          allowtransparency
-        ></iframe>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/3a8b602a-2219-4aaf-b462-ec6c11b4015c"
-          frameborder="0"
-          width="100%"
-          height="650"
-          allowtransparency
-        ></iframe>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/573abf00-5a78-4ade-aa86-e354f6b41d28"
-          frameborder="0"
-          width="100%"
-          height="600"
-          allowtransparency
-        ></iframe>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <iframe
-          src="https://mb.web3go.xyz/public/question/9881f737-b690-4fab-b126-89ee28d6e895"
-          frameborder="0"
-          width="100%"
-          height="700"
-          allowtransparency
-        ></iframe>
+      <div class="tab-content">
+        <Overview></Overview>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import countTo from "vue-count-to";
-import basApi from "@/api/moonbeamDashboard";
+import Overview from "./Overview";
 export default {
-  components: { countTo },
+  components: {
+    Overview,
+  },
   data() {
-    return {
-      numData: [],
-    };
+    return {};
   },
-  created() {
-    basApi.addressSummary().then((d) => {
-      d.forEach((v) => {
-        v.value = Number(v.value);
-        v.comment = v.comment.replace("\n", "<br/>");
-      });
-      this.numData = d;
-    });
+  created() {},
+  methods: {
+    jumpUrl(url) {
+      window.open(url);
+    },
   },
-  mounted() {},
 };
 </script>
 
 <style lang="less" scoped>
-.component-wrap {
-  margin-top: 40px;
-  .info-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 114px;
-    padding: 0 20px;
-    .info {
-      background: #ffffff;
-      box-shadow: 14px 17px 37px 18px rgba(112, 144, 176, 0.08);
-      border-radius: 30px;
-      width: 100%;
-      height: 141px;
-      box-sizing: border-box;
+.page-wrap {
+  background: white;
+  padding: 24px 10px;
+}
+@media screen and (max-width: 1400px) {
+  .page {
+    // width: 1200px !important;
+  }
+}
+.page {
+  // width: 1400px;
+  margin: 0 auto;
+  .banner {
+    position: relative;
+    height: 251.78px;
+    background: url(~@/assets/images/basBanner.png) no-repeat center;
+    background-size: cover;
+    .circle {
+      position: absolute;
+      bottom: -90px;
+      left: 50%;
+      transform: translateX(-50%);
+      img {
+        width: 180px;
+      }
+    }
+  }
+  .intro {
+    margin-top: 20px;
+    text-align: center;
+    .big-title {
+      margin-bottom: 14px;
+      font-weight: 700;
+      font-size: 54px;
+      color: #2b3674;
+    }
+    .sub-title {
+      justify-content: center;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
-      .item {
-        flex: 1;
-        position: relative;
-        &:last-child {
-          &::after {
-            display: none;
-          }
+      font-weight: 400;
+      line-height: 24px;
+      font-size: 18px;
+      color: #3965ff;
+      img {
+        margin-right: 10px;
+        width: 21px;
+      }
+      span {
+        text-decoration: underline;
+        cursor: pointer;
+        &:hover {
+          opacity: 0.8;
         }
-        &::after {
-          content: "";
-          height: 54px;
-          width: 2px;
-          background: #e9edf7;
-          display: block;
-          position: absolute;
-          right: 0;
-          top: 50%;
-          transform: translateY(-50%);
-        }
-        .num {
-          font-weight: 700;
-          font-size: 32px;
-          color: #2b3674;
-        }
-        .label {
-          height: 34px;
-          display: block;
-          margin-top: 12px;
-          font-weight: 500;
-          font-size: 14px;
-          color: #a3aed0;
-          .el-icon-warning-outline {
-            margin-left: 4px;
-          }
+      }
+    }
+    .text {
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 32px;
+      color: #2b3674;
+      .link {
+        color: #3965ff;
+        cursor: pointer;
+        &:hover {
+          opacity: 0.8;
         }
       }
     }
   }
-  .row {
+  .tab-wrap {
+    margin-top: 30px;
     display: flex;
-    margin-top: 20px;
-    .col {
-      flex: 1;
+    justify-content: center;
+  }
+  .tabs {
+    display: flex;
+    align-items: center;
+    .tab-item {
+      cursor: pointer;
+      margin: 0 40px;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 50px;
+      color: #a3aed0;
+      position: relative;
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0px;
+        height: 4px;
+        background: #4318ff;
+        border-radius: 2px;
+        opacity: 0;
+      }
+      &:hover {
+        color: #2b3674;
+      }
+      &.active {
+        color: #2b3674;
+        &::after {
+          opacity: 1;
+        }
+      }
     }
   }
 }
