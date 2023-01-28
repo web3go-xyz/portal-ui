@@ -6,6 +6,9 @@ import ProfileHome from "@/components/profile/ProfileHome";
 import Insight from "@/components/Insight";
 import InsightDetail from "@/components/Insight/InsightDetail";
 import BAS from "@/components/BAS";
+import MoonbeamPublicDashboard from "@/components/MoonbeamPublicDashboard/index";
+import MoonriverPublicDashboard from "@/components/MoonriverPublicDashboard/index";
+
 
 import ProfileIndex from "@/components/profile/ProfileIndex";
 import Login from "@/components/user/Login";
@@ -32,6 +35,7 @@ import CustomQuery from "@/components/customQuery/CustomQuery";
 import Moonriver from "@/components/moonRiver/index";
 import CollectorDetail from "@/components/moonRiver/CollectorDetail";
 import DelegatorDetail from "@/components/moonRiver/DelegatorDetail";
+
 
 import Moonbeam from "@/components/moonBeam/index";
 import MoonbeamCollectorDetail from "@/components/moonBeam/CollectorDetail";
@@ -95,6 +99,22 @@ export default new Router({
             parent: 'BAS'
         },
         component: BAS
+    },
+    {
+        path: "/MoonbeamPublicDashboard",
+        name: "MoonbeamPublicDashboard",
+        meta: {
+            parent: 'MoonbeamPublicDashboard'
+        },
+        component: MoonbeamPublicDashboard
+    },
+    {
+        path: "/MoonriverPublicDashboard",
+        name: "MoonriverPublicDashboard",
+        meta: {
+            parent: 'MoonriverPublicDashboard'
+        },
+        component: MoonriverPublicDashboard
     },
     {
         path: "/InsightDetail",
