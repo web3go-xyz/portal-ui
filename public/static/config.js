@@ -1,3 +1,6 @@
+
+window.CURRENT_ENV='test'
+
 window.BASE_API = "https://web3go.xyz"; //Prefix for all target api service
 
 window.API = "https://web3go.xyz/portal/"; //Prefix for api in portal service
@@ -22,13 +25,15 @@ window.OAK_STAKING_API = "https://web3go.xyz/oak-staking/"; //Prefix for all oak
 //window.MOONBEAM_API = "http://localhost:20014/";
 // window.BIFROST_STAKING_API = "http://localhost:20015/";
 //window.OAK_STAKING_API = "http://16.163.5.216:20017/";
-window.LITENTRY_STAKING_TESTNET_API = "http://13.215.119.80:20015/";
-window.LITENTRY_STAKING_MAINNET_API = "http://13.215.119.80:20029/";
-window.CALAMARI_STAKING_MAINNET_API = "http://13.215.119.80:20039/";
+window.LITENTRY_STAKING_TESTNET_API = "https://dev-v2.web3go.xyz:10015/";
+window.LITENTRY_STAKING_MAINNET_API = "https://dev-v2.web3go.xyz:10029/";
+window.CALAMARI_STAKING_MAINNET_API = "https://dev-v2.web3go.xyz:10039/";
 
+window.DATAHIGHWAY_TANGANIKA_STAKING_MAINNET_API = "https://dev-v2.web3go.xyz:10049/";
 
 window.MOONBEAM_PUBLIC_DASHBOARD_BASE_API = 'https://web3go.xyz/moonbeam-public-data/';
 window.MOONRIVER_PUBLIC_DASHBOARD_BASE_API = 'https://web3go.xyz/moonriver-public-data/';
+
 
 console.log("window.API:", window.API);
 console.log("window.POLKADOT_API", window.POLKADOT_API);
@@ -43,6 +48,7 @@ console.log("window.OAK_STAKING_API", window.OAK_STAKING_API);
 console.log("window.LITENTRY_STAKING_TESTNET_API", window.LITENTRY_STAKING_TESTNET_API);
 console.log("window.LITENTRY_STAKING_MAINNET_API", window.LITENTRY_STAKING_MAINNET_API);
 console.log("window.CALAMARI_STAKING_MAINNET_API", window.CALAMARI_STAKING_MAINNET_API);
+console.log("window.DATAHIGHWAY_TANGANIKA_STAKING_MAINNET_API", window.DATAHIGHWAY_TANGANIKA_STAKING_MAINNET_API);
 
 
 console.log("window.MOONBEAM_PUBLIC_DASHBOARD_BASE_API", window.MOONBEAM_PUBLIC_DASHBOARD_BASE_API);

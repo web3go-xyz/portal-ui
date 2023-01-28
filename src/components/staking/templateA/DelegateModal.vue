@@ -54,7 +54,7 @@ export default {
       num: 1,
       visible: false,
       receiverAccount: {},
-      btnLoading: false,
+      btnLoading: false
     };
   },
   computed: {
@@ -90,6 +90,37 @@ export default {
     formatWithDecimals(value) {
       return BigNumber(value).multipliedBy(this.decimalsFormat).toString();
     },
+    async getDelegationInfo(delegator) {
+      const result = {
+        delegationCount: 0,
+      };
+      if (this.symbol === "DHX") { // unavailabe for the Tanganika, but it doesn't matter
+        // const delegationCount = (
+        //   await this.api.query.parachainStaking.counterForCandidatePool(
+        //     delegator
+        //   )
+        // ).toHuman();
+        result.delegationCount = 0; // delegationCount;
+      } else {
+        const candidateInfo = (
+          await this.api.query.parachainStaking.candidateInfo(delegator)
+        ).toHuman();
+        result.delegationCount = candidateInfo.delegationCount;
+      }
+      return result;
+    },
+    getTxStatus(events) {
+      let flag = { success: false, fail: false };
+      events.forEach(({ phase, event: { data, method, section } }) => {
+        console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        if (method === "ExtrinsicFailed") {
+          flag.fail = true;
+        } else if (method === "ExtrinsicSuccess") {
+          flag.success = true;
+        }
+      });
+      return flag;
+    },
     async confirm() {
       if (this.num <= 0) {
         this.$message.error("Please enter a number greater than 0");
@@ -104,25 +135,32 @@ export default {
         this.currentWalletAccount.meta.source
       );
       if (this.isDelegateMore) {
-        await this.api.tx.parachainStaking
-          .delegatorBondMore(
+        const specialMethod = {
+            DHX: 'delegatorStakeMore'
+          }
+        const method = specialMethod[this.symbol] || 'delegatorBondMore';
+        const unsub = await this.api.tx.parachainStaking[method](
             this.receiverAccount.address,
             this.formatWithDecimals(this.num)
           )
           .signAndSend(
             this.linkAccount.address,
             { signer: injector.signer },
-            ({ status }) => {
-              if (status.isInBlock) {
-                this.visible = false;
+            ({ events = [], status }) => {
+              status && console.log(`Current status: ${status.type}`);
+              if (status && (status.isInBlock || status.isFinalized)) {
+                const txStatus = this.getTxStatus(events);
                 this.btnLoading = false;
-                this.$message.success("Delegate success");
-                this.$emit("success");
-                console.log(
-                  `Completed at block hash #${status.asInBlock.toString()}`
-                );
-              } else {
-                console.log(`Current status: ${status.type}`);
+                if (txStatus.success) {
+                  this.visible = false;
+                  this.$message.success("Delegate success");
+                  this.$emit("success");
+                  console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+                  //this.decision.loading = false;
+                } else if (txStatus.fail) {
+                  this.$message.error("transaction failed");
+                }
+                unsub();
               }
             }
           )
@@ -132,12 +170,6 @@ export default {
             console.log(":( transaction failed", error);
           });
       } else {
-        const candidateInfoBack =
-          await this.api.query.parachainStaking.candidateInfo(
-            this.receiverAccount.address
-          );
-        const candidateInfo = candidateInfoBack.toHuman();
-        const delegationCount = candidateInfo.delegationCount;
         const delegatorInfo =
           await this.api.query.parachainStaking.delegatorState(
             this.linkAccount.address
@@ -150,18 +182,25 @@ export default {
           "111",
           this.receiverAccount.address,
           this.formatWithDecimals(this.num),
-          delegationCount,
+          // delegationCount,
           myDelegationCount
         );
         console.log(`delegateParameterCount:${this.delegateParameterCount}`);
         let delegateTx = null;
+        const specialMethod = {
+            DHX: 'joinDelegators'
+          }
+        const method = specialMethod[this.symbol] || 'delegate';
         if (this.delegateParameterCount < 4) {
-          delegateTx = await this.api.tx.parachainStaking.delegate(
+          delegateTx = await this.api.tx.parachainStaking[method](
             this.receiverAccount.address,
             this.formatWithDecimals(this.num)
           );
         } else {
-          delegateTx = await this.api.tx.parachainStaking.delegate(
+          const { delegationCount } = await this.getDelegationInfo(
+          this.receiverAccount.address
+        );
+          delegateTx = await this.api.tx.parachainStaking[method](
             this.receiverAccount.address,
             this.formatWithDecimals(this.num),
             delegationCount,
@@ -169,21 +208,24 @@ export default {
           );
         }
 
-        delegateTx
+        const unsub = await delegateTx
           .signAndSend(
             this.linkAccount.address,
             { signer: injector.signer },
-            ({ status }) => {
-              if (status.isInBlock) {
-                this.visible = false;
+            ({ events = [], status }) => {
+              status && console.log(`Current status: ${status.type}`);
+              if (status && (status.isInBlock || status.isFinalized)) {
+                const txStatus = this.getTxStatus(events);
                 this.btnLoading = false;
-                this.$message.success("Delegate success");
-                this.$emit("success");
-                console.log(
-                  `Completed at block hash #${status.asInBlock.toString()}`
-                );
-              } else {
-                console.log(`Current status: ${status.type}`);
+                if (txStatus.success) {
+                  this.visible = false;
+                  this.$message.success("Delegate success");
+                  this.$emit("success");
+                  console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+                } else if (txStatus.fail) {
+                  this.$message.error("transaction failed");
+                }
+                unsub();
               }
             }
           )
@@ -204,7 +246,7 @@ export default {
       this.receiverAccount = { ...this.linkAccount, address };
       this.visible = true;
     },
-  },
+  }
 };
 </script>
 
