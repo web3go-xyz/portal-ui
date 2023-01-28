@@ -543,7 +543,7 @@ export default {
           tags: ["Featured", "Kusama", "Calamari"],
           icon: require(`./../assets/images/home/calamari.png`),
         },
-         {
+        {
           id: "DataHighwayStaking-Mainnet-1",
           type: "DataHighwayStaking",
           name: "Staking Analysis",
@@ -588,15 +588,16 @@ export default {
           tags: ["Featured", "Kusama", "Turing"],
           icon: require(`./../assets/images/home/oak-turing.png`),
         },
-         {
-           id: "Litentry-Testnet-1",
-           type: "LitentryTestnetStaking",
-           name: "Staking Analysis",
-           description: "Litentry Testnet staking analysis and simulate",
-           created: "Web3go Offical Team",
-           tags: ["Featured", "Kusama", "Litentry"],
-           icon: require(`./../assets/images/home/litentry.png`),
-         },
+        {
+          id: "Litentry-Testnet-1",
+          type: "LitentryTestnetStaking",
+          name: "Staking Analysis",
+          description: "Litentry Testnet staking analysis and simulate",
+          created: "Web3go Offical Team",
+          tags: ["Featured", "Kusama", "Litentry"],
+          icon: require(`./../assets/images/home/litentry.png`),
+          onlyForEnv: "test",
+        },
       ],
       rmrkNFTDashboardList: [
         {
@@ -779,7 +780,16 @@ export default {
           }
         });
       }
-      return filterList;
+
+      let filterListByEnv = [];
+      if (filterList) {
+        filterList.forEach((d) => {
+          if (d.onlyForEnv == undefined || d.onlyForEnv == window.CURRENT_ENV) {
+            filterListByEnv.push(d);
+          }
+        });
+      }
+      return filterListByEnv;
     },
     clickSlide(item, index) {
       const { children, isShow } = item;
