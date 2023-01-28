@@ -96,7 +96,7 @@
 
 <script>
 import countTo from "vue-count-to";
-import basApi from "@/api/moonbeamDashboard";
+import basApi from "@/api/moonriverDashboard";
 export default {
   components: { countTo },
   data() {
