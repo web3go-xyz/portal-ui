@@ -106,6 +106,18 @@ export default {
       }
       return result;
     },
+    getTxStatus(events) {
+      let flag = { success: false, fail: false };
+      events.forEach(({ phase, event: { data, method, section } }) => {
+        console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        if (method === "ExtrinsicFailed") {
+          flag.fail = true;
+        } else if (method === "ExtrinsicSuccess") {
+          flag.success = true;
+        }
+      });
+      return flag;
+    },
     async confirm() {
       if (this.num <= 0) {
         this.$message.error("Please enter a number greater than 0");
@@ -124,24 +136,28 @@ export default {
             DHX: 'delegatorStakeMore'
           }
         const method = specialMethod[this.symbol] || 'delegatorBondMore';
-        await this.api.tx.parachainStaking[method](
+        const unsub = await this.api.tx.parachainStaking[method](
             this.receiverAccount.address,
             this.formatWithDecimals(this.num)
           )
           .signAndSend(
             this.linkAccount.address,
             { signer: injector.signer },
-            ({ status }) => {
-              if (status.isInBlock) {
-                this.visible = false;
+            ({ events = [], status }) => {
+              status && console.log(`Current status: ${status.type}`);
+              if (status && (status.isInBlock || status.isFinalized)) {
+                const txStatus = this.getTxStatus(events);
                 this.btnLoading = false;
-                this.$message.success("Delegate success");
-                this.$emit("success");
-                console.log(
-                  `Completed at block hash #${status.asInBlock.toString()}`
-                );
-              } else {
-                console.log(`Current status: ${status.type}`);
+                if (txStatus.success) {
+                  this.visible = false;
+                  this.$message.success("Delegate success");
+                  this.$emit("success");
+                  console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+                  //this.decision.loading = false;
+                } else if (txStatus.fail) {
+                  this.$message.error("transaction failed");
+                }
+                unsub();
               }
             }
           )
@@ -189,21 +205,24 @@ export default {
           );
         }
 
-        delegateTx
+        const unsub = await delegateTx
           .signAndSend(
             this.linkAccount.address,
             { signer: injector.signer },
-            ({ status }) => {
-              if (status.isInBlock) {
-                this.visible = false;
+            ({ events = [], status }) => {
+              status && console.log(`Current status: ${status.type}`);
+              if (status && (status.isInBlock || status.isFinalized)) {
+                const txStatus = this.getTxStatus(events);
                 this.btnLoading = false;
-                this.$message.success("Delegate success");
-                this.$emit("success");
-                console.log(
-                  `Completed at block hash #${status.asInBlock.toString()}`
-                );
-              } else {
-                console.log(`Current status: ${status.type}`);
+                if (txStatus.success) {
+                  this.visible = false;
+                  this.$message.success("Delegate success");
+                  this.$emit("success");
+                  console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+                } else if (txStatus.fail) {
+                  this.$message.error("transaction failed");
+                }
+                unsub();
               }
             }
           )

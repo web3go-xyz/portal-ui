@@ -805,7 +805,7 @@
                 DelegateMore
               </div>
               <RevokeStake
-                v-if="activeTab == 2 && apiPromise && roundInfo && blockNumber"
+                v-if="!loading && activeTab == 2 && apiPromise && roundInfo && blockNumber"
                 :api="apiPromise"
                 :collator="scope.row.id"
                 :symbol="symbol"
@@ -1907,6 +1907,7 @@ export default {
     },
     getAllData() {
       let self = this;
+      this.loading = true;
       stakingService.getLatestBlockNumber().then((d) => {
         this.blockNumber = d;
       });

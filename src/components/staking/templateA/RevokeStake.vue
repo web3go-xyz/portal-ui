@@ -419,7 +419,7 @@ export default {
         if (this.symbol === 'DHX') {
           return this.api.tx.parachainStaking.unlockUnstaked(this.linkAccount.address)
         } else {
-          this.api.tx.parachainStaking.executeDelegationRequest(this.linkAccount.address, this.collator)
+          return this.api.tx.parachainStaking.executeDelegationRequest(this.linkAccount.address, this.collator)
         }
       }
 
