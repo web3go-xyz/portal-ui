@@ -7,6 +7,7 @@ import Insight from "@/components/Insight";
 import InsightDetail from "@/components/Insight/InsightDetail";
 import BAS from "@/components/BAS";
 import MoonbeamPublicDashboard from "@/components/MoonbeamPublicDashboard/index";
+import MoonriverPublicDashboard from "@/components/MoonriverPublicDashboard/index";
 
 
 import ProfileIndex from "@/components/profile/ProfileIndex";
@@ -106,6 +107,14 @@ export default new Router({
             parent: 'MoonbeamPublicDashboard'
         },
         component: MoonbeamPublicDashboard
+    },
+    {
+        path: "/MoonriverPublicDashboard",
+        name: "MoonriverPublicDashboard",
+        meta: {
+            parent: 'MoonriverPublicDashboard'
+        },
+        component: MoonriverPublicDashboard
     },
     {
         path: "/InsightDetail",
