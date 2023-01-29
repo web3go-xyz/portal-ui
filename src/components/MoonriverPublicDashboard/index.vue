@@ -2,26 +2,26 @@
   <div class="page-wrap">
     <div class="page">
       <div class="intro">
-        <div class="big-title">Moonbeam Overview</div>
+        <div class="big-title">Moonriver Overview</div>
         <div class="sub-title">
           <img src="@/assets/images/worldIcon.png" alt="" />
-          <span @click="jumpUrl('https://moonbeam.network/')"
-            >https://moonbeam.network/</span
+          <span @click="jumpUrl('https://moonbeam.network/networks/moonriver/')"
+            >https://moonbeam.network/networks/moonriver/</span
           >
         </div>
         <div class="text">
-          Made by the Web3Go team (Moonbeam Community Enthusiasts) We are early
-          Moonbeam supporters and our mission is to provide open data analytics
-          for the Moonbeam community. We started with a Moonbeam Collator
+          Made by the Web3Go team (Moonriver Community Enthusiasts) We are early
+          Moonriver supporters and our mission is to provide open data analytics
+          for the Moonriver community. We started with a Moonriver Collator
           Dashboard (
           <a
             class="link"
             target="blank"
-            href="https://app.web3go.xyz/#/Moonbeam"
-            >https://app.web3go.xyz/#/Moonbeam</a
+            href="https://app.web3go.xyz/#/Moonriver"
+            >https://app.web3go.xyz/#/Moonriver</a
           >
           )and have been working over the past year on more dashboards to
-          provide greater visibility into what is happening on Moonbeam (both
+          provide greater visibility into what is happening on Moonriver (both
           EVM and substrate). We will continue to refine our dashboards and add
           more information. Please reach out if you have suggestions or
           questions.
