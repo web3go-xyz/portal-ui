@@ -545,7 +545,7 @@ export default {
         },
         {
           id: "DataHighwayStaking-Mainnet-1",
-          type: "DataHighwayStaking",
+          type: "DataHighway Staking",
           name: "Staking Analysis",
           description: "DataHighway Mainnet staking analysis and simulate",
           created: "Web3go Offical Team",
