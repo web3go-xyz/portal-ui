@@ -545,7 +545,7 @@ export default {
         },
         {
           id: "DataHighwayStaking-Mainnet-1",
-          type: "DataHighway Staking",
+          type: "DataHighwayStaking",
           name: "Staking Analysis",
           description: "DataHighway Mainnet staking analysis and simulate",
           created: "Web3go Offical Team",
@@ -710,6 +710,7 @@ export default {
         LitentryTestnetStaking: "Litentry Rococo Staking",
         LitentryMainnetStaking: "Litentry Staking",
         CalamariStaking: "Calamari Staking",
+        DataHighwayStaking: "DataHighway Staking",
       };
       return obj[type] || type;
     },
