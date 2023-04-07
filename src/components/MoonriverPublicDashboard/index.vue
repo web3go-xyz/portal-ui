@@ -1,5 +1,13 @@
 <template>
   <div class="page-wrap">
+    <div class="fixed-right-menu">
+      <a
+        class="link hover-item"
+        target="blank"
+        href="https://web3go.gitbook.io/moonscan-smart-contract-label-for-projects/"
+        >Wanna label your contracts?</a
+      >
+    </div>
     <div class="page">
       <div class="intro">
         <div class="big-title">Moonriver Overview</div>
@@ -55,7 +63,28 @@ export default {
 <style lang="less" scoped>
 .page-wrap {
   background: white;
-  padding: 24px 10px;
+  padding: 24px;
+  .fixed-right-menu {
+    z-index: 10;
+    padding: 10px;
+    background: #ffffff;
+    box-shadow: 0px 11px 13px rgba(160, 156, 185, 0.09);
+    border-radius: 12px;
+    position: fixed;
+    bottom: 30%;
+    transform: translateY(-50%);
+    right: 8px;
+    .link {
+      font-weight: 400;
+      line-height: 24px;
+      font-size: 14px;
+      color: #3965ff;
+      display: flex;
+      align-items: center;
+      text-decoration: underline;
+      justify-content: center;
+    }
+  }
 }
 @media screen and (max-width: 1400px) {
   .page {
