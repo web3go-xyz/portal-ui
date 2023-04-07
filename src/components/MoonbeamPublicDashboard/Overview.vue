@@ -27,12 +27,6 @@
 
     <div class="row">
       <div class="col">
-        <a
-          class="link hover-item"
-          target="blank"
-          href="https://web3go.gitbook.io/moonscan-smart-contract-label-for-projects/"
-          >Wanna label your contracts?</a
-        >
         <iframe
           src="https://mb.web3go.xyz/public/question/89ceab6e-9028-4fb5-9ec8-60ad9a9dcf6a"
           frameborder="0"
@@ -206,20 +200,6 @@ export default {
     margin-top: 20px;
     .col {
       flex: 1;
-      position: relative;
-      .link {
-        position: absolute;
-        right: 1.5rem;
-        top: 2rem;
-        font-weight: 400;
-        line-height: 24px;
-        font-size: 16px;
-        color: #3965ff;
-        display: flex;
-        align-items: center;
-        text-decoration: underline;
-        justify-content: center;
-      }
     }
   }
   // .chart {
