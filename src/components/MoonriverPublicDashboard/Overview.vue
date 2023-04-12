@@ -102,6 +102,17 @@
         ></iframe>
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <iframe
+          src="https://mb.web3go.xyz/public/dashboard/28637ac8-b6ca-4dd1-9d4d-748db8c70d70"
+          frameborder="0"
+          width="100%"
+          height="700"
+          allowtransparency
+        ></iframe>
+      </div>
+    </div>
   </div>
 </template>
 
