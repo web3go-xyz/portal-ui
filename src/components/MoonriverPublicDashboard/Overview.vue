@@ -28,7 +28,7 @@
     <div class="row">
       <div class="col">
         <iframe
-          src="https://mb.web3go.xyz/public/question/85ccc88c-5b1c-447a-ac0b-80113dee9b7d"
+          src="https://mb.web3go.xyz/public/question/85ccc88c-5b1c-447a-ac0b-80113dee9b7d?date=past30days"
           frameborder="0"
           width="100%"
           height="500"
@@ -39,7 +39,7 @@
     <div class="row">
       <div class="col">
         <iframe
-          src="https://mb.web3go.xyz/public/question/aa3cac4f-c4b2-4716-9f8b-2efee8814809"
+          src="https://mb.web3go.xyz/public/question/aa3cac4f-c4b2-4716-9f8b-2efee8814809?date=past30days"
           frameborder="0"
           width="100%"
           height="500"
@@ -72,7 +72,7 @@
     <div class="row">
       <div class="col">
         <iframe
-          src="https://mb.web3go.xyz/public/question/573abf00-5a78-4ade-aa86-e354f6b41d28"
+          src="https://mb.web3go.xyz/public/question/573abf00-5a78-4ade-aa86-e354f6b41d28?date=past30days"
           frameborder="0"
           width="100%"
           height="600"
@@ -83,7 +83,7 @@
     <div class="row">
       <div class="col">
         <iframe
-          src="https://mb.web3go.xyz/public/question/9881f737-b690-4fab-b126-89ee28d6e895"
+          src="https://mb.web3go.xyz/public/question/9881f737-b690-4fab-b126-89ee28d6e895?date=past30days"
           frameborder="0"
           width="100%"
           height="700"
@@ -94,7 +94,7 @@
     <div class="row">
       <div class="col">
         <iframe
-          src="https://mb.web3go.xyz/public/question/d577f146-fed2-43f7-9e1e-644994e87c52"
+          src="https://mb.web3go.xyz/public/question/d577f146-fed2-43f7-9e1e-644994e87c52?date=past30days"
           frameborder="0"
           width="100%"
           height="700"
@@ -105,6 +105,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="dapp-activity"        
           src="https://mb.web3go.xyz/public/dashboard/28637ac8-b6ca-4dd1-9d4d-748db8c70d70"
           frameborder="0"
           width="100%"
@@ -126,6 +127,14 @@ export default {
       numData: [],
     };
   },
+  methods: {
+    scrollToElement(options) {
+      const hash = this.$route.hash;
+      if (hash === "#DappActivity") {
+        this.$refs["dapp-activity"].scrollIntoView(options);
+      }
+    }
+  },
   created() {
     basApi.addressSummary().then((d) => {
       d.forEach((v) => {
@@ -135,7 +144,7 @@ export default {
       this.numData = d;
     });
   },
-  mounted() {},
+  mounted() { this.scrollToElement({behavior: "smooth"}); },
 };
 </script>
 
