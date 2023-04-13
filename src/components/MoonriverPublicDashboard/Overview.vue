@@ -130,7 +130,7 @@ export default {
   methods: {
     scrollToElement(options) {
       const hash = this.$route.hash;
-      if (hash === "#DappActivity") {
+      if (decodeURIComponent(hash) === "#DappActivity") {
         this.$refs["dapp-activity"].scrollIntoView(options);
       }
     }
