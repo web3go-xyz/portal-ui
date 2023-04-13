@@ -101,7 +101,7 @@ export default new Router({
         component: BAS
     },
     {
-        path: "/MoonbeamPublicDashboard",
+        path: "/MoonbeamPublicDashboard*",
         name: "MoonbeamPublicDashboard",
         meta: {
             parent: 'MoonbeamPublicDashboard'
@@ -109,7 +109,7 @@ export default new Router({
         component: MoonbeamPublicDashboard
     },
     {
-        path: "/MoonriverPublicDashboard",
+        path: "/MoonriverPublicDashboard*",
         name: "MoonriverPublicDashboard",
         meta: {
             parent: 'MoonriverPublicDashboard'

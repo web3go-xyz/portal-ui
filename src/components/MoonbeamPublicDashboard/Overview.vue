@@ -130,8 +130,8 @@ export default {
   },
   methods: {
     scrollToElement(options) {
-      const hash = this.$route.hash;
-      if (decodeURIComponent(hash) === "#DappActivity") {
+      const hash = new URL(decodeURIComponent(this.$route.fullPath), "http://web3go.xyz").hash;
+      if (hash === "#DappActivity") {
         this.$refs["dapp-activity"].scrollIntoView(options);
       }
     }
