@@ -479,28 +479,28 @@ export default new Router({
             base_api: window.CALAMARI_STAKING_MAINNET_API
         },
     },
-    {
-        path: "/DataHighwayStaking",
-        name: "DataHighwayStaking",
-        component: StakingTemplateA,
-        meta: {
-            parachain: {
-                name: 'DataHighway Tanganika',
-                icon: 'static/parachain-icon/datahighway.png',
-                symbol: 'DHX',
-                decimals: 18,
-                minBond: 10,
-                canDelegate: true,
-                delegateParameterCount: 2,
-                supportSimulate: false,
-                supportNotify: false,
-                walletSupport: 'polkadot.js',
-                ss58Format: 33, // polkadot.js 
-                rpcUrls: ["wss://tanganika-archive.datahighway.com/"], //MetaMask,polkadot.js
-            },
-            base_api: window.DATAHIGHWAY_TANGANIKA_STAKING_MAINNET_API
-        },
-    },
+    // {
+    //     path: "/DataHighwayStaking",
+    //     name: "DataHighwayStaking",
+    //     component: StakingTemplateA,
+    //     meta: {
+    //         parachain: {
+    //             name: 'DataHighway Tanganika',
+    //             icon: 'static/parachain-icon/datahighway.png',
+    //             symbol: 'DHX',
+    //             decimals: 18,
+    //             minBond: 10,
+    //             canDelegate: true,
+    //             delegateParameterCount: 2,
+    //             supportSimulate: false,
+    //             supportNotify: false,
+    //             walletSupport: 'polkadot.js',
+    //             ss58Format: 33, // polkadot.js 
+    //             rpcUrls: ["wss://tanganika-archive.datahighway.com/"], //MetaMask,polkadot.js
+    //         },
+    //         base_api: window.DATAHIGHWAY_TANGANIKA_STAKING_MAINNET_API
+    //     },
+    // },
     {
         path: "/Moonriver",
         name: "Moonriver",
