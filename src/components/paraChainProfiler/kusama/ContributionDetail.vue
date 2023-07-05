@@ -572,7 +572,7 @@ export default {
         .then(({ address, base64 }) => {
           if (key == "twitter") {
             utils.share(
-              `https://web3go.xyz/#${this.$route.fullPath}`,
+              `https://app.web3go.xyz/#${this.$route.fullPath}`,
               address,
               title
             );
@@ -673,7 +673,7 @@ export default {
         .then(({ address, base64 }) => {
           if (key == "twitter") {
             utils.share(
-              `https://web3go.xyz/#${this.$route.fullPath}`,
+              `https://app.web3go.xyz/#${this.$route.fullPath}`,
               address,
               title
             );

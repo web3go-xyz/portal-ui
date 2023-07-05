@@ -394,7 +394,7 @@ export default {
             }
             if (key == "twitter") {
               utils.share(
-                "https://web3go.xyz/#/ParaChainProfiler?chainType=Kusama",
+                "https://app.web3go.xyz/#/ParaChainProfiler?chainType=Kusama",
                 address,
                 title
               );

@@ -2,7 +2,7 @@ import request from "@/utils/request";
 
 export function imgUpload(data) {
     return request({
-        url: "https://web3go.xyz/portal/imgUpload",
+        url: "https://app.web3go.xyz/portal/imgUpload",
         method: "post",
         data,
     });

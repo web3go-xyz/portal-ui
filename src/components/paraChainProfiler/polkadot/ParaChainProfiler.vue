@@ -391,7 +391,7 @@ export default {
             }
             if (key == "twitter") {
               utils.share(
-                "https://web3go.xyz/#/ParaChainProfiler4Polkadot?chainType=Polkadot",
+                "https://app.web3go.xyz/#/ParaChainProfiler4Polkadot?chainType=Polkadot",
                 address,
                 title
               );

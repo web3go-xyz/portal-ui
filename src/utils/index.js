@@ -138,7 +138,7 @@ export function html2Img(el, transferSuccessFn) {
                             formData.append("file", file2);
                             imgUpload(formData).then((d) => {
                                 resolve({
-                                    address: `https://web3go.xyz/img-upload/${d}`,
+                                    address: `https://app.web3go.xyz/img-upload/${d}`,
                                     base64: canvas1.toDataURL(),
                                 });
                             });
@@ -169,7 +169,7 @@ export function share(jumpUrl, imgUrl, title) {
 
     metaParams = encodeURIComponent(encodeURIComponent(metaParams));
 
-    let backInterfaceUrl = `https://web3go.xyz/portal/twittershare?meta=${metaParams}`;
+    let backInterfaceUrl = `https://app.web3go.xyz/portal/twittershare?meta=${metaParams}`;
     let fullUrl = `https://twitter.com/share?text=${title}&url=${backInterfaceUrl}`;
     window.open(fullUrl);
 }
@@ -208,7 +208,7 @@ export function fullScreenDom(id) {
     el.style.zIndex = 9999;
 }
 
-const identity_api_path = "https://web3go.xyz/polkadot-identity/polkadot-identity-analysis/getIdentityInfo";
+const identity_api_path = "https://app.web3go.xyz/polkadot-identity/polkadot-identity-analysis/getIdentityInfo";
 
 //const identity_api_path = "http://localhost:20006/polkadot-identity-analysis/getIdentityInfo";
 export async function loadAddressIdentityAsync(addressInfo) {
