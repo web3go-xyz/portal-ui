@@ -28,6 +28,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="unique-address"
           src="https://mb.web3go.xyz/public/question/89ceab6e-9028-4fb5-9ec8-60ad9a9dcf6a?date=past30days"
           frameborder="0"
           width="100%"
@@ -39,6 +40,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="active-address"
           src="https://mb.web3go.xyz/public/question/4ba55dfa-f461-4a5d-beb7-6d5654fd2161?date=past30days"
           frameborder="0"
           width="100%"
@@ -50,6 +52,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="tx-by-layers"
           src="https://mb.web3go.xyz/public/question/4b884dee-285c-482b-94e8-6297b3c02a16"
           frameborder="0"
           width="100%"
@@ -61,6 +64,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="tx-by-category"
           src="https://mb.web3go.xyz/public/question/ac6d3130-dea4-4990-9eb0-89a52d2ee44f"
           frameborder="0"
           width="100%"
@@ -72,6 +76,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="tx-by-daily-trend"
           src="https://mb.web3go.xyz/public/question/185cff5d-9baa-4056-94d7-e0cb6d7c4ee2?date=past30days"
           frameborder="0"
           width="100%"
@@ -83,6 +88,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="tx-by-daily-stack"
           src="https://mb.web3go.xyz/public/question/4d703600-a8ff-4217-a21d-beef5918c649?date=past30days"
           frameborder="0"
           width="100%"
@@ -94,6 +100,7 @@
     <div class="row">
       <div class="col">
         <iframe
+          ref="gross-inflation-breakout"
           src="https://mb.web3go.xyz/public/question/4ce00ac3-17a3-4e8e-b749-58ad2bf59d3a?date=past30days"
           frameborder="0"
           width="100%"
@@ -106,7 +113,7 @@
       <div class="col">
         <iframe
           ref="dapp-activity"
-          src="https://mb.web3go.xyz/public/dashboard/b4cb729e-7e9b-4cc0-a634-f477c767bdd9"
+          src="https://analytix.web3go.xyz/public/dashboard/c99f7e10-de9c-4d9f-992b-279b6e0ae2e2"
           frameborder="0"
           width="100%"
           height="700"
@@ -131,8 +138,38 @@ export default {
   methods: {
     scrollToElement(options) {
       const hash = new URL(decodeURIComponent(this.$route.fullPath), "http://web3go.xyz").hash;
-      if (hash === "#DappActivity") {
-        this.$refs["dapp-activity"].scrollIntoView(options);
+      switch (hash) {
+        case "#UniqueAddress":
+          this.$refs["unique-address"].scrollIntoView(options);
+          break;
+
+        case "#ActiveAddress":
+          this.$refs["active-address"].scrollIntoView(options);
+          break;
+
+        case "#TransactionByLayers":
+          this.$refs["tx-by-layers"].scrollIntoView(options);
+          break;
+
+        case "#TransactionByCategory":
+          this.$refs["tx-by-category"].scrollIntoView(options);
+          break;
+
+        case "#TransactionDailyTrend":
+          this.$refs["tx-by-daily-trend"].scrollIntoView(options);
+          break;
+
+        case "#TransactionByDailyStack":
+          this.$refs["tx-by-daily-stack"].scrollIntoView(options);
+          break;
+
+        case "#GrossInflationBreakout":
+          this.$refs["gross-inflation-breakout"].scrollIntoView(options);
+          break;
+
+        case "#DappActivity":
+          this.$refs["dapp-activity"].scrollIntoView(options);
+          break;
       }
     }
   },
@@ -145,7 +182,7 @@ export default {
       this.numData = d;
     });
   },
-  mounted() { this.scrollToElement({behavior: "smooth"}); },
+  mounted() { this.scrollToElement({behavior: "smooth", block: "center"}); },
 };
 </script>
 
